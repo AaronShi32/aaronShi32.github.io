@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8">
     
-    <title>NodeJS - 理解 Buffer | 失重的橘子</title>
+    <title>NodeJS - 理解 Buffer | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="简介Buffer 是一个像 Array 的对象，主要用于操作字节，数组元素为 16 进制的两位数，即 0 到 255的数值，如果超出或者不足，小数等情况，会使用叠加，递减，省略小数部分的措施保证元素数值合法性，此外，采用 JavaScript 和 C++ 相结合的模式，将性能部分用 C++ 来实现，非性能相关的部分用 JavaScript 来实现
 内存分配机制Buffer 对象的内存分配不是在 V">
 <meta property="og:type" content="article">
 <meta property="og:title" content="NodeJS - 理解 Buffer">
 <meta property="og:url" content="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/index.html">
-<meta property="og:site_name" content="失重的橘子">
+<meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="简介Buffer 是一个像 Array 的对象，主要用于操作字节，数组元素为 16 进制的两位数，即 0 到 255的数值，如果超出或者不足，小数等情况，会使用叠加，递减，省略小数部分的措施保证元素数值合法性，此外，采用 JavaScript 和 C++ 相结合的模式，将性能部分用 C++ 来实现，非性能相关的部分用 JavaScript 来实现
 内存分配机制Buffer 对象的内存分配不是在 V">
 <meta property="og:image" content="https://aaronshi32.github.io/2017/08/29/NodeJS%20-%20理解%20Buffer/buffer-allocate.png">
-<meta property="og:updated_time" content="2017-08-29T03:31:10.640Z">
+<meta property="og:updated_time" content="2017-08-29T03:31:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="NodeJS - 理解 Buffer">
 <meta name="twitter:description" content="简介Buffer 是一个像 Array 的对象，主要用于操作字节，数组元素为 16 进制的两位数，即 0 到 255的数值，如果超出或者不足，小数等情况，会使用叠加，递减，省略小数部分的措施保证元素数值合法性，此外，采用 JavaScript 和 C++ 相结合的模式，将性能部分用 C++ 来实现，非性能相关的部分用 JavaScript 来实现
@@ -54,7 +54,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">失重的橘子</span>
+                <span class="site-title">着陆的橘子</span>
             </a>
             <nav id="main-nav">
                 
@@ -148,7 +148,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                31
+                33
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -264,7 +264,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjch961ej000lz4kqn2s2g83v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfajwkv10007fds6lar10ylr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -339,19 +339,19 @@
         
 <nav id="article-nav">
     
-        <a href="/2017/08/29/NodeJS - 理解 内存控制/" id="article-nav-newer" class="article-nav-link-wrap">
+        <a href="/2017/10/16/SpringBoot 问题汇总/" id="article-nav-newer" class="article-nav-link-wrap">
             <strong class="article-nav-caption">上一篇</strong>
             <div class="article-nav-title">
                 
-                    NodeJS - 理解 内存控制
+                    SpringBoot 问题汇总
                 
             </div>
         </a>
     
     
-        <a href="/2017/07/05/读书笔记-程序员的自我修养（十一）/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2017/08/29/NodeJS - 理解 内存控制/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">读书笔记-程序员的自我修养（十一）</div>
+            <div class="article-nav-title">NodeJS - 理解 内存控制</div>
         </a>
     
 </nav>
@@ -376,7 +376,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -385,7 +385,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">17</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
         </div>
     </div>
 

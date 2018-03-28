@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>失重的橘子</title>
+    <title>着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta property="og:type" content="website">
-<meta property="og:title" content="失重的橘子">
+<meta property="og:title" content="着陆的橘子">
 <meta property="og:url" content="https://aaronshi32.github.io/page/2/index.html">
-<meta property="og:site_name" content="失重的橘子">
+<meta property="og:site_name" content="着陆的橘子">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="失重的橘子">
+<meta name="twitter:title" content="着陆的橘子">
     
 
     
@@ -45,7 +45,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">失重的橘子</span>
+                <span class="site-title">着陆的橘子</span>
             </a>
             <nav id="main-nav">
                 
@@ -139,7 +139,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                31
+                33
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -174,6 +174,367 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-程序员的自我修养（九）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/06/20/读书笔记-程序员的自我修养（九）/">读书笔记-程序员的自我修养（九）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/06/20/读书笔记-程序员的自我修养（九）/">
+            <time datetime="2017-06-20T02:06:20.000Z" itemprop="datePublished">2017-06-20</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="内存：一个承载程序运行的介质，也是程序进行各种运算和表达的场所"><a href="#内存：一个承载程序运行的介质，也是程序进行各种运算和表达的场所" class="headerlink" title="内存：一个承载程序运行的介质，也是程序进行各种运算和表达的场所"></a>内存：一个承载程序运行的介质，也是程序进行各种运算和表达的场所</h3><ul>
+<li><strong>程序的内存（进程的地址空间）布局</strong></li>
+</ul>
+<ol>
+<li><p><strong>栈</strong>：用于维护函数调用的上下文，执行 <strong>函数调用</strong> 的功能</p>
+</li>
+<li><p><strong>堆</strong>：用于程序 <strong>动态分配</strong> 的内存区域，也是 malloc 或 new 分配的内存区域</p>
+</li>
+<li><p><strong>可执行文件映像</strong>：存储着可执行文件在内存里的映像，<strong>装载器</strong></p>
+</li>
+<li><p><strong>保留区</strong>：保留区并不是一个单一的内存区域，而是对内存中<strong>受到保护</strong>而禁止访问的内存区域的总称，比如有些地址不允许访问等等</p>
+</li>
+</ol>
+<ul>
+<li><p><strong>栈与调用惯例</strong></p>
+<ul>
+<li><p><strong>作用</strong>：保存了一个函数调用所需要的 <strong>维护信息</strong>（函数返回地址和参数，临时变量，保存的上下文），常称为 <strong>堆栈帧（Stack Frame）</strong></p>
+</li>
+<li><p>函数的调用方和被调用方对于函数如何调用，遵循 <strong>惯用惯例</strong>，包括：<strong>函数参数的传递顺序和方式，栈的维护方式，名字修饰策略</strong>。常用的管理模式有：cdecl（函数调用方），stdcall（函数本身），fastcall（函数本身），pascal（函数本身）</p>
+</li>
+</ul>
+</li>
+<li><p><strong>堆与内存管理</strong></p>
+<ul>
+<li><p><strong>普及</strong>：全局变量没有办法动态地产生，只能在编译的时候定义</p>
+</li>
+<li><p><strong>形象解释</strong>：运行库相当于是向操作系统 <strong>“批发”</strong> 了一块较大的对控件，然后 <strong>“零售”</strong> 给程序用。当全部 <strong>“售完”</strong> 或程序有大量的内存需求时，再根据实际需求向操作系统 <strong>“进货”</strong></p>
+</li>
+<li><p>Linux 提供两种系统调用：brk 和 mmap，Window 提供四种系统调用：HeapCreate，HeapAlloc，HeapFree，HeapDestroy，对向上封装的函数就是著名的 <strong>malloc</strong></p>
+</li>
+<li><p><strong>要点</strong>：</p>
+<ul>
+<li><p><strong>堆里的同一片内存不能重复释放两次</strong></p>
+</li>
+<li><p><strong>malloc 申请的内存，进程结束后，所有资源都会回收，因此不存在了</strong></p>
+</li>
+<li><p><strong>malloc 申请的内存，逻辑上是连贯的，物理上不一定</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>堆分配算法</strong>：如何管理一大块连续的内存空间，能够按照需求分配、释放其中的空间</p>
+<ul>
+<li><p><strong>空闲链表</strong></p>
+<p>  核心原理：在堆里的每一个空闲空间的开头（或结尾）有一个头（header），头结构里记录了上一个（prev）和下一个（next）空间块的地址，这样所有空闲块形成了一个链表，<strong>申请的时候</strong>，查找符合大小的空闲块，然后将这块空闲空间从链表中”删除”，供使用，<strong>回收的时候</strong>，需要知道头指针和空间大小，因此在申请的时候，往往申请 K 空间，分配 K + 4 的空间，多余的 4 个记录大小，但这样一旦堆操作<strong>越界</strong>，破坏了这 4 个里面的数据，整个对就无法正常工作了</p>
+</li>
+<li><p><strong>位图</strong></p>
+<p>  将整个堆划分为大量的 <strong>块（Block）</strong>，每个块大小相同，申请的时候，总是分配整数个块的空间，且称已经分配的第一块为 <strong>头（head）</strong>，其余的称为 <strong>主体（Body）</strong>，优点：<strong>速度快</strong>，整个堆的空闲信息存储在一个数组中，因此访问该数组时cache容易命中，<strong>稳定性好</strong>：为了避免用户越界读写破坏，只需要简单的备份下位图即可，缺点：分配容易产生<strong>碎片</strong>（平均划分），位图很大，cache命中率降低</p>
+</li>
+<li><p><strong>对象池</strong></p>
+<p>  以申请空间的大小作为分水岭，综合应用上述两种算法</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfajwkvl001ifds6j7my6hno" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-读书笔记-程序员的自我修养（八）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/06/14/读书笔记-程序员的自我修养（八）/">读书笔记-程序员的自我修养（八）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/06/14/读书笔记-程序员的自我修养（八）/">
+            <time datetime="2017-06-14T02:45:07.000Z" itemprop="datePublished">2017-06-14</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="Windows-下的动态链接"><a href="#Windows-下的动态链接" class="headerlink" title="Windows 下的动态链接"></a>Windows 下的动态链接</h2><ul>
+<li><p><strong>普及</strong>：Windows 下的 DLL 文件和 EXE 文件实际上是一个概念，都是 <strong>PE 格式</strong> 的二进制文件，扩展名并不唯一：<strong>.dll</strong> 和 <strong>.ocx</strong> 或是 <strong>.cpl</strong> 都是 dll 文件，<strong>软件更新包（Service  Packs）</strong>机制就是通过升级 DLL 的形式进行自我完善</p>
+</li>
+<li><p><strong>普及</strong>：当一个 dll 被装载到内存中之后，通常有两个地址概念分别是：<strong>基地址（Base Address）</strong> 和 <strong>相对地址（RVA, Relative Virtual Address）</strong>，基地址就是被装载的起始地址，RVA地址就是 地址 + 基地址</p>
+</li>
+<li><p><strong>普及</strong>：dll 实现进程共享数据段，不推荐，存在一定的安全风险，应该尽量 <strong>避免</strong> 这种 dll 共享数据段来实现进程间通信</p>
+</li>
+<li><p><strong>普及</strong>：声明 dll 中的某个函数为 <strong>导出函数</strong> 的办法有两种：一种是使用 <strong> __declspec(dllexport)</strong> 扩展，另一种是采用模块定义<strong>（.def）</strong>文件声明</p>
+</li>
+<li><p><strong>普及</strong>：dll 支持显示运行时链接，提供了 <strong> 3 个 API</strong> 分别是：LoadLibrary，GerProcAddress，FreeLibrary</p>
+</li>
+<li><p><strong>符号导入导出表</strong></p>
+<ul>
+<li><strong>导出表</strong>，EXP文件，导出重定向，<strong>导入表</strong>，导入函数调用，这些都是 dll 中存在的结构和方式，均与符号和函数相关</li>
+</ul>
+</li>
+<li><p><strong>DLL优化</strong></p>
+<ul>
+<li><p><strong>应用程序在加载 dll 导致启动速度变慢</strong>，这里主要有两个原因：1. dll 的代码段和数据段本身并不是地址无关的，当被装载的目标地址被占用时，整个 dll 便会引起 rebase，<strong>频繁的 rebase</strong> 情况更加糟糕； 2. 导入函数的符号在运行时需要被 <strong>逐个查找解析</strong>，这里用的是二分查找，整个过程随着 dll 数量的增加，也是非常耗时的</p>
+</li>
+<li><p><strong>重定基地址（Rebasing）</strong>：只需要重新定位基地址即可，其余的 RVA 只是的偏移量，不受影响，当且仅当 dll 被装载时，基地址被占用的情况下，才会发生 重定位，所以 windows 系统为本身自带的许多库单独划分了一段空间区域（0x70000000 ~ 0x80000000），用于映射这些系统常用的 dll</p>
+</li>
+<li><p><strong>dll 绑定</strong>：把导出函数的地址保存到模块的导入表中，省去了每次启动时符号解析的过程，根本优化在于：当程序每次运行时，所有被依赖的 dll 都会装载，并且一些列的导入导出符号依赖关系都会 <strong>被重新解析</strong>，大多数情况下，这些 dll 都会 <strong>以同样的顺序</strong> 被装载到 <strong>同样的内存地址</strong>，所以他们的到处符号的地址都是不变的</p>
+</li>
+</ul>
+</li>
+<li><p><strong>在使用 C++ 时需要注意的动态链接事项</strong></p>
+<ol>
+<li><p>所有接口函数都应该是抽象的，所有的方法都应该是纯虚的</p>
+</li>
+<li><p>所有的全局函数都应该是用 extern “C” 来防止名字修饰的不兼容，并且导出函数都是应该是 __stdcall 调用规范的</p>
+</li>
+<li><p>不要使用 C++ 标准的 STL</p>
+</li>
+<li><p>不要使用异常</p>
+</li>
+<li><p>不要使用虚析构函数</p>
+</li>
+<li><p>不要在 dll 里面申请内存，而且在 dll 外释放（或者相反）</p>
+</li>
+<li><p>不要再接口中使用重载方法</p>
+</li>
+</ol>
+</li>
+<li><p><strong>DLL HELL：主要是更新过程中的兼容性问题，解决方法如下：</strong></p>
+<ul>
+<li><p>静态链接</p>
+</li>
+<li><p>防止 dll 覆盖（DLL Stomping）</p>
+</li>
+<li><p>避免 dll 冲突（Conflicting DLLs）</p>
+</li>
+<li><p><strong>应用程序使用 Manifest 文件来打包，控制自身依赖的 dll</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfajwkvq001qfds6k9w7wgls" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-程序员的自我修养（七）" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -329,7 +690,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjch961fa0019z4kqmmhca9jq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfajwkvj001dfds66rtgmtd2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -550,7 +911,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjch961fu001rz4kqrcjqtgh9" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfajwkvq001sfds6ptt0riln" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -727,7 +1088,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjch961fe001ez4kqyp2eudnb" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfajwkvp001nfds6p1lduqzw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -894,7 +1255,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjch961fh001hz4kq8akz8jn6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjfajwkvt0020fds65g75ifih" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1086,7 +1447,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjch961f70015z4kq8l38pukh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjfajwkvl001gfds6vax9nted" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1265,7 +1626,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjch961fc001cz4kqb6ogrjg0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjfajwkvn001lfds6mx7amdst" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1445,7 +1806,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjch961eu000sz4kqa8fz00l7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjfajwkvi001bfds6ccbc6gxl" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1622,314 +1983,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjch961dy0007z4kqzuzyp353" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-疑难杂症-解决MSYS2在Window上越用越慢的方法" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/">疑难杂症-解决MSYS2在Window上越用越慢的方法</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/">
-            <time datetime="2017-02-27T09:45:50.000Z" itemprop="datePublished">2017-02-27</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/疑难杂症/">疑难杂症</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>最近折腾电脑真是费了不少脑细胞，谁让咱用着 window 还操着 linux 的心呢，事情起因是因为习惯了在 cmd 中使用 linux 的命令，但是 cygwin 新版的界面真是不该恭维的美感，所以就把 git/bin 目录加到了 PATH 中，这样一举两得，谁知 git for windows 现在用的是 MSYS2 的环境，运行个 ls，grep要等上 1 分钟才能出结果，于是乎忍无可忍，终于在今天解决了这个问题</p>
-<h5 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h5><p>解决 MSYS2 在使用过程中越用越慢的问题</p>
-<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">mkpasswd -l -c &gt; /etc/passwd</div><div class="line"></div><div class="line">mkgroup -l -c &gt; /etc/group</div><div class="line"></div><div class="line"># 如果是window系统就在 git/etc 下面执行</div><div class="line"></div><div class="line"># 修改 /etc/nsswitch.conf，其中</div><div class="line"></div><div class="line">passwd: files #db</div><div class="line"></div><div class="line">group: files #db</div></pre></td></tr></table></figure>
-<h5 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h5><ul>
-<li><a href="https://gist.github.com/k-takata/9b8d143f0f3fef5abdab" target="_blank" rel="external">https://gist.github.com/k-takata/9b8d143f0f3fef5abdab</a></li>
-<li><a href="http://bjg.io/guide/cygwin-ad/" target="_blank" rel="external">http://bjg.io/guide/cygwin-ad/</a></li>
-</ul>
-<p>终于，系统恢复了丝滑版的顺畅~</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjch961ez000xz4kqajhcmuj4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Tensorflow学习-机器学习" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/13/Tensorflow学习-机器学习/">机器学习</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/13/Tensorflow学习-机器学习/">
-            <time datetime="2017-02-13T10:27:59.000Z" itemprop="datePublished">2017-02-13</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><table>
-<thead>
-<tr>
-<th>机器学习</th>
-<th style="text-align:left">有监督学习(Supervised)</th>
-<th style="text-align:left">无监督学习(UnSupervised)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>理解</td>
-<td style="text-align:left">有一组称之为”正确”的数据提供给算法，用于监督每次的训练成果</td>
-<td style="text-align:left">从数据集中发掘出规律，从而将数据进行某种程度划分</td>
-</tr>
-<tr>
-<td>问题</td>
-<td style="text-align:left"><li>回归预测（Regression Predict）</li><li>特征分类（Feature Classification）</li></td>
-<td style="text-align:left"><li>聚类（Cluster）</li></td>
-</tr>
-</tbody>
-</table>
-<h4 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h4><ul>
-<li><p>模型表示</p>
-<ul>
-<li><p>关键词：训练集（Training Set）| 学习算法（Learning Algorithm）| 假说（Hypothesis）</p>
-</li>
-<li><p>通过<strong>学习算法</strong>找到某种<strong>假说</strong>使得<strong>训练集</strong>的数据呈现该假说规律，即：H maps from TraningSet</p>
-</li>
-<li><p>如何检测<strong>假说</strong>的效果，使用成本函数（cost function or loss function），有时候也叫损失函数，通常来说，假说越准确，越接近真实，其值就越小。成本函数的出现通常伴随着目标，即 <code>When cost function defined，the goal has appearanced</code></p>
-<p>  线性回归通常使用的成本函数和目标为：</p>
-  <img src="/2017/02/13/Tensorflow学习-机器学习/cfg.png" alt="线性回归的成本函数和目标" title="线性回归的成本函数和目标">
-</li>
-<li><p>学习算法：</p>
-<ol>
-<li><p>梯度下降法（Gradient Descent）</p>
-<ul>
-<li>梯度下降法的缺点包括：1）靠近极小值时速度减慢，2）直线搜索可能会产生一些问题，3）可能会“之字型”地下降。</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><p>如何调节机器学习的结果：</p>
-<ol>
-<li><p>特征缩放（Feature Scaling）</p>
-<p> 解释：在运用一些机器学习算法的时候不可避免地要对数据进行特征缩放（feature scaling），比如：在随机梯度下降（stochastic gradient descent）算法中，特征缩放有时能提高算法的收敛速度</p>
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjch961e4000bz4kqjr1ufg87" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjfajwkv4000ffds63zz8unfd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2018,7 +2072,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2027,7 +2081,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">17</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
         </div>
     </div>
 

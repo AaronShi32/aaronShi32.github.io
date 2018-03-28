@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>失重的橘子</title>
+    <title>着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta property="og:type" content="website">
-<meta property="og:title" content="失重的橘子">
+<meta property="og:title" content="着陆的橘子">
 <meta property="og:url" content="https://aaronshi32.github.io/page/4/index.html">
-<meta property="og:site_name" content="失重的橘子">
+<meta property="og:site_name" content="着陆的橘子">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="失重的橘子">
+<meta name="twitter:title" content="着陆的橘子">
     
 
     
@@ -45,7 +45,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">失重的橘子</span>
+                <span class="site-title">着陆的橘子</span>
             </a>
             <nav id="main-nav">
                 
@@ -139,7 +139,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                31
+                33
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -174,6 +174,317 @@
 
             
             <section id="main">
+    <article id="post-Node命令行工具-Yargs和Commander" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2016/11/16/Node命令行工具-Yargs和Commander/">Node命令行工具-Yargs和Commander</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/11/16/Node命令行工具-Yargs和Commander/">
+            <time datetime="2016-11-16T10:25:40.000Z" itemprop="datePublished">2016-11-16</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>, <a class="tag-link" href="/tags/工具/">工具</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>日常使用Node时，避免不了编写几个命令行工具。作为命令行工具，最直接的就是针对输入的各种参数、选项等，执行相应的命令。使用原生的<code>progress.argv</code>虽然可以进行参数判断，但使用起来十分不方便，为此研究了下Node第三方命令行工具 yargs 和 commander</p>
+<h4 id="Yargs"><a href="#Yargs" class="headerlink" title="Yargs"></a>Yargs</h4><p>首先来看一个简单的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">λ index -h                                          </div><div class="line">Usage: index.js &lt;command&gt; -a [num] -b [num]       </div><div class="line">                                                  </div><div class="line">Commands:                               </div><div class="line">  add   same as a + b                         </div><div class="line">  plus  same as a - b                                    </div><div class="line">                                                  </div><div class="line">Options:                                                  </div><div class="line">  -a, -A      load a parameter        [number] [required]</div><div class="line">  -b, -B      load b parameter        [number] [required]</div><div class="line">  -h, --help  Show help               [boolean]</div><div class="line">                                                             </div><div class="line">Examples:                                                    </div><div class="line">  index.js add -a 10 -b 3  //compute 10 add 3</div></pre></td></tr></table></figure>
+<p>这段帮助信息是用 yargs 编写的，实现起来很简单，来看代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/usr/bin/env node</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> yargs = <span class="built_in">require</span>(<span class="string">'yargs'</span>);</div><div class="line">ARGV = yargs.usage(<span class="string">'Usage: $0 &lt;command&gt; -a [num] -b [num]'</span>)</div><div class="line">	    .command(<span class="string">'add'</span>, <span class="string">'same as a + b'</span>)</div><div class="line">	    .command(<span class="string">'plus'</span>, <span class="string">'same as a - b'</span>)</div><div class="line">	    .example(<span class="string">'$0 add -a 10 -b 3'</span>, <span class="string">'//compute 10 add 3'</span>)</div><div class="line">	    .alias(<span class="string">'a'</span>, <span class="string">'A'</span>)</div><div class="line">	    .alias(<span class="string">'b'</span>, <span class="string">'B'</span>)</div><div class="line">	    .alias(<span class="string">'h'</span>, <span class="string">'help'</span>)</div><div class="line">	    .number(<span class="string">'a'</span>)</div><div class="line">	    .number(<span class="string">'b'</span>)</div><div class="line">	    .describe(<span class="string">'a'</span>, <span class="string">'load a parameters'</span>)</div><div class="line">	    .describe(<span class="string">'b'</span>, <span class="string">'load b parameters'</span>)</div><div class="line">	    .demand([<span class="string">'a'</span>,<span class="string">'b'</span>])</div><div class="line">	    .help(<span class="string">'h'</span>)</div><div class="line">	    .argv</div><div class="line"><span class="keyword">if</span>(ARGV.h || ARGV.help)&#123;</div><div class="line">    print(ARGV.help());</div><div class="line">    process.exit(<span class="number">0</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上述代码可以分为几个阶段</p>
+<ul>
+<li><p>usage: 命令行工具的使用方法</p>
+</li>
+<li><p>command: 如果需要输入命令，则用 <code>command(&#39;命令&#39;，&#39;描述&#39;)</code> 的方式标注</p>
+</li>
+<li><p>example: 给出使用的例子，用 <code>example(&#39;命令&#39;，&#39;描述&#39;)</code> 的方式标注</p>
+</li>
+<li><p>alias: 对输入参数别名化，比如 -a 和 -A 是等效的</p>
+</li>
+<li><p>number(string,boolean,array…): 对输入的参数进行类型转换，比如<code>.array(a), -a 10 4 3 5</code>，那么 ARGV.a 是 <code>[10,4,3,5]</code></p>
+</li>
+<li><p>describe: 对输入参数进行描述，用 <code>describe(&#39;参数&#39;，&#39;描述&#39;)</code> 的方式标注</p>
+</li>
+<li><p>require：标注哪些参数是必备的，比如 a 和 b 的后面加入了 <code>[require]</code> 的描述</p>
+</li>
+<li><p>help/epilog: 辅助的帮助/版权信息</p>
+</li>
+</ul>
+<p>就这样，一个简单的命令行信息交互帮助信息就生成了，后面可以用 ARGV.xxx 获得输入的参数，做后续程序的逻辑判断。</p>
+<h5 id="进阶用法"><a href="#进阶用法" class="headerlink" title="进阶用法"></a>进阶用法</h5><ul>
+<li><p>ARGV._ : 获得未指定的输入参数，比如 index -a 10 -b 3 5 “no” “13”，则 ARGV._ 获得 [‘5’,’no’,’13’]</p>
+</li>
+<li><p>.check(cb)：检查输入参数合法性，如果 cb 返回 false，则输出帮助信息并退出</p>
+</li>
+<li><p>.fail(cb)：当工具运行出错时，输出错误信息</p>
+</li>
+</ul>
+<p>更多用法请参考 <a href="https://github.com/yargs/yargs" target="_blank" rel="external">yargs</a>，一般情况下，用 yargs 快速搭建一个命令行的使用帮助信息就足够了，不建议把判断的复杂逻辑也集成到 yargs 中</p>
+<h4 id="Commander"><a href="#Commander" class="headerlink" title="Commander"></a>Commander</h4><p>还是之前的例子，用 commander 实现的运行结果如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">λ commander --help</div><div class="line"></div><div class="line">  Usage: commander &lt;command&gt; -a [num] -b [num]</div><div class="line"></div><div class="line"></div><div class="line">  Commands:</div><div class="line"></div><div class="line">    add    same as a + b</div><div class="line">    plus   same as a - b</div><div class="line"></div><div class="line">  Options:</div><div class="line"></div><div class="line">    -h, --help    output usage information</div><div class="line">    -a, -A [num]  load a parameter</div><div class="line">    -b, -B [num]  load b parameter</div></pre></td></tr></table></figure>
+<p>来看代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/usr/bin/env node</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> program = <span class="built_in">require</span>(<span class="string">'commander'</span>);</div><div class="line"></div><div class="line">program</div><div class="line">  .usage(<span class="string">'&lt;command&gt; -a [num] -b [num]'</span>)</div><div class="line">  .option(<span class="string">'-a, -A [num]'</span>, <span class="string">'load a parameter'</span>)</div><div class="line">  .option(<span class="string">'-b, -B [num]'</span>, <span class="string">'load b parameter'</span>);</div><div class="line"></div><div class="line">program</div><div class="line">  .command(<span class="string">'add'</span>)</div><div class="line">  .description(<span class="string">'same as a + b'</span>);</div><div class="line"></div><div class="line">program</div><div class="line">  .command(<span class="string">'plus'</span>)</div><div class="line">  .description(<span class="string">'same as a - b'</span>);</div><div class="line"></div><div class="line">program.parse(process.argv);</div></pre></td></tr></table></figure>
+<p>通过对比，个人比较喜欢 commander 的代码风格，每个 command 单独处理，可以各种自定义，比如针对某个命令输出 help 信息，而 yargs 的那种分块编码，也值得借鉴，从代码量而言，yargs 和 commander 指定复杂的命令时，前者的代码量会比较少，同样，前者在功能上比后者更加丰富，适合复杂通用的命令行工具，更多用法请参考 <a href="https://github.com/tj/commander.js" target="_blank" rel="external">commander</a></p>
+<h4 id="后记：Windows-上如何调用nodejs命令行工具"><a href="#后记：Windows-上如何调用nodejs命令行工具" class="headerlink" title="后记：Windows 上如何调用nodejs命令行工具"></a>后记：Windows 上如何调用nodejs命令行工具</h4><p>在本机上找到任意一个npm的安装包，都能发现有 xxx.cmd 这样的文件，打开如下</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@<span class="keyword">IF</span> <span class="keyword">EXIST</span> "%~dp0\node.exe" (</div><div class="line">  "%~dp0\node.exe"  "%~dp0\xxx.js" %*</div><div class="line">) <span class="keyword">ELSE</span> (</div><div class="line">  @<span class="built_in">SETLOCAL</span></div><div class="line">  @<span class="built_in">SET</span> PATHEXT=<span class="variable">%PATHEXT:;.JS;=;%</span></div><div class="line">  node  "%~dp0\xxx.js" %*</div><div class="line">)</div></pre></td></tr></table></figure>
+<p>不难理解，在window上要执行nodejs，必须要用 <code>node xxx.js</code> 的方式，而这段代码就是省略了前面的node，直接用 xxx 即可，比如之前的例子中，<code>#!/usr/bin/env node</code>用来在linux上指定脚本运行环境为node，所以可以直接用 ./script.js 加参数运行，在window上，将上面的文件中 xxx 替换成script，即可用 script 加参数运行了</p>
+<p>如果以后涉及到用Node写两个平台通用的工具，请记住编写这个文件</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2016/11/16/Node命令行工具-Yargs和Commander/" data-id="cjfajwkv3000cfds6ioxcifpm" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-JS压缩混淆工具-UglifyJS" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2016/11/14/JS压缩混淆工具-UglifyJS/">JS压缩混淆工具-UglifyJS</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/11/14/JS压缩混淆工具-UglifyJS/">
+            <time datetime="2016-11-14T08:08:52.000Z" itemprop="datePublished">2016-11-14</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>, <a class="tag-link" href="/tags/工具/">工具</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>最近写了一些JS的项目，顺便研究了下UglifyJS工具，它是一款JS代码处理工具，提供了压缩，混淆和代码规范化等功能，同时还支持命令行和NodeJS两种使用方式，在代码基本”格式化”功能的基础上，可自定义扩展一些功能选项，满足具体项目中的使用。在业界内，JQuery使用UglifyJS进行代码压缩混淆，可见其结果具备准确性和稳定性。</p>
+<p>使用方式：<code>uglifyjs [input files] [options]</code></p>
+<h4 id="SourceMap"><a href="#SourceMap" class="headerlink" title="SourceMap"></a>SourceMap</h4><p>UglifyJS支持使用/生成SourceMap, 那什么是SourceMap，简单来说就是一个解码表，JS代码从原生到压缩混淆之后，从原来的几百行甚至几千行中，压缩到几十行。不仅代码行数骤减，同时经过混淆，代码的变量声明都进行了替换，因此当我们看混淆之后的代码，很难读懂代码的本意，这也是压缩混淆的初衷，减少JS代码的大小，方便网络传输，理论上对代码进行了保护。利弊相对，压缩混淆之后的代码对调试来说尤为困难，因此SourceMap就出现了。</p>
+<p>简单来讲，压缩混淆之后的代码通过SourceMap，即可还原成原始的JS代码，这就是为什么说它是一个解码表的原因，因为反向还原了JS代码，结合到UglifyJS而言，其支持以下几个选项：</p>
+<ul>
+<li>source-map                  指定生成一个SourceMap的文件名</li>
+<li>source-map-root             指定SourceMap的根目录位置</li>
+<li>source-map-url              指定SourceMap的网络路径</li>
+<li>source-map-inline           在压缩混淆的JS代码后，追加SourceMap内容</li>
+<li>in-source-map               指定一个SourceMap</li>
+</ul>
+<h4 id="功能：压缩"><a href="#功能：压缩" class="headerlink" title="功能：压缩"></a>功能：压缩</h4><p>使用UglifyJS进行代码压缩，-c 选项即启用压缩，例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">"use strict"</span>;</div><div class="line"><span class="keyword">var</span> net = <span class="built_in">require</span>(<span class="string">'net'</span>);</div><div class="line"></div><div class="line"><span class="keyword">const</span> IP = <span class="string">"127.0.0.1"</span>;</div><div class="line"><span class="keyword">const</span> PORT = <span class="number">8887</span>;</div><div class="line"></div><div class="line"><span class="keyword">var</span> client = <span class="keyword">new</span> net.Socket();</div><div class="line">client.connect(PORT, IP, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'CONNECTED TO: '</span> + IP + <span class="string">':'</span> + PORT);</div><div class="line">    client.write(<span class="string">'I am Chuck Norris!'</span>);</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>压缩后变成</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">"use strict"</span>;<span class="keyword">var</span> net=<span class="built_in">require</span>(<span class="string">"net"</span>);<span class="keyword">const</span> IP=<span class="string">"127.0.0.1"</span>,PORT=<span class="number">8887</span>;<span class="keyword">var</span> client=<span class="keyword">new</span> net.Socket;client.connect(PORT,IP,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="string">"CONNECTED TO: "</span>+IP+<span class="string">":"</span>+PORT),client.write(<span class="string">"I am Chuck Norris!"</span>)&#125;);</div></pre></td></tr></table></figure>
+<p>可以看出，压缩之后去掉了空行以及连续声明时候的关键字const，如果让你调试这样的出错代码，没有SourceMap，则无从下手</p>
+<h4 id="功能：混淆"><a href="#功能：混淆" class="headerlink" title="功能：混淆"></a>功能：混淆</h4><p>使用UglifyJS进行代码混淆，-m 选项即启用混淆，例如，还是上面的代码，经过混淆后变成</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">"use strict"</span>;<span class="keyword">var</span> c=<span class="built_in">require</span>(<span class="string">"net"</span>);<span class="keyword">const</span> e=<span class="string">"127.0.0.1"</span>;<span class="keyword">const</span> n=<span class="number">8887</span>;<span class="keyword">var</span> o=<span class="keyword">new</span> c.Socket;o.connect(n,e,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="string">"CONNECTED TO: "</span>+e+<span class="string">":"</span>+n);o.write(<span class="string">"I am Chuck Norris!"</span>)&#125;);</div></pre></td></tr></table></figure>
+<p>可以看出，混淆把变量都替换成了单字符，相比于压缩，进一步的减小了代码量</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>UglifyJS是一款出色的JS代码压缩，混淆工具，其具有丰富的功能，例如代码美化，支持NodeJS自定义编程等，更多细节请参考 <a href="https://github.com/mishoo/UglifyJS2" target="_blank" rel="external">UglifyJS</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2016/11/14/JS压缩混淆工具-UglifyJS/" data-id="cjfajwkuq0000fds6i8hp8si1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-Google工作整理术" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -467,7 +778,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/10/26/读书笔记-Google工作整理术/" data-id="cjch961g5001wz4kqlhp2hfqu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/10/26/读书笔记-Google工作整理术/" data-id="cjfajwkvd0011fds6ctdurmrq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -556,7 +867,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -565,7 +876,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">17</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
         </div>
     </div>
 
