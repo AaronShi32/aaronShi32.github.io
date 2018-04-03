@@ -9,6 +9,7 @@
 <meta property="og:title" content="着陆的橘子">
 <meta property="og:url" content="https://aaronshi32.github.io/page/3/index.html">
 <meta property="og:site_name" content="着陆的橘子">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="着陆的橘子">
     
@@ -139,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -174,6 +175,542 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-程序员的自我修养（二）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/08/读书笔记-程序员的自我修养（二）/">读书笔记-程序员的自我修养（二）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/08/读书笔记-程序员的自我修养（二）/">
+            <time datetime="2017-05-08T02:24:26.000Z" itemprop="datePublished">2017-05-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="编译和链接"><a href="#编译和链接" class="headerlink" title="编译和链接"></a>编译和链接</h3><ul>
+<li><p>编译和链接： 通常将编译和链接合并到一起的过程称为 <strong>构建（Build）</strong>，可以分解成以下 4 个步骤</p>
+<ul>
+<li><p><strong>预编译（Propressing）</strong></p>
+<p>  源文件 和 头文件 被预编译器预编译成一个 <strong>.i</strong> 或者 <strong>.ii</strong>（cpp）的文件</p>
+<p>  期间主要处理那些源代码文件中的以 <strong>#</strong> 开始的预编译命令，比如 <strong> #include，#define </strong> 等</p>
+<p>  经过预编译后的 .i 文件 <strong>不包含任何宏定义</strong>，<strong>并且引用的文件已经全部被插入到  .i 文件中</strong>，<strong>删除了所有注释</strong>，<strong>处理了所有条件预编译指令（#if，#ifdef，#elif，#else，#endif）</strong>，<strong>保留了所有#progma编译器命令</strong></p>
+<p>  为此，当需要判断 <strong>宏定义</strong>，<strong>包含的头文件</strong>是否正确时，可以查看预编译后的文件来确定问题（gcc -E hello.c -o hello.i）</p>
+</li>
+<li><p><strong>编译（Compilation）</strong></p>
+<p>  编译过程就是把预编译完的文件（.i / .ii）进行一些列 <strong>词法分析，语法分析，语义分析及优化</strong> 后生成相应的 <strong>汇编代码文件</strong>（.s）</p>
+<p>  如今GCC已经把预编译和编译两个步骤合二为一了，使用叫做 <strong>cc1</strong> 的程序来完成（gcc -S hello.c -o hello.s）</p>
+<p>  实际 <strong>gcc</strong> 这个命令只是这些后台程序的 <strong>包装</strong>，它会根据不同的参数要求去调用预编译编译程序 <strong>cc1</strong>，汇编器 <strong>as</strong>，链接器 <strong>Id</strong></p>
+</li>
+<li><p><strong>汇编（Assembly）</strong></p>
+<p>  汇编过程只是根据汇编指令和机器指令的对照表一一翻译就可以了（gcc -c hello.s -o hello.o），生成 <strong>目标文件（Object File）</strong></p>
+</li>
+<li><p><strong>链接（Linking）</strong></p>
+<p>  目标文件 到 可执行文件，需要链接许多内容（静态链接和动态链接），后文会详细介绍</p>
+<p>  ld <strong>-static crt1.o crti.o crtbeginT.o</strong> hello.o <strong>–start-group -lgcc -lgcc_eh -lc -end-group crtend.o crtn.o</strong></p>
+</li>
+</ul>
+</li>
+<li><p>编译的过程： <strong>编译器</strong> 从源代码（Source Code）到最终目标代码（Final Target Code）过程，做了以下 6 个步骤</p>
+<ul>
+<li><p><strong>词法分析</strong></p>
+<p>  通过扫描器，运用一种类似于 <strong>有限状态机（Final State Machine）</strong> 的算法，将源代码的字符序列分割成一系列的 <strong>记号（Token）</strong></p>
+<p>  词法分析产生的记号一般分为以下几类：<strong>关键字、标识符、字面量（包含数字、字符串等）和 特殊符号（如加号、等号）</strong>，并将它们放到对应的 <strong>表</strong> 中</p>
+<p>  <strong>lex</strong> 程序可以实现词法分析，支持自定义词法规则</p>
+</li>
+<li><p><strong>语法分析</strong></p>
+<p>  通过 <strong>语法分析器（Grammar Parser）</strong>，采用 <strong>上下文无关语法（Context-free Grammar）</strong> 的分析手段，将由扫描器产生的记号生成 <strong>语法树（Syntax Tree）</strong></p>
+<p>  语法树就是以 <strong>表达式（Expression）</strong> 为节点的树，如果出现了表达式不合法，编译器就会报告语法分析阶段的错误</p>
+<p>  <strong>yacc</strong> 程序可以实现语法分析，构建一颗语法树，支持自定义语法规则</p>
+</li>
+<li><p><strong>语义分析</strong></p>
+<p>  <strong>语义分析器（Semantic Analyzer）</strong> 只对表达式完成语法层面的分析，不关心是否真正有意义，通常可以分为以下两种</p>
+<p>  <strong>静态语义（Static Semantic）</strong> 通常包括声明和类型的匹配，类型的转换，最简单的例子：赋值类型转换</p>
+<p>  <strong>动态语义（Dynamic Semantic）</strong> 一般指在运行期出现的语义相关问题，比如将0作为除数</p>
+<p>  经过语义分析之后，整个语法树的表达式都被标识了 <strong>类型</strong>，如果有些类型需要做隐式转换，语义分析程序会在语法树中 <strong>插入</strong> 相应的转换节点</p>
+</li>
+<li><p><strong>中间语言生成</strong></p>
+<p>  现代的编译器都包含 <strong>源码级优化器（Source Code Optimizer）</strong>，在源代码级别有一个优化过程（比如能在编译期间确定表达式值）</p>
+<p>  直接在语法树上做优化比较困难，所以将整个语法树转换成 <strong>中间代码（Intermediate Code）</strong>，比较常见的有：<strong>三地址码（Three-address Code）</strong> 和 <strong>P-代码（P-Code）</strong></p>
+<p>  <strong>跨平台原理</strong>：中间代码使得编译器可以被分为前端和后端。编译器前端负责产生机器无关的中间代码，编译器后端将中间代码转换成目标机器代码。这样对于一些可以跨平台的编译器而言，他们可以针对不同的平台使用同一个前端和针对不同机器平台的数个后端</p>
+</li>
+<li><p><strong>目标代码生成与优化</strong></p>
+<p>  源代码级优化器产出的结果：中间代码，标志着下面的过程都属于编译器后端，包括 <strong>代码生成器（Code Generator）</strong> 和 <strong>目标代码优化器（Target Code Optimizer）</strong></p>
+<p>  <strong>代码生成器（Code Generator）</strong> 主要是将中间代码转换成目标机器代码，依赖于目标机器的环境</p>
+<p>  <strong>目标代码优化器（Target Code Optimizer）</strong> 主要针对目标代码，在合适的寻址方式，使用位移来代替乘法运算，删除多余的指令等方面，进行优化，涉及到的技术比如： <strong>基址比例变址寻址（Base Index Scale Addressing）</strong></p>
+<p>  <strong>问题：此时，目标机器代码（汇编）已经生成，但是目标代码中的变量地址还没有确定，这个地址可以是本程序内定义的，也可以是其他程序模块中的，那么运行时该如何寻址？在介绍链接器之前，先说明下链接器的作用对象：目标文件都包括什么</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjfj3pq4d001pobs63lfe9ezr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-读书笔记-程序员的自我修养（一）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/06/读书笔记-程序员的自我修养（一）/">读书笔记-程序员的自我修养（一）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/06/读书笔记-程序员的自我修养（一）/">
+            <time datetime="2017-05-06T02:50:04.000Z" itemprop="datePublished">2017-05-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="计算机基础知识回顾"><a href="#计算机基础知识回顾" class="headerlink" title="计算机基础知识回顾"></a>计算机基础知识回顾</h3><ul>
+<li><p>SMP（Symmetrical Multi-Processing）对称多处理器：每个CPU在系统中所处的地位和所发挥的功能都是一样的。通常情况下的程序不可能分解成多个不相干的子问题，除非商用的计算环境（充分发挥每个CPU的能力），所以多核处理器（Mutli-core Processor）和 SMP 通常是一个概念。</p>
+</li>
+<li><p>层次结构，计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。开发工具与应用程序属于同一个层次，因为它们都使用运行库提供的 <strong>应用程序编程接口（Application Programming Interface）</strong>。运行库使用操作系统提供的 <strong>系统调用接口（System call Interface）</strong>，通常以软件中断方式实现提供。操作系统内核层使用硬件层提供的 <strong>硬件规格（Hardware Specification）</strong></p>
+</li>
+<li><p>操作系统的一个功能是提供抽象的接口，另一个主要功能是管理硬件资源（CPU，存储器（内存和磁盘）和 I/O 设备）</p>
+<ul>
+<li><p>不要让CPU打盹：早期的CPU是 <strong>单一</strong> 服务式，简直浪费，后来出现了分时系统（Time-Sharing System），以 <strong>协作</strong> 的方式主动让闲CPU，供其他程序使用，再到现在，操作系统接管了所有硬件资源，本身运行在一个受硬件保护的级别，所有程序都以进程的方式运转，并且允许 <strong>抢占式</strong> 的CPU分配方式</p>
+</li>
+<li><p>设备驱动（Device Driver），操作系统 <strong>将硬件逐渐抽象成一些列的概念</strong>。比如：UNIX 中硬件设备的访问形式跟访问普通的文件形式一样，Windows 中，图像硬件被抽象成 GDI，声音和多媒体设备被抽象成 DirectX 对象等，向上提供统一的接口供程序使用，设备驱动完成向下对硬件的适配</p>
+</li>
+<li><p>I/O 设备：内存和磁盘的读取和写入是通过 I/O 端口寄存器来实现的，提供读取和写入的地址，来完成磁盘数据操作</p>
+<p>即操作系统以进程概念，使得每个进程从逻辑上来看都是独占计算机资源，实质上操作系统以抢占式的 CPU 策略，I/O 抽象模型的方式来管理这些资源</p>
+</li>
+</ul>
+</li>
+<li><p>操作系统是如何管理内存的</p>
+<ul>
+<li><p>解决的问题：如何将计算机 <strong>有限</strong> 的物理内存分配给 <strong>多个</strong> 程序使用</p>
+</li>
+<li><p>直接分配物理内存的弊端：地址空间不隔离（程序直接访问物理内存），内存使用效率低（缺乏有效的内存管理机制，使得频繁换入换出数据，内存的使用分配以程序为单位（粒度太大）），程序运行的地址不固定（程序每次装入内存执行时，数据和指令跳转涉及到重定位问题）</p>
+</li>
+<li><p>解决方法： 增加中间层来 <strong>隔离</strong>，把程序给出的地址看作是一种 <strong>虚拟地址（Virtual Address）</strong>，通过某些映射方法，保证任意一个程序所能够访问的物理内存区域跟另外一个程序相互不重叠，以达到地址空间隔离的效果</p>
+</li>
+<li><p>分段（Segmentation）：段映射，以程序所使用的的内存为单位，从虚拟地址映射到物理地址，映射结果唯一，解决了隔离和程序地址不固定的问题</p>
+</li>
+<li><p>分页（Paging）：页分割，把常用的数据和代码页装载到内存中，把不常用的代码和数据保存在磁盘里，当用到的时候再取出来。若用到的页不在内存中，操作系统会受到页错误（Page Fault），然后将需要的页装载到内存中。硬件级别：<strong>MMU（Memory Management Unit）</strong>用来支持虚拟地址到物理地址的转换，已集成到CPU内部</p>
+</li>
+</ul>
+</li>
+<li><p>程序执行流最小单元：线程（Thread），又称为轻量级进程（Lightweight Process，LWP）</p>
+<ul>
+<li><p>基础概念</p>
+<p>  <strong>线程私有</strong>（局部变量，函数的参数，TLS数据），<strong>线程之间共享</strong>（全局变量，堆数据，函数里的静态变量，程序代码，打开的文件，这些就是进程所有的东西）</p>
+<p>  <strong>调度</strong>（线程数&gt;处理器时（或者单处理器应对多线程时），会模拟出来一种并发的状态，即切换不同的线程行为，称之为线程调度 </p>
+<p>  <strong>至少三种状态</strong>：运行，就绪，等待，以时间片的改变作为区分 </p>
+<p>  <strong>调度算法</strong>：优先级调度（Priority Schedule），轮转法（Round Robin），也区分出 <strong>IO密集型线程（IO Bound Thread）</strong> 和 <strong>CPU密集型线程（CPU Bound Thread）</strong>，IO 总比 CPU 能获得更高的优先级 </p>
+<p>  为了防止 <strong>饿死（Starvation）</strong> 现象： 用户指定优先级/根据进入等待状态的频繁程序提升或降低优先级/长时间得不到执行而被提升优先级，也出现了 <strong>可抢占式线程（Preemption）</strong></p>
+</li>
+<li><p>线程安全</p>
+<p>  <strong>竞争与原子操作</strong>：多个线程同时访问一个共享数据，为此引出 <strong>原子性（Atomic）</strong>，但原子性操作只适用于简单的操作，更复杂的数据结构访问，通常用 <strong>锁</strong> 的手段</p>
+<p>  <strong>同步与锁</strong>：<strong>同步（Synchronization）</strong> 是一种机制：保证线程访问数据的原子性。<strong>锁（Lock）</strong> 是一种手段，每个线程在访问数据或资源之前，首先试图 <strong>获取（Accquire）</strong> 锁，并在访问结束之后 <strong>释放（Release）</strong> 锁</p>
+<p>  <strong>锁的演进</strong>：<strong>二元信号量（Binary Semaphore）</strong>，只允许一个线程独占，其状态有两个：占用 和 非占用，可以由一个线程获取，另一个线程释放；<strong>多元信号量（N Semaphore）</strong>，允许 N 个线程并发访问共享资源；<strong>互斥量（Mutex）</strong>，类似于二元信号量，但谁获得谁负责释放；<strong>临界区（Critical Section）</strong>：不同于之前的信号量，互斥量（作用域为进程内的所有线程），临界区的作用范围仅限于本线程，其他线程无法获取临界区的锁，因此也就无法访问；<strong>条件变量（Condition Variable）</strong>，使用条件变量可以让许多线程一起等待某个事件的发生，当事件发生时，所有线程可以一起恢复执行</p>
+<p>  <strong>读写锁（Read-Write Lock）</strong>：三种状态分别是，<strong>自由（Free），共享（Shared）和独占（Exclusive）</strong>，当处于自由状态时，试图以任何一种方式获取锁都能成功，并将锁至于对应的状态。如果锁处于共享状态，其他线程以共享的方式获取锁仍会成功（读），此时这个锁分配给了多个线程。如果其他线程试图以独占的方式获取已经处于共享状态的锁，那么他将必须等在锁被所有的线程释放后，才能将锁的状态置成独占（写）</p>
+<p>  <strong>可重入（Reentrant）</strong>：即幂等性的函数，可以称为可重入函数</p>
+<p>  <strong>过度优化</strong>：使用 volatile 关键字，解决 1. 阻止编译器为了提高速度将一个变量缓存到寄存器内而不写回，2. 阻止编译器调整操作 volatile 变量的质量顺序，<strong>但还是无法阻止CPU动态调度换序</strong></p>
+</li>
+<li><p>线程内部三种模型</p>
+<p>  多线程库的实现方式：对用户来说如果有三个线程在同时执行（<strong>用户态线程（User Thread）</strong>），对内核来说很可能只有一个线程（<strong>内核线程（Kernel Thread）</strong>），下面提及的模型都是 <strong>UT：KT</strong></p>
+<p>  <strong>一对一模型</strong>：真正意义上的并发调度，缺点是受内核线程数量限制，内核线程上下文切换调度开销较大，使得用户线程执行效率低下</p>
+<p>  <strong>多对一模型</strong>：高效的上下文切换和几乎无限制的线程数量，缺点是一个用户线程阻塞了，那么所有线程都将无法执行</p>
+<p>  <strong>多对多模型</strong>：多个用户线程映射到多个内核线程，切换方便且避免了一个阻塞全局的情况</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjfj3pq48001fobs686ctiga8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-SonarQube安装使用调试" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/03/14/SonarQube安装使用调试/">SonarQube - 安装使用调试</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/03/14/SonarQube安装使用调试/">
+            <time datetime="2017-03-14T02:57:08.000Z" itemprop="datePublished">2017-03-14</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/工具/">工具</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历</p>
+<h5 id="安装与运行"><a href="#安装与运行" class="headerlink" title="安装与运行"></a>安装与运行</h5><p>SonarQube分为两个部分：Server 和 Scanner，其中</p>
+<p>Server：<a href="https://www.sonarqube.org/downloads/" target="_blank" rel="noopener">https://www.sonarqube.org/downloads/</a></p>
+<p>Scanner：<a href="https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code" target="_blank" rel="noopener">https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code</a></p>
+<p>其余安装环境就不赘述了：MySQL 和 Java</p>
+<p>参考这篇文章：<a href="http://blog.csdn.net/hunterno4/article/details/11687269" target="_blank" rel="noopener">http://blog.csdn.net/hunterno4/article/details/11687269</a></p>
+<h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><ol>
+<li>在配置了 sonar-project.properties 之后，运行 sonar-scanner 报如下错误：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.sonarqube.ws.client.HttpException: Error 500 on http://localhost:9000/api/ce/submit?projectKey=xxx&amp;projectName=yyy : &#123;&quot;errors&quot;:[&#123;&quot;msg&quot;:&quot;An error has occurred. Please contact your administrator.&quot;&#125;]&#125;</span><br></pre></td></tr></table></figure>
+<p>解决方法如下：</p>
+<ul>
+<li><p>查看 <sonar-root>/logs/web.log 得知详细原因是：<code>Packet for query is too large (6082109 &gt; 4194304). You can change this value on the server by setting the max_allowed_packet&#39; variable</code></sonar-root></p>
+</li>
+<li><p>修改 MySQL 的配置，用命令行登入执行：<code>show VARIABLES like &#39;%max_allowed_packet%&#39;; SET GLOBAL max_allowed_packet=268435456;</code></p>
+</li>
+<li><p>重启 MySQL 和 Sonar-Server 服务</p>
+</li>
+</ul>
+<p>尝试分析一个工程，发现已经成功打通的整套流程，SonarQube的高集成特性以及丰富的插件，可以根据实际项目需要丰富的定制。接下来我会围绕它打造一个后期的基础质量保障“设施”，首先来看看如何调试自定义扩展插件</p>
+<h5 id="扩展插件"><a href="#扩展插件" class="headerlink" title="扩展插件"></a>扩展插件</h5><p>官方给出了扩展插件的示例：<a href="https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到" target="_blank" rel="noopener">https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到</a></p>
+<ul>
+<li><p><code>org.sonarsource.plugins.example</code>， 插件入口目录，相当于 Main 函数的作用</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.hooks</code> ，工具钩子，可以在各个阶段自定义一些需要的操作，继承自：PostJob/PostProjectAnalysisTask</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.languages</code> ，自定义语言支持，继承自：AbstractLanguage</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.measures</code>， 自定义质量阀的衡量标准，继承自：Metrics</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.rules</code>，自定义代码规则，继承自：Sensor</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.settings</code>，自定义设置，继承自：Sensor</p>
+</li>
+<li><p><code>org.sonarsource.plugins.example.web</code>，自定义网页显示部分，继承自：web.xxx</p>
+</li>
+</ul>
+<p>以上这些自定义的各个模块，分别作用于 SonarQube 的基本流程里，即：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Project project)</span> </span>&#123;  </span><br><span class="line">    ... </span><br><span class="line">    sensorsExecutor.execute(sensorContext);  </span><br><span class="line">    decoratorsExecutor.execute();  </span><br><span class="line">    persistenceManager.dump();  </span><br><span class="line">    persistenceManager.setDelayedMode(<span class="keyword">false</span>);  </span><br><span class="line">    <span class="keyword">if</span> (project.isRoot()) &#123;  </span><br><span class="line">        <span class="keyword">if</span> (updateStatusJob != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            updateStatusJob.execute();  </span><br><span class="line">        &#125;  </span><br><span class="line">        postJobsExecutor.execute(sensorContext);   </span><br><span class="line">    &#125;  </span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>首先，初始化整个分析过程，包括加载所有的分析任务，其次，分析这些任务（Sensor和Decorator），并且把结果存储到数据库，最后，执行postjob，做相关的一些分析，因此需要根据插件作用需要，可以自行在各个阶段模块中进行扩展</p>
+<h5 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h5><p>官方提供了调试方法：<a href="https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug" target="_blank" rel="noopener">https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug</a></p>
+<p>这里总结下步骤，避免踩坑：</p>
+<ol>
+<li><p>在 conf/sonar.properties 中设置<code>sonar.web.javaAdditionalOpts=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8001</code></p>
+</li>
+<li><p>将插件打包部署到 extensions/plugins 中</p>
+</li>
+<li><p><strong>如果你安装了SonarQube服务，请先关掉</strong>，然后用 bin/StartSonar启动，可以检查是否出现：Listening for transport dt_socket at address: 8001</p>
+</li>
+<li><p>在IDE中新建远程调试，<strong>打上断点</strong>，启动调试，<strong>打开localhost:8001</strong>，此时IDE会进到debug模式</p>
+</li>
+</ol>
+<p>好了，学会了调试，接下来就可以进一步打造我们的插件了</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjfj3pq3q000fobs668mlyw1c" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-疑难杂症-解决MSYS2在Window上越用越慢的方法" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -214,10 +751,10 @@
             
             <p>最近折腾电脑真是费了不少脑细胞，谁让咱用着 window 还操着 linux 的心呢，事情起因是因为习惯了在 cmd 中使用 linux 的命令，但是 cygwin 新版的界面真是不该恭维的美感，所以就把 git/bin 目录加到了 PATH 中，这样一举两得，谁知 git for windows 现在用的是 MSYS2 的环境，运行个 ls，grep要等上 1 分钟才能出结果，于是乎忍无可忍，终于在今天解决了这个问题</p>
 <h5 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h5><p>解决 MSYS2 在使用过程中越用越慢的问题</p>
-<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">mkpasswd -l -c &gt; /etc/passwd</div><div class="line"></div><div class="line">mkgroup -l -c &gt; /etc/group</div><div class="line"></div><div class="line"># 如果是window系统就在 git/etc 下面执行</div><div class="line"></div><div class="line"># 修改 /etc/nsswitch.conf，其中</div><div class="line"></div><div class="line">passwd: files #db</div><div class="line"></div><div class="line">group: files #db</div></pre></td></tr></table></figure>
+<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mkpasswd -l -c &gt; /etc/passwd</span><br><span class="line"></span><br><span class="line">mkgroup -l -c &gt; /etc/group</span><br><span class="line"></span><br><span class="line"># 如果是window系统就在 git/etc 下面执行</span><br><span class="line"></span><br><span class="line"># 修改 /etc/nsswitch.conf，其中</span><br><span class="line"></span><br><span class="line">passwd: files #db</span><br><span class="line"></span><br><span class="line">group: files #db</span><br></pre></td></tr></table></figure>
 <h5 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h5><ul>
-<li><a href="https://gist.github.com/k-takata/9b8d143f0f3fef5abdab" target="_blank" rel="external">https://gist.github.com/k-takata/9b8d143f0f3fef5abdab</a></li>
-<li><a href="http://bjg.io/guide/cygwin-ad/" target="_blank" rel="external">http://bjg.io/guide/cygwin-ad/</a></li>
+<li><a href="https://gist.github.com/k-takata/9b8d143f0f3fef5abdab" target="_blank" rel="noopener">https://gist.github.com/k-takata/9b8d143f0f3fef5abdab</a></li>
+<li><a href="http://bjg.io/guide/cygwin-ad/" target="_blank" rel="noopener">http://bjg.io/guide/cygwin-ad/</a></li>
 </ul>
 <p>终于，系统恢复了丝滑版的顺畅~</p>
 
@@ -230,7 +767,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjfajwkvd000zfds62c52yr3s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjfj3pq40000yobs6rlj4egvi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -374,7 +911,7 @@
 </li>
 <li><p>如何检测<strong>假说</strong>的效果，使用成本函数（cost function or loss function），有时候也叫损失函数，通常来说，假说越准确，越接近真实，其值就越小。成本函数的出现通常伴随着目标，即 <code>When cost function defined，the goal has appearanced</code></p>
 <p>  线性回归通常使用的成本函数和目标为：</p>
-  <img src="/2017/02/13/Tensorflow学习-机器学习/cfg.png" alt="线性回归的成本函数和目标" title="线性回归的成本函数和目标">
+  <img src="/2017/02/13/Tensorflow学习-机器学习/cfg.png" title="线性回归的成本函数和目标">
 </li>
 <li><p>学习算法：</p>
 <ol>
@@ -405,144 +942,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjfajwkv6000hfds6ysjkmoe1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/08/Tensorflow学习-神经网络/">
-            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
-<p>首先来回忆几个概念</p>
-<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
-<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
-<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
-<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
-<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
-<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
-<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
-<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
-<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
-</ul>
-<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="external">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="external">斯坦福大学UFLDL-神经网络</a></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjfajwkv8000mfds6td9mz36v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjfj3pq3s000kobs6ucbupl2f" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -671,21 +1071,21 @@
 <li><p>翻墙</p>
 </li>
 </ul>
-<p>基于 Anaconda 搭建 Tensorflow 的环境非常方便，避免GFW的干扰，提供一个环境网站：<a href="https://mirrors.tuna.tsinghua.edu.cn/" target="_blank" rel="external">https://mirrors.tuna.tsinghua.edu.cn/</a></p>
+<p>基于 Anaconda 搭建 Tensorflow 的环境非常方便，避免GFW的干扰，提供一个环境网站：<a href="https://mirrors.tuna.tsinghua.edu.cn/" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/</a></p>
 <p>创建虚拟机的步骤就不赘述了，用过VMware的很简单，记得安装VMware Tools ，这个很关键</p>
 <p>下载好 Anaconda 之后，有 2 和 3 两个版本，分别对应 python 2.7 和 python 3.5，<strong>chmod 之后就可以一路安装了</strong>，记得添加到PATH中，这样默认的python环境就升级了</p>
 <p>打开终端，输入以下命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ conda create -n tensorflow python=2.7</div><div class="line"></div><div class="line">$ source activate tensorflow</div><div class="line"></div><div class="line">(tensorflow)$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</div><div class="line"></div><div class="line">(tensorflow)$ pip install --ignore-installed --upgrade $TF_BINARY_URL</div><div class="line"></div><div class="line">$ source deactivate</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> conda create -n tensorflow python=2.7</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source activate tensorflow</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> pip install --ignore-installed --upgrade $TF_BINARY_URL</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source deactivate</span><br></pre></td></tr></table></figure>
 <p>下载安装 Sublime Text，安装 Package Control 之后依次添加以下插件：</p>
 <ul>
 <li>Anaconda</li>
 </ul>
-<p>其中 Anaconda 配置参考：<a href="http://www.cnblogs.com/nx520zj/p/5787393.html" target="_blank" rel="external">http://www.cnblogs.com/nx520zj/p/5787393.html</a></p>
-<p>去掉代码检测提示框：<a href="https://segmentfault.com/q/1010000002415020" target="_blank" rel="external">https://segmentfault.com/q/1010000002415020</a></p>
+<p>其中 Anaconda 配置参考：<a href="http://www.cnblogs.com/nx520zj/p/5787393.html" target="_blank" rel="noopener">http://www.cnblogs.com/nx520zj/p/5787393.html</a></p>
+<p>去掉代码检测提示框：<a href="https://segmentfault.com/q/1010000002415020" target="_blank" rel="noopener">https://segmentfault.com/q/1010000002415020</a></p>
 <p>这样，Tensorflow 的环境就搭建成功了，总体来说还是非常方便的，保证一个通畅的网络，翻墙很关键！</p>
 <p>试运行一个线性拟合 Demo 点此下载：<a href="/2017/02/08/Tensorflow学习-环境搭建/line.py" title="line.py">line.py</a></p>
 <p>得到如下输出：</p>
-<img src="/2017/02/08/Tensorflow学习-环境搭建/line-result.png" alt="运行结果" title="运行结果">
+<img src="/2017/02/08/Tensorflow学习-环境搭建/line-result.png" title="运行结果">
 
         
         </div>
@@ -696,7 +1096,144 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjfajwkv7000kfds6ul5z4dyh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjfj3pq3u000mobs6h40qb0wt" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/08/Tensorflow学习-神经网络/">
+            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
+<p>首先来回忆几个概念</p>
+<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
+<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
+<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
+<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
+<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
+<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
+<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
+<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
+<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
+</ul>
+<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjfj3pq3v000pobs68lce3pxn" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -848,7 +1385,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjfajwkux0003fds6xe60ddl2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjfj3pq3a0000obs68k929axp" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -962,11 +1499,11 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>由于工作中需要将 markdown 格式的文件转换成 html，因此抽空研究了下业界的工具<code>Showdown</code>，Showdown 是一个可以将标准 markdown 规范解析生成基础 html 的工具，使用起来很简单，通过命令：<code>showdown makehtml -i &lt;input&gt; -o &lt;output&gt;</code>即可完成转化，详细的介绍请参考官方文档 <a href="https://github.com/showdownjs" target="_blank" rel="external">Showdown</a>，在此就不过多赘述了。</p>
+            <p>由于工作中需要将 markdown 格式的文件转换成 html，因此抽空研究了下业界的工具<code>Showdown</code>，Showdown 是一个可以将标准 markdown 规范解析生成基础 html 的工具，使用起来很简单，通过命令：<code>showdown makehtml -i &lt;input&gt; -o &lt;output&gt;</code>即可完成转化，详细的介绍请参考官方文档 <a href="https://github.com/showdownjs" target="_blank" rel="noopener">Showdown</a>，在此就不过多赘述了。</p>
 <h4 id="Extensions-与-Listeners"><a href="#Extensions-与-Listeners" class="headerlink" title="Extensions 与 Listeners"></a>Extensions 与 Listeners</h4><p>通过研究发现，当需要解析一些”自定义”的 markdown 规范时，Showdown 提供了清晰良好的代码格式，方便我们扩展，包括<code>extensions</code>, <code>listener</code>的方式，可以进行注册，监听，来看 Showdown 的入口文件，里面有这样三行代码： </p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//src/cli/makehtml.cmd.js</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> converter = <span class="keyword">new</span> showdown.Converter(argv);</div><div class="line">  ...</div><div class="line">  input = fs.readFileSync(argv.i, enc);</div><div class="line">  ...</div><div class="line">  output = converter.makeHtml(input);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//src/cli/makehtml.cmd.js</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> converter = <span class="keyword">new</span> showdown.Converter(argv);</span><br><span class="line">  ...</span><br><span class="line">  input = fs.readFileSync(argv.i, enc);</span><br><span class="line">  ...</span><br><span class="line">  output = converter.makeHtml(input);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以分析出，<code>converter</code>通过接受参数，来配置各种<code>extensions</code>和<code>listener</code>，然后直接从源文件中读取，经过 makeHtml 一转换就变成 html 了</p>
-<p>官方也提供了几个现有的 <code>extensions</code>， 如 <a href="https://github.com/showdownjs/table-extension" target="_blank" rel="external">table-extension</a> <a href="https://github.com/showdownjs/prettify-extension" target="_blank" rel="external">prettify-extension</a> 等，这些现有的<code>extensions</code>都是对 markdown 的元素进行了自定义的解析和渲染，如果是基于标准的 markdown 语法，使用这种方式进行自定义渲染就非常方便了</p>
+<p>官方也提供了几个现有的 <code>extensions</code>， 如 <a href="https://github.com/showdownjs/table-extension" target="_blank" rel="noopener">table-extension</a> <a href="https://github.com/showdownjs/prettify-extension" target="_blank" rel="noopener">prettify-extension</a> 等，这些现有的<code>extensions</code>都是对 markdown 的元素进行了自定义的解析和渲染，如果是基于标准的 markdown 语法，使用这种方式进行自定义渲染就非常方便了</p>
 <p>关于 Listeners 可以参考下面的工作原理章节</p>
 <h4 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h4><p>关于工作原理，可以用一句话来概括：<strong>Showdown使用正则表达式解析 markdown 语法，然后直接渲染成 html</strong>，注意这里面有两个关键词：</p>
 <ul>
@@ -974,7 +1511,7 @@
 <p>  来看一个 Parser 的源码片段：</p>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 斜体和黑体的解析器：italicsAndBold</span></div><div class="line">showdown.subParser(<span class="string">'italicsAndBold'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">text, options, globals</span>) </span>&#123;</div><div class="line"><span class="meta">  'use strict'</span>;</div><div class="line"></div><div class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.before'</span>, text, options, globals);</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (options.literalMidWordUnderscores) &#123;</div><div class="line">    <span class="comment">//underscores</span></div><div class="line">    <span class="comment">// Since we are consuming a \s character, we need to add it</span></div><div class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)__(?=\S)([\s\S]+?)__(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;strong&gt;$2&lt;/strong&gt;'</span>);</div><div class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)_(?=\S)([\s\S]+?)_(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;em&gt;$2&lt;/em&gt;'</span>);</div><div class="line">    <span class="comment">//asterisks</span></div><div class="line">    text = text.replace(<span class="regexp">/(\*\*)(?=\S)([^\r]*?\S[*]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</div><div class="line">    text = text.replace(<span class="regexp">/(\*)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</div><div class="line"></div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="comment">// &lt;strong&gt; must go first:</span></div><div class="line">    text = text.replace(<span class="regexp">/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</div><div class="line">    text = text.replace(<span class="regexp">/(\*|_)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.after'</span>, text, options, globals);</div><div class="line">  <span class="keyword">return</span> text;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 斜体和黑体的解析器：italicsAndBold</span></span><br><span class="line">showdown.subParser(<span class="string">'italicsAndBold'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">text, options, globals</span>) </span>&#123;</span><br><span class="line"><span class="meta">  'use strict'</span>;</span><br><span class="line"></span><br><span class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.before'</span>, text, options, globals);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (options.literalMidWordUnderscores) &#123;</span><br><span class="line">    <span class="comment">//underscores</span></span><br><span class="line">    <span class="comment">// Since we are consuming a \s character, we need to add it</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)__(?=\S)([\s\S]+?)__(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)_(?=\S)([\s\S]+?)_(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line">    <span class="comment">//asterisks</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(\*\*)(?=\S)([^\r]*?\S[*]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(\*)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line"></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// &lt;strong&gt; must go first:</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(\*|_)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.after'</span>, text, options, globals);</span><br><span class="line">  <span class="keyword">return</span> text;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>每个 Parser 的开始和结束，都抛出了相应的事件供监听，这就是 <code>listener</code> 扩展的机制，每次处理的结果都是返回 text 文本，可以看到在解析器中，对输入的文本进行正则表达式的匹配并直接替换成了相应的 html 元素</p>
 <ul>
 <li><p>直接渲染</p>
@@ -984,7 +1521,7 @@
 </li>
 <li><p>如果对渲染之后的 html 进行样式更改，加入css，则无法满足</p>
 <p>可以看出，replace 替换的仅仅是 html 基本元素样式，且没有 id，class 等信息，因此极大程度上约束了生成的 html 样式，并不利于满足一些实际需求，然而 Showdown 的代码架构，将各个 markdown 元素分别定义了单独的解析器，这就为我们提供了一个思路，可以根据自定义的 markdown 的格式通过自定义的 parser 解析出来就好了，例如：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="section">### start 修订记录 ###</span></div><div class="line">1.0</div><div class="line">date: 11.3</div><div class="line">2.0</div><div class="line">date: 12.9</div><div class="line"><span class="section">### end 修订记录 ###</span></div></pre></td></tr></table></figure>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">### start 修订记录 ###</span></span><br><span class="line">1.0</span><br><span class="line">date: 11.3</span><br><span class="line">2.0</span><br><span class="line">date: 12.9</span><br><span class="line"><span class="section">### end 修订记录 ###</span></span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 </li>
@@ -1002,7 +1539,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjfajwkv00005fds6d5946cvx" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjfj3pq3m0007obs6jvbx2ai4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1117,7 +1654,7 @@
         
             
             <p>WebPack 是一个前端资源打包工具，借助于<code>Loader</code>它可以将任何前端资源(js/image/css/…)统一转换为原生JS 代码，通过静态分析构建模块之间的依赖关系，将涉及到资源分类打包成不同的模块，这些模块在浏览器，Nodejs 中可以按需进行加载，可提升加载效率。同时，WebPack 的打包也非常高效，Webpack 使用异步 I/O 和多级缓存提高运行效率，这使得 Webpack 能够以令人难以置信的速度快速增量编译。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">官方文档：http://webpack.github.io/docs/</div><div class="line">中文文档：http://webpackdoc.com/index.html</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">官方文档：http://webpack.github.io/docs/</span><br><span class="line">中文文档：http://webpackdoc.com/index.html</span><br></pre></td></tr></table></figure>
 <p>以上两个文档已经非常全面的阐述了 WebPack 强大的功能，下面针对几个关键点进行实战</p>
 <h4 id="解释一切资源：Loaders"><a href="#解释一切资源：Loaders" class="headerlink" title="解释一切资源：Loaders"></a>解释一切资源：Loaders</h4><p>由于 WebPack 打包的来源只能是原生 JS 代码，因此许多静态资源(图片/CSS), 非JS写的代码(Coffee 和 JSX)需要以一种转换方式转换成 JS 代码，为此 Loader 应运而生</p>
 <p>Loader 作为一个单独的模块，其具有以下几个特征：</p>
@@ -1133,17 +1670,17 @@
 </ol>
 <p>总而言之，Loader 作为一个JS代码的转义器，有任何需要被 WebPack 打包的非原生 JS 资源，都可以通过内置/自定义的 Loader 加以转换，供打包使用</p>
 <p>使用方式：<code>npm install xxx-loader --save-dev</code></p>
-<p><strong>Loader列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-loaders.html" target="_blank" rel="external">List of Loaders</a></p>
+<p><strong>Loader列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-loaders.html" target="_blank" rel="noopener">List of Loaders</a></p>
 <h4 id="丰富的插件：Plugins"><a href="#丰富的插件：Plugins" class="headerlink" title="丰富的插件：Plugins"></a>丰富的插件：Plugins</h4><p>在打包过程中，WebPack 还允许借助各种插件，对打包过程、生成的结果进行处理，比如最简单的借助于 UglifyJS 实现压缩和混淆，使用如下命令：</p>
 <p><code>new webpack.optimize.UglifyJsPlugin([options])</code></p>
 <p>即可生成压缩混淆之后的打包文件，同理，内置的插件可以做更多的事情</p>
 <p>使用方式：在配置文件中配置</p>
-<p><strong>Plugin列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-plugins.html" target="_blank" rel="external">List of Plugin</a></p>
+<p><strong>Plugin列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-plugins.html" target="_blank" rel="noopener">List of Plugin</a></p>
 <h4 id="配置文件：webpack-config-js"><a href="#配置文件：webpack-config-js" class="headerlink" title="配置文件：webpack.config.js"></a>配置文件：webpack.config.js</h4><p>在大型项目中，WebPack 通常借助于配置文件 <code>webpack.config.js</code> 将打包过程所需执行的步骤，插件统一进行管理，同时方便发布系统实时监控打包，配置文件的内容通常如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//WebPack配置文件</span></div><div class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  <span class="attr">entry</span>: <span class="string">'./entry.js'</span>,</div><div class="line">  <span class="attr">output</span>: &#123;</div><div class="line">	<span class="attr">path</span>: __dirname,</div><div class="line">	<span class="attr">filename</span>: <span class="string">'bundle.js'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="attr">module</span>: &#123;</div><div class="line">	<span class="attr">loaders</span>: [&#123;</div><div class="line">	  <span class="attr">test</span>: <span class="regexp">/\.css$/</span>,</div><div class="line">	  <span class="attr">loader</span>: <span class="string">'style!css'</span></div><div class="line">	&#125;]</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">plugins</span>: [</div><div class="line">	<span class="keyword">new</span> webpack.optimize.UglifyJsPlugin(&#123;</div><div class="line">	  <span class="attr">mangle</span>: <span class="literal">false</span>,</div><div class="line">	  <span class="attr">compress</span>: <span class="literal">false</span></div><div class="line">	&#125;),</div><div class="line">	<span class="keyword">new</span> webpack.BannerPlugin(<span class="string">'This file is created by ChenS'</span>)</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//WebPack配置文件</span></span><br><span class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./entry.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">	path: __dirname,</span><br><span class="line">	filename: <span class="string">'bundle.js'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">	loaders: [&#123;</span><br><span class="line">	  test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	  loader: <span class="string">'style!css'</span></span><br><span class="line">	&#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">	<span class="keyword">new</span> webpack.optimize.UglifyJsPlugin(&#123;</span><br><span class="line">	  mangle: <span class="literal">false</span>,</span><br><span class="line">	  compress: <span class="literal">false</span></span><br><span class="line">	&#125;),</span><br><span class="line">	<span class="keyword">new</span> webpack.BannerPlugin(<span class="string">'This file is created by ChenS'</span>)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看出，<code>entry</code>中配置要打包的文件，<code>output</code>打包之后的文件输出路径，<code>module</code>里配置各种 Loader，以 test 的正则表达式匹配资源文件格式，Loader 传入名称，在<code>plugins</code>里配置各种插件以及选项，比如上述 UglifyJsPlugin 禁用了混淆和压缩，有了这个配置文件，在使用 WebPack时就可以直接运行<code>webpack</code>命令，一切轻松搞定</p>
 <p>以上Demo工程可点此下载：<a href="/2016/11/30/前端资源打包工具-WebPack/node-webpack.rar" title="node-webpack-demo">node-webpack-demo</a></p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>WebPack 的基础实战在上面分析完了，更多完整功能用法，请参考<a href="http://webpack.github.io/docs/" target="_blank" rel="external">WebPack</a></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>WebPack 的基础实战在上面分析完了，更多完整功能用法，请参考<a href="http://webpack.github.io/docs/" target="_blank" rel="noopener">WebPack</a></p>
 
         
         </div>
@@ -1154,1082 +1691,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjfajwkvb000ufds65nkocnut" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-Effective JavaScript" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/17/读书笔记-Effective JavaScript/">读书笔记-Effective JavaScript</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/17/读书笔记-Effective JavaScript/">
-            <time datetime="2016-11-17T09:53:00.000Z" itemprop="datePublished">2016-11-17</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <ul>
-<li><a href="##让自己习惯JavaScript">让自己习惯JavaScript</a></li>
-<li><a href="##变量作用域">变量作用域</a></li>
-<li><a href="##使用函数">使用函数</a></li>
-<li><a href="##对象和原型">对象和原型</a></li>
-<li><a href="##数组和字典">数组和字典</a></li>
-<li><a href="##库和API设计">库和API设计</a></li>
-<li><a href="##并发">并发</a></li>
-</ul>
-<h3 id="让自己习惯-JavaScript"><a href="#让自己习惯-JavaScript" class="headerlink" title="让自己习惯 JavaScript"></a>让自己习惯 JavaScript</h3><ul>
-<li><p>了解你使用的JavaScript版本</p>
-<ul>
-<li><p>Web浏览器，并不支持让程序员指定JS的版本来执行代码</p>
-</li>
-<li><p>严格模式（”use strict”），允许你选择在受限制的JS版本中禁用一些问题较多或者出错的特性</p>
-</li>
-<li><p>不要试图将严格模式和非严格模式的文件连接在一起，建议在严格模式下编写代码（ES5 中增加的，兼容ES3）</p>
-</li>
-<li><p>将其自身包裹在立即调用的函数（IIFE）表达式中的方式连接多个文件，是比较安全的</p>
-</li>
-</ul>
-</li>
-<li><p>理解JavaScript的浮点数</p>
-<ul>
-<li><p>大多数编程语言都有几种数值型数据类型，但JS只有一种，就是 number，也就是常理解的 double(双精度浮点数)</p>
-</li>
-<li><p>JS中所有 位运算符 的工作方式是：将操作数转换为整数，然后使用整数位模式进行运算，最后将结果转换为标准的JS浮点数（3步），即将数字视为32位的有符号整数</p>
-</li>
-<li><p>浮点数的操作是出了名的不准确</p>
-<pre><code>0.1 + 0.2 // 0.300000000000004
-0.1 + 0.2 + 0.3 ≠ 0.1 +（0.2 + 0.3）
-</code></pre></li>
-<li><p>当心浮点运算中的精度陷阱，一般都是转化为最小单位（尽可能转换成整数）去计算，因为整数在表示时不需要舍入</p>
-</li>
-</ul>
-</li>
-<li><p>当心隐式的强制转换</p>
-<ul>
-<li><p>类型错误可能被隐式的强制转换所隐藏</p>
-</li>
-<li><p>重载运算符 + 是进行加法运算还是字符串连接操作取决于其参数类型</p>
-</li>
-<li><p>对象通过valueOf方法强制转换为数字，通过toString方法强制转换为字符串</p>
-</li>
-<li><p>具有valueOf方法的对象应该实现toString方法，返回一个valueOf方法产生的数字字符串表示</p>
-</li>
-<li><p>JS中有且只有7种假值：false、0、-0、””、NaN、null 和 undefined</p>
-</li>
-<li><p>测试一个值是否为未定义的值，应该使用 typeOf或者与undefined进行比较而不是真值运算</p>
-</li>
-</ul>
-</li>
-<li><p>原始类型优于封装对象</p>
-<ul>
-<li><p>5个原始类型：<strong>布尔值、数字、字符串、null 和 undefined</strong></p>
-</li>
-<li><p>隐式封装：当对原始值提取属性和进行方法调用时，他表现得就像已经使用了对应的对象类型封装了该值一样。例如：String的原型对象有一个toUpperCase的方法，你可以对这个原始字符串值调用这个方法</p>
-</li>
-<li><p>当做相等比较时，原始类型的封装对象 ≠ 原始类型值</p>
-</li>
-<li><p>获取和设置原始类型值的属性会隐式地创建封装对象，字符串对象的引用在用完之后立即被销毁，所以不能给字符串添加属性</p>
-<pre><code>&quot;hello&quot;.property = 1;
-&quot;hello&quot;.property; // undefined
-</code></pre></li>
-</ul>
-</li>
-<li><p>避免对混合类型使用 == 运算符</p>
-<ul>
-<li><p>当参数类型不同时，==运算符应用了一套难以理解的隐式强制转换规则</p>
-</li>
-<li><p>当使用 === 运算符时，不需要涉及任何的隐式强制转换就明白你的比较运算符</p>
-</li>
-<li><p>当比较不同类型的值时，使用你自己的显示强制转换使程序的行为更清晰</p>
-<pre><code>null == undefined // true
-string/number/boolean == Date // Date.toString() --&gt; Date.valueOf()
-string/number/boolean == 非 Date // 非 Date.valueOf() --&gt; 非 Date.toString()
-</code></pre></li>
-</ul>
-</li>
-<li><p>了解分号插入的局限：分号插入原则</p>
-<ul>
-<li><p>仅在 } 标记之前、一个或多个换行之后和程序输入的结尾</p>
-</li>
-<li><p>仅在紧接着的标记不能被解析的时候推导分号</p>
-</li>
-<li><p>在以（、[、+、- 或 / 字符开头的语句钱决不能省略分号</p>
-</li>
-<li><p>当脚本连接的时候，在脚本之间显式插入分号</p>
-</li>
-<li><p>在 return、throw、break、contine、++ 或 – 的参数之前决不能换行</p>
-</li>
-<li><p>分号不能作为for循环的头部或空语句的分隔符</p>
-</li>
-</ul>
-</li>
-<li><p>视字符串为16位的代码单元序列</p>
-<ul>
-<li>JS字符串有16位的代码单元组成，而不是由Unicode代码点组成</li>
-</ul>
-</li>
-</ul>
-<h3 id="变量作用域"><a href="#变量作用域" class="headerlink" title="变量作用域"></a>变量作用域</h3><ul>
-<li><p>尽量少用全局对象    </p>
-<ul>
-<li><p>多使用局部变量</p>
-</li>
-<li><p>避免对全局对象添加属性</p>
-</li>
-<li><p>使用全局对象来做平台特性检测</p>
-</li>
-</ul>
-</li>
-<li><p>始终声明局部变量</p>
-<ul>
-<li><p>使用 var(函数作用域) 和 let(for循环局部作用域) 来声明新的局部变量</p>
-</li>
-<li><p>考虑使用lint工具帮助检查未绑定的变量</p>
-</li>
-</ul>
-</li>
-<li><p>不要使用with</p>
-</li>
-<li><p>熟练掌握闭包</p>
-<ul>
-<li><p>JavaScript允许你引用在当前函数以外定义的变量（内部函数可以访问外部成员变量，引了，该函数就成为闭包）</p>
-</li>
-<li><p>闭包比创建它们的函数有更长的生命周期</p>
-</li>
-<li><p>闭包在内部存储其外部变量的而引用，并能读写这些变量</p>
-<pre><code>function sandwichMaker(){
-    var magicIngredient = &quot;peanut butter&quot;;
-    function make(filling){
-        return magicIngredient + &quot; and &quot; + filling
-    }
-    return make;
-}
-var f = sandwichMaker();
-f(&apos;jelly&apos;) // peanut butter and jelly
-f(&apos;bananas&apos;) // peanut butter and bananas
-
-//那些在其所涵盖的作用域内跟踪变量的函数，称为闭包，make函数就是一个闭包
-</code></pre></li>
-</ul>
-</li>
-<li><p>理解变量生命提升</p>
-<ul>
-<li><p>JavaScript隐式地提升（hoists）声明部分到封闭函数的顶部，而将赋值留在原地，换句话说，变量的作用域是整个函数，但仅在var语句出现的位置进行赋值</p>
-</li>
-<li><p>重声明变量被视为单个变量</p>
-</li>
-<li><p>请手动提升局部变量的声明，从而避免混淆</p>
-</li>
-</ul>
-</li>
-<li><p>使用立即调用的函数表达式（IIFE）创建局部作用域</p>
-<ul>
-<li><p>闭包存储的是其外部变量的引用，而不是值</p>
-<pre><code>function wrapElements(a){
-    var result = [], i, n;
-    for(i = 0, n = a.length ; i &lt; n ; i++){
-        result[i] = function(){ return a[i]; };
-    }
-    return result;
-}
-
-由于function中引用了变量i，所以该函数为每个result[i]都创建了一个闭包，且保存着对i的引用
-所以i = a.length;即result[1...a.length-1]都等于a[a.length],即 undefined
-</code></pre></li>
-<li><p>立即调用的函数表达式</p>
-<pre><code>function wrapElements(a){
-    var result = [];
-    for(var i = 0, n = a.length ; i &lt; n ; i++){
-        (function(j){
-            result[i] = function(){ return a[i]; };
-        })(i);
-    }
-    return result;
-}
-</code></pre></li>
-</ul>
-</li>
-<li><p>当心命名函数表达式笨拙的作用域</p>
-<ul>
-<li>var f = function(){}</li>
-</ul>
-</li>
-<li><p>当心局部块函数声明笨拙的作用域</p>
-<ul>
-<li><p>始终将函数声明至于程序或被包含的函数的最外层，以避免不可移植的行为</p>
-</li>
-<li><p>局部块函数声明: 使用var声明和有条件的赋值语句代替有条件的函数声明</p>
-</li>
-</ul>
-</li>
-<li><p>避免使用eval创建局部变量</p>
-<ul>
-<li><p>不要赋予外部调用者能改变函数内部作用域的能力，即 函数内部过分依赖于 动态绑定（eval(“var x = 1”)）</p>
-</li>
-<li><p>如果 eval 函数代码可能创建全局变量，将此调用封装到嵌套的函数中以防止作用域污染</p>
-<pre><code>var y = &quot;global&quot;;
-function test(src){
-    (function(){ eval(src); })();
-    return y;
-}
-
-test(&quot;var y = &apos;local&apos;;&quot;) // global
-test(&quot;var z = &apos;local&apos;;&quot;) // global
-</code></pre></li>
-</ul>
-</li>
-<li><p>间接调用eval函数优于直接调用(Node里面没有臭名昭著的eval)</p>
-<ul>
-<li>尽可能间接调用eval函数，而不要直接调用eval函数：（0，eval）(src)    </li>
-</ul>
-</li>
-</ul>
-<h3 id="使用函数"><a href="#使用函数" class="headerlink" title="使用函数"></a>使用函数</h3><ul>
-<li><p>理解函数调用、方法调用及构造函数调用之间的不同</p>
-<ul>
-<li><p>在方法调用中是由调用表达式自身来确定this变量的绑定。绑定到this变量的对象被称为调用接收者(receiver)</p>
-</li>
-<li><p>方法调用将被查找方法属性的对象作为调用接收者</p>
-</li>
-<li><p>函数调用将全局对象作为其接受者，一般很少使用函数调用语法来调用方法</p>
-</li>
-<li><p>构造函数需要通过new运算符调用，并产生一个新的对象作为其接收者</p>
-</li>
-</ul>
-</li>
-<li><p>熟练掌握高阶函数</p>
-<ul>
-<li><p>高阶函数就是那些将函数作为 <strong>参数</strong> 或者 <strong>返回值</strong> 的函数</p>
-</li>
-<li><p>当发现自己在重复地写一些相同的模式时，学会借助于一个高阶函数（提炼逻辑，让callback作为参数传递）可以使代码更简洁、更高效、更可读，学会发现可以被高阶函数所取代的常见的编码模式</p>
-</li>
-<li><p>掌握现有库中的高阶函数，比如数组的map</p>
-</li>
-</ul>
-</li>
-<li><p>使用call方法自定义接受者来调用方法</p>
-<ul>
-<li><p>f.call（obj,arg1,arg2,arg3）与 f（arg1,arg2,arg3）不同的是第一个参数提供了一个显式的接收者对象</p>
-</li>
-<li><p>使用 call 方法自定义接收者来调用函数</p>
-</li>
-<li><p>使用 call 方法可以调用在给定的对象中不存在的方法</p>
-</li>
-<li><p>使用 call 方法定义高阶函数允许使用者给回调函数指定接收者</p>
-</li>
-</ul>
-</li>
-<li><p>使用apply方法通过不同数量的参数调用函数</p>
-<ul>
-<li><p>使用 apply 方法制定一个可计算的参数数组来调用可变参数的函数，apply方法需要一个参数数组，然后将数组的每一个元素作为调用的单独参数调用该函数</p>
-</li>
-<li><p>使用 apply 方法的第一个参数给可变参数的方法提供一个接收者</p>
-</li>
-</ul>
-</li>
-<li><p>使用arguments创建可变参数的函数</p>
-<ul>
-<li><p>JavaScript给每个函数都隐式得提供了一个名为arguments的局部变量。arguments对象给实参提供了一个类似的数组接口，它为每个实参提供了一个索引属性，还包含一个length属性用来指示参数的个数，从而可以通过遍历arguments对象的每个元素来实现可变元数的函数</p>
-</li>
-<li><p>如果提供了一个便利的可变参数的函数，也最好提供一个需要显示指定数组的固定元数版本</p>
-<pre><code>function average(){
-    return averageOfArray(arguments);
-}
-</code></pre></li>
-</ul>
-</li>
-<li><p>永远不要修改 arguments 对象</p>
-<ul>
-<li>使用 [].slice.call(arguments) 将 arguments 对象复制到一个真正的数组中再进行修改</li>
-</ul>
-</li>
-<li><p>使用变量保存 arguments 的引用</p>
-<ul>
-<li>先用变量绑定到 arguments，明确作用域之后，再在嵌套函数中引用它</li>
-</ul>
-</li>
-<li><p>使用 bind 方法提取具有确定接受者的方法</p>
-<ul>
-<li><p>提取一个方法不会将方法的接收者绑定到该方法的对象上</p>
-</li>
-<li><p>当给高阶函数传递对象方法时，使用匿名函数在适当的接收者上调用该方法</p>
-</li>
-<li><p>使用 bind 方法创建绑定到适当接收者的函数</p>
-</li>
-</ul>
-</li>
-<li><p>使用 bind 方法实现函数柯里化(不懂)</p>
-<ul>
-<li><p>将函数与其参数的一个子集绑定的技术成为函数柯里化</p>
-</li>
-<li><p>function.bind(null, arg1, arg2)</p>
-</li>
-</ul>
-</li>
-<li><p>使用闭包而不是字符串来封装代码</p>
-<ul>
-<li><p>当将字符串传递给eval函数以执行时，不要在字符串中包含局部变量的引用，容易在函数中引起冲突</p>
-</li>
-<li><p>优先接收函数，而不是eval执行的字符串，即</p>
-<pre><code>function repeat(n, action){
-    for(var i = 0 ; i &lt; n ; i++){
-        action();
-    }
-}
-</code></pre></li>
-</ul>
-</li>
-<li><p>不要信赖函数的toString方法</p>
-<ul>
-<li><p>在不同的引擎下调用toString方法的结果可能不同，所以绝不要信赖函数源代码的详细细节</p>
-</li>
-<li><p>toString方法的执行结果并不会暴露存储在闭包中的局部变量值</p>
-</li>
-<li><p>通常情况下，应该避免使用函数对象的toString方法</p>
-</li>
-</ul>
-</li>
-<li><p>避免使用非标准的栈检查属性</p>
-<ul>
-<li><p>调用栈实质当前正在执行的活动函数链</p>
-</li>
-<li><p>不要使用非标准的 arguments.caller 和 arguments.callee 属性</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="对象和原型"><a href="#对象和原型" class="headerlink" title="对象和原型"></a>对象和原型</h3><ul>
-<li><p>理解 prototype、getPrototypeOf 和 <strong>proto</strong> 之间的不同(有一个重点图)</p>
-<ul>
-<li><p>C.prototype 属性是 new C() 创建的对象的原型</p>
-</li>
-<li><p>Object.getPrototypeOf(obj)是ES5中检索对象原型的标准函数</p>
-<pre><code>Object.getPrototypeOf(u) === User.prototype
-</code></pre></li>
-<li><p>obj.<em>proto</em> 是检索对象原型的非标准方法（不支持ES5的情况下采用）</p>
-</li>
-<li><p>类：是由一个构造函数 和 一个关联的原型 组成的一种设计模式</p>
-<pre><code>function User(name, passwordHash){
-    this.name = name;
-    this.passwordHash = passwordHash;
-}
-
-User.prototype.toString = function(){
-    return &quot;sdsds&quot;;
-}
-
-var instance = new User(&quot;abc&quot;,&quot;abc&quot;);
-
-Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.prototype(.toString) --&gt; instance(.name/.passwordHash)
-</code></pre></li>
-</ul>
-</li>
-<li><p>使用 Object.getPrototypeOf 函数而不要使用 <strong>proto</strong> 属性</p>
-<ul>
-<li><p>获取对象原型的标准API是 Object.getPrototypeOf（）</p>
-</li>
-<li><p>在支持<em>proto</em>属性的非ES5环境中实现 getPrototypeOf</p>
-<pre><code>if(type Object.getPrototypeOf === &quot;undefined&quot;){
-    Object.getPrototypeOf = function(obj){
-        var t = typeof obj;
-        if(!t || ( t !== &quot;onject&quot; &amp;&amp; t !== &quot;function&quot;)){
-            throw new TypeError（&quot;not an object&quot;）；
-        }
-        return obj._proto_;
-    }
-}
-</code></pre></li>
-</ul>
-</li>
-<li><p>始终不要修改 <strong>proto</strong> 属性</p>
-<ul>
-<li>使用Object.create函数给新对象设置自定义的原型</li>
-</ul>
-</li>
-<li><p>使构造函数与 new 操作符无关</p>
-<ul>
-<li><p>防范误用构造函数可能不值得费心去做，但在跨大型代码库中共享构造函数或者构造函数来自一个共享库的时候，就需要多加防范了</p>
-</li>
-<li><p>当一个函数期望使用new操作符调用时，清晰地文档化该函数</p>
-</li>
-<li><p>通过使用 new 操作符或Object.create 方法在构造函数定义中调用自身使得该构造函数与调用语法无关</p>
-</li>
-</ul>
-</li>
-<li><p>在原型中存储方法</p>
-<ul>
-<li><p>原型是共享方法的渠道之一，将方法存储于原型中由于存储在示例对象中</p>
-</li>
-<li><p>将方法存储在示例对象中将创建该函数的多个副本，因为每个实例对象都有一份副本</p>
-</li>
-</ul>
-</li>
-<li><p>使用闭包存储私有数据</p>
-<ul>
-<li><p>闭包变量是私有的，只能通过局部的引用获取</p>
-</li>
-<li><p>将局部变量作为私有数据从而通过方法实现信息隐藏</p>
-</li>
-</ul>
-</li>
-<li><p>只将实例状态存储在实例对象中</p>
-<ul>
-<li><p>共享可变数据可能会出现问题，因为原型是被其所有的实例共享的</p>
-</li>
-<li><p>将可变的实力状态存储在实例对象中</p>
-</li>
-</ul>
-</li>
-<li><p>认识到 this 变量的隐式绑定问题</p>
-<ul>
-<li><p>this 变量的作用域总是由其最近的封闭函数所确定的</p>
-</li>
-<li><p>使用一个局部变量（通常命名为 self、me 和 that）使得this绑定对于内部函数是可用的</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="数组和字典"><a href="#数组和字典" class="headerlink" title="数组和字典"></a>数组和字典</h3><ul>
-<li><p>原型污染</p>
-<ul>
-<li><p>定义：Object 是 js 对象的根，如果在 Object.prototype 上增加任何方法，那么随之使用 for…in 遍历对象属性的时候，此时增加的方法也会计算进去从而造成的原型污染，此外，一些特殊命名的变量名也会对对象造成污染。</p>
-</li>
-<li><p>原因：for…in 循环除了枚举出对象”自身”的属性外，还会枚举出继承过来的属性</p>
-</li>
-<li><p>预防：</p>
-<ul>
-<li><p>使用 Object.create(null) 来创建一个没有原型的对象，因此原型污染就无法影响这样的对象行为</p>
-</li>
-<li><p>使用 hasOwnProperty 方法（只过来对象自身属性）以避免原型污染： var hasOwn= Object.prototype.hasOwnProperty; hasOwn.call(dic，”alice”)</p>
-</li>
-<li><p>别在 Object.prototype 中增加属性，若不小心增加了属性，也要用 Object.defineProperty方法把属性 enumerable置成false</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>循环和迭代</p>
-<ul>
-<li><p>使用数组而不要使用字典来存储有序集合</p>
-</li>
-<li><p>for…in 循环会挑选一定的顺序来枚举对象的属性，如果是有序的，还是用for循环遍历</p>
-</li>
-<li><p>避免在 for…in 期间修改对象，如果需要修改，应该使用while或for循环</p>
-</li>
-<li><p>数组的循环优先使用for循环而不是for…in循环</p>
-</li>
-<li><p>使用迭代方法由于循环：forEach，map，every，some</p>
-</li>
-<li><p>处理数组内容的改变：map，筛选数组的内容：filter</p>
-</li>
-<li><p>循环只有一点优于迭代函数，那就是控制流操作，如 break 和 continue</p>
-</li>
-</ul>
-</li>
-<li><p>创建 数组、对象，直接使用 var x = []，{} 即可，因为使用 Array 和 Object 不能保证是不是被污染了</p>
-</li>
-</ul>
-<h3 id="库和API设计"><a href="#库和API设计" class="headerlink" title="库和API设计"></a>库和API设计</h3><p>-【参数】 保持一致的约定</p>
-<pre><code>- 约定参数的顺序
-
-    - 宽度第一，然后高度： new Widget(320, 640) // width:320, height:240
-
-    - CSS顺时针约定：top，right，bottom，left
-</code></pre><p>-【参数】 在变量命名和函数签名中使用一致的约定</p>
-<p>-【多元化】 不要偏离用户在其他开发平台中很可能遇到的约定</p>
-<p>-【检查】真值测试是实现参数默认值的一种简明的方式（this.hostname = hostname || “localhost”），但<strong>不适用</strong>于允许0、NaN或空字符串为有效参数的情况，比如this.hostname就是等于undefined</p>
-<p>-【检查】应该提供参数默认值应当采用测试undefined的方式，而不是检查arguments.length，即 this.width = width === undefined ? 320 : width</p>
-<p>-【参数】使用接收关键字参数的选项对象，options object，既接收Alert({xxx:yyy})的方式，避免参数过多，API失去可扩展性</p>
-<p>-【设计】避免不必要的状态，API有时候被归为两类：有状态的(Date对象)和无状态的（幂等性，输入对应固定输出），无状态的API比有状态的API，从易用性，学习容易性而言，更优。无状态的API简洁，易于扩展</p>
-<p>-【设计】API绝对不应该重载与其他类型有重叠的类型，一个方法不应该既接收type 1又接收type 2，当重载一个结构类型与其他类型时，先测试其他类型</p>
-<pre><code>- 判断是不是数组：Array.isArray 和 toString.call(x) === &quot;[Object Array]&quot;
-- 将对象转换成数组：[].slice.call(arguments)
-</code></pre><p>-【设计】避免过度的强制转换，应该显示的转换，用代码写出来，而不是交给编译器</p>
-<p>-【设计】支持方法链</p>
-<pre><code>- 使用方法连来连接无状态的操作
-- 通过在无状态的方法中返回新对象来支持方法链
-- 通过在有状态的方法中返回this来支持方法连
-</code></pre><h3 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h3><ul>
-<li><p>异步的强大能力：JS的运行到完成机制(run-to-complete)，在系统里维护了一个按时间发生顺序的内部<strong>事件队列</strong>，一次调用一个已注册的回调函数，通过轮询这个队列来完成异步的操作，有序的调用回调函数。</p>
-</li>
-<li><p>Workers API提供了线程的能力，在一个完全隔离的状态下执行，没有获取全局作用域或应用程序主线程Web页面内容的能力</p>
-</li>
-<li><p>应该避免将可被并行执行的操作顺序化，嵌套的回调函数应该用Promise</p>
-</li>
-<li><p>对于异步的代码，多步的处理通常被分隔到时间队列的单独伦次中，因此不可能将它们全部包装在一个try语句块中。事实上，异步的API甚至根本不可能抛出异常，因为，当一个异步的错误发生时，没有一个明显的执行上下文来抛出异常！因此，异步API更加倾向于将错误表示为回调函数的特定参数，即err，<strong>在Nodejs平台中，err是回调函数的第一个参数</strong></p>
-</li>
-<li><p>目前典型的JS环境中一个递归函数同步调用自身过多次会导致失败，原因是：<strong>存储过多的栈帧需要的空间量会消耗JS环境分配的空间</strong></p>
-<ul>
-<li><p>循环不能是异步的</p>
-</li>
-<li><p>使用<strong>递归函数</strong>在事件循环的单独轮次中执行迭代</p>
-<pre><code>function downloadOneAsync(urls, onsuccess, onfailure){
-    var n = urls.length;
-    function tryNextURL(i){
-        if(i&gt;=n){
-            onfailure(&quot;xxxxxxx&quot;);
-            return;    
-        }
-        downloadAsync(url[i], onsuccess,function(){
-            tryNextURL(i+1);
-        });
-    }
-    tryNextURL(0);
-} 
-</code></pre></li>
-</ul>
-</li>
-<li><p>避免在主事件队列中执行代价高昂的算法，在支持Worker API的平台，该API可以用来在一个独立的事件队列中运行场计算程序，在Work API不可用或代价昂贵的环境中，考虑将计算程序分解到事件循环的多个轮次中</p>
-</li>
-<li><p>使用计数器来执行并行操作可以避免竞争，Js应用程序中的事件发生时不确定的，即顺序是不可预测的</p>
-</li>
-<li><p>同步地调用异步的回调函数扰乱了预期的操作序列，并可能导致意想不到的交错代码，也可能导致栈溢出或者错误的异常处理</p>
-</li>
-</ul>
-<h5 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h5><ul>
-<li><p>promise代表最终值，即并行操作完成时最终产生的结果</p>
-</li>
-<li><p>使用promise组合不同的并行操作，避免数据竞争</p>
-</li>
-<li><p>在要求有意的竞争条件时，使用select</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjfajwkvh0018fds6b0sbm6lb" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-大话设计模式" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/17/读书笔记-大话设计模式/">读书笔记-大话设计模式</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/17/读书笔记-大话设计模式/">
-            <time datetime="2016-11-17T09:53:00.000Z" itemprop="datePublished">2016-11-17</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <ul>
-<li><a href="##迪米特法则">迪米特法则</a></li>
-<li><a href="##合成/聚合复用原则">合成/聚合复用原则</a></li>
-<li><a href="##原型模式">原型模式</a></li>
-<li><a href="##模板模式">模板模式</a></li>
-<li><a href="##外观模式">外观模式</a></li>
-<li><a href="##建造者模式">建造者模式</a></li>
-<li><a href="##适配器模式">适配器模式</a></li>
-<li><a href="##备忘录模式">备忘录模式</a></li>
-<li><a href="##组合模式">组合模式</a></li>
-<li><a href="##迭代器模式">迭代器模式</a></li>
-<li><a href="##桥接模式">桥接模式</a></li>
-<li><a href="##命令模式">命令模式</a></li>
-<li><a href="##职责链模式">职责链模式</a></li>
-<li><a href="##中介模式">中介模式</a></li>
-<li><a href="##享元模式">享元模式</a></li>
-<li><a href="##解释器模式">解释器模式</a></li>
-<li><a href="##访问者模式">*访问者模式</a></li>
-</ul>
-<h4 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h4><ul>
-<li><p>也叫最少知识原则，即：类的设计要降低耦合，如果两个类不必彼此直接通信，那么这两个类就不应当发生直接的相互作用。如果其中一个类需要调用另一个类的某一个方法的话，可以通过第三者转发这个调用</p>
-</li>
-<li><p>在类的结构设计上，每一个类都应当尽量降低成员的访问权限，设计时应当考虑两个类是直接发生调用关系，还是通过第三方来搭建关系</p>
-</li>
-</ul>
-<h4 id="合成-聚合复用原则"><a href="#合成-聚合复用原则" class="headerlink" title="合成/聚合复用原则"></a>合成/聚合复用原则</h4><ul>
-<li><p>尽量使用合成/聚合，尽量不要使用类继承，因为父类的改变，会影响到所有子类</p>
-</li>
-<li><p>聚合表示一种弱的拥有关系，体现的是A对象可以包含B对象，但B对象不是A对象的一部分。合成是一种强的拥有关系，体现的是严格的部分和整体的关系。</p>
-</li>
-<li><p>大雁拥有翅膀（合成），许多大雁聚合成雁群（聚合）</p>
-</li>
-</ul>
-<hr>
-
-<h4 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h4><ul>
-<li><p>深复制：把引用对象的变量指向复制过的新对象，而不是原有的被引用的对象</p>
-</li>
-<li><p>浅复制：被复制对象的鄋变量都含有与原来的对象相同的值，而所有对其他对象的引用都仍然指向原来的对象</p>
-</li>
-<li><p><strong>如何实现深复制：</strong> 用 私有构造函数 创建引用对象，然后再clone方法里调用私有构造函数，完成克隆，其他的值引用则在clone里面直接赋值就好了</p>
-</li>
-</ul>
-<h4 id="模板模式"><a href="#模板模式" class="headerlink" title="模板模式"></a>模板模式</h4><ul>
-<li><p>定义一个操作中的算法的骨架，而将一些步骤延迟到子类中，模板方法是的子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤</p>
-</li>
-<li><p>一切逻辑都在父类中写好，需要延迟交给子类的部分，通过让子类@Override方法来实现，或者抽象类实现逻辑，具体类实现细节</p>
-</li>
-</ul>
-<h4 id="外观模式"><a href="#外观模式" class="headerlink" title="外观模式"></a>外观模式</h4><ul>
-<li><p>为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这个接口使得这一子系统更加容易使用，比如，基金是各种股票的外观模式，购买者只需要和基金打交道就好了</p>
-</li>
-<li><p>分层的处理：Facade类，承上启下的作用，对外暴露的接口简单，统一</p>
-</li>
-</ul>
-<h4 id="建造者模式"><a href="#建造者模式" class="headerlink" title="建造者模式"></a>建造者模式</h4><ul>
-<li><p>Builder 和 Director： Builder是抽象类，用于让开发者实现一些细节步骤，Director里面包含了Buider的实例，用于封装一些操作逻辑，这样开发者每次只需要根据自己的需求实现Builder，然后交给Director就可以了，不用care操作逻辑是否有遗漏</p>
-</li>
-<li><p>适用于当创建复杂对象的算法应该独立于该对象的组成部分以及他们的装配方式时适用的模式，即将一个复杂对象的构建与它的表示分离，使得同样的构建过程（Director）可以创建不同的表示(Builder)</p>
-</li>
-</ul>
-<h4 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a>状态模式</h4><ul>
-<li><p>当一个对象的内在状态改变时允许改变其行为，这个对象看起来像是改变了其类</p>
-</li>
-<li><p>状态模式主要解决的是当控制一个对象状态转换的条件表达式过于复杂时，把状态的判断逻辑转移到表示不同状态的一系列类当中（<strong>实际！</strong>）</p>
-</li>
-</ul>
-<h4 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h4><ul>
-<li><p>将一个类的接口转换成客户希望的另外一个接口，Adapter模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
-</li>
-<li><p>使用一个已经存在的类，但如果它的接口，也就是它的方法和你的要求不相同时，就应该考虑用适配器模式，即：使用一个Adapter类实现抽象接口，里面持有待适配的对象，在Override接口方法的时候，将待适配对象的方法实现到接口中</p>
-</li>
-</ul>
-<h4 id="备忘录模式"><a href="#备忘录模式" class="headerlink" title="备忘录模式"></a>备忘录模式</h4><ul>
-<li><p>在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。</p>
-</li>
-<li><p>Originator(发起人，负责创建一个备忘录，即在SaveStatus时创建个Mememto) 和 Memento(备忘录，负责创建状态副本，保存在自己的类中) 和 Caretaker（管理者，负责管理内部的状态副本get和set）</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Originator</span> &#123;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> Mememto <span class="title">SaveState</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">return</span> <span class="keyword">new</span> Memento(vit,atk,def)	</div><div class="line">  &#125;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RecoveryState</span>(<span class="params">Mememto state</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.vit = state.vit;</div><div class="line">	<span class="keyword">this</span>.atk = state.atk;</div><div class="line">	<span class="keyword">this</span>.def = state.def;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Memento</span> &#123;</div><div class="line"></div><div class="line">  <span class="keyword">private</span> <span class="keyword">int</span> vit;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">int</span> atk;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">int</span> def;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Memento</span>(<span class="params"><span class="keyword">int</span> vit, <span class="keyword">int</span> atk, <span class="keyword">int</span> def</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.vit = vit;</div><div class="line">	<span class="keyword">this</span>.atk = atk;</div><div class="line">	<span class="keyword">this</span>.def = def;</div><div class="line">  &#125;</div><div class="line">  /...</div><div class="line">	<span class="keyword">get</span>/<span class="keyword">set</span></div><div class="line">  .../</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Caretaker</span> &#123;</div><div class="line">  <span class="keyword">private</span> Memento memento;</div><div class="line">  /...</div><div class="line">	<span class="keyword">get</span>/<span class="keyword">set</span></div><div class="line">  .../</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//----------To Do----------</span></div><div class="line"></div><div class="line">Caretaker.memento = Originator.SaveState();</div><div class="line">Originator.RecoveryState(Caretaker.memento);</div></pre></td></tr></table></figure>
-<h4 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h4><ul>
-<li><p>将对象组合成属性结构以表示”部分-整体”的层次结构。组合模式使得用户对单个对象和组合对象的使用具有<strong>一致性</strong></p>
-</li>
-<li><p>“部分-整体” 的关系实质上为 “树叶-根”的关系，所有的组件实现统一的接口，这个接口包含扩展组件的能力，即</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">abstarct <span class="keyword">class</span> <span class="title">Component</span>&#123;</div><div class="line">			</div><div class="line">  <span class="keyword">protected</span> <span class="keyword">string</span> name;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Component</span>(<span class="params"><span class="keyword">string</span> name</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.name = name;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Add</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 扩展能力</span></div><div class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Remove</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 扩展能力</span></div><div class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Display</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 各司其职</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="迭代器模式"><a href="#迭代器模式" class="headerlink" title="迭代器模式"></a>迭代器模式</h4><ul>
-<li><p>提供一种方法顺序访问一个聚合对象中各个元素，而又不暴露该对象的内部表示，即当你需要访问一个聚集对象，而且不管这些对象是什么，就应该考虑用迭代器模式</p>
-</li>
-<li><p>迭代器抽象类（Iterator） 和 迭代器具体类 (ConcreteIterator) </p>
-</li>
-<li><p>聚集抽象类（Aggregate）和 聚集具体类（ConcreteAggregate）</p>
-</li>
-</ul>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">abstaract class Iterator &#123;</div><div class="line"></div><div class="line">  public abstract object First();</div><div class="line">  public abstract object Next();</div><div class="line">  public abstract bool IsDone();</div><div class="line">  public abstract object CurrentItem();</div><div class="line">&#125;</div><div class="line"></div><div class="line">abstaract class Aggregate &#123;</div><div class="line">  public abstract Iterator createIterator();</div><div class="line">&#125;</div><div class="line">		</div><div class="line">class ConcreteAggregate：Aggregate &#123;</div><div class="line"></div><div class="line">  private IList&lt;object&gt; items = new List&lt;object&gt;();</div><div class="line">  public orerride Iterator createIterator&#123;</div><div class="line">	return new ConcreteIterator(this);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">		</div><div class="line">class ConcreteIterator : Iterator &#123;</div><div class="line">  </div><div class="line">private ConcreteAggregate aggregate;</div><div class="line">  public ConcreteIterator(ConcreteAggregate aggregate)&#123;</div><div class="line">	this.aggregate = aggregate;</div><div class="line">  &#125;</div><div class="line">  /**</div><div class="line">   * Override methods in Iterator</div><div class="line">   * /</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a>桥接模式</h4><ul>
-<li><p>将抽象部分与它的实现部分分离，使它们都可以独立的变化</p>
-</li>
-<li><p>Abstraction 和 Implementor </p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Implementor</span> &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">ConcreteImplementorA</span> : <span class="title">Implenmentor</span>&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">class ConcreteImplementorB : Implenmentor&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">class Abstraction &#123;</div><div class="line">  <span class="keyword">protected</span> Implementor implementor;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetImplementor</span>(<span class="params">Implementor implementor</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.implementor = implementor;</div><div class="line">  &#125;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">RefinedAbstraction</span>: <span class="title">Abstraction</span>&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	implementor.Operation();</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span>&#123;</div><div class="line">  Abstraction ab = <span class="keyword">new</span> RefinedAbstraction();</div><div class="line">  ab.SetImpelementor(<span class="keyword">new</span> ConcreteImplementorA());</div><div class="line">  ad.Operation();</div><div class="line">  ab.SetImpelementor(<span class="keyword">new</span> ConcreteImplementorB());</div><div class="line">  ad.Operation();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h4><ul>
-<li><p>分离两个类的职责，统一规划到中间的消息队列管理：客户 - 服务员 - 烤肉者</p>
-</li>
-<li><p>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化，对请求排队或记录请求日志，以及支持可撤销的操作，它将请求一个操作的对象与知道怎么执行一个操作的对象分隔开: Command 和 Receiver 绑定，而 Command 的调度执行，由 Invoker 负责</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Command</span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">protected</span> Receiver receiver;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Command</span>(<span class="params">Receiver receiver</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.receiver = receiver;</div><div class="line">  &#125;</div><div class="line">  <span class="function"><span class="keyword">abstract</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">ConcreteCommand</span> : <span class="title">Command</span>&#123;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ConcreteCommand</span>(<span class="params">Receiver receiver</span>): <span class="title">base</span>(<span class="params">receiver</span>)</span>&#123;&#125;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	receiver.Action();			</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Invoker</span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">private</span> Command command;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetCommand</span>(<span class="params">Command command</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.command = command;</div><div class="line">  &#125;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ExecuteCommand</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	command.Execute();</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Receiver</span>&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Action</span>(<span class="params"></span>)</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  Receiver r = <span class="keyword">new</span> Receiver();</div><div class="line">  Command c = <span class="keyword">new</span> ConcreteCommand(r);</div><div class="line">  Invoker i = <span class="keyword">new</span> Invoker();</div><div class="line">  i.SetCommand(c);</div><div class="line">  i.ExecuteCommand();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="职责链模式"><a href="#职责链模式" class="headerlink" title="职责链模式"></a>职责链模式</h4><ul>
-<li><p>使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系，将这个对象连成一个链，并沿着这条链传递该请求，知道有一个对象处理它为止（Chain）</p>
-</li>
-<li><p>接收者和发送者都没有对方的明确信息，且链中的对象自己也并不知道链的结构。结果是职责链可简化对象的相互连接，仅需要保持一个向后引用</p>
-</li>
-<li><p>随时增加或修改处理一个请求的结构，增强了给对象指派职责的灵活性，<strong>最坏情况</strong>：到末端都得不到处理，需要事先考虑全面</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Handler</span>&#123;</div><div class="line">  </div><div class="line">  <span class="keyword">protected</span> Handler successor;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetSuccessor</span>(<span class="params">Handler successor</span>)</span>&#123;</div><div class="line">	<span class="keyword">this</span>.successor = successor;</div><div class="line">  &#125;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> request</span>)</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">ConcreteHandler1</span> : <span class="title">Handler</span> &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> request</span>)</span>&#123;</div><div class="line">	<span class="keyword">if</span>(request &gt;= <span class="number">0</span> &amp;&amp; request &lt; <span class="number">10</span>)&#123;</div><div class="line">	  <span class="comment">// do handle request</span></div><div class="line">	&#125;<span class="function"><span class="keyword">else</span> <span class="title">if</span>(<span class="params">successor != <span class="literal">null</span></span>)</span>&#123;</div><div class="line">	  successor.HandleRequest(request);</div><div class="line">	&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="中介模式"><a href="#中介模式" class="headerlink" title="中介模式"></a>中介模式</h4><ul>
-<li><p>对象之间大量的连接使得一个对象不可能在没有其他对象的支持下工作，系统表现为一个不可分割的整理，所谓低耦合的解决方案：中介模式其中之一</p>
-</li>
-<li><p>用一个中介对象来封装一系列的对象交互。中介者使得各对象不需要显示地相互引用，从而使其耦合松散，并且可以独立的改变他们之间的交互。</p>
-</li>
-<li><p>缺点：把交互的复杂性变成了中介者的复杂性，需要着重考虑，对象之间多对多的交互，首先应当考虑系统设计上的合理性</p>
-</li>
-</ul>
-<h4 id="享元模式"><a href="#享元模式" class="headerlink" title="享元模式"></a>享元模式</h4><ul>
-<li><p>如果一个应用程序使用了大量的对象，而大量的这些对象造成了很大的存储开销时就应该考虑使用享元模式，还有就是对象的大多数的外部状态，如果删除不影响的话，那么可以用相对较少的共享对象取代很多组对象，此时也应该考虑使用享元模式，比如：线程池</p>
-</li>
-<li><p>享元模式共享的是对象，对象数量是有限制的，因此会在工厂内部保存对象的引用，而工厂模式是生成对象，对象数量是无限制的</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Flyweight</span>&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">int</span> ee</span>)</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">class ConcreteFlyweight : Flyweight&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">int</span> ee</span>)</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">FlyweightFactory</span>&#123;</div><div class="line">  </div><div class="line">  <span class="keyword">private</span> Hashtable flyweights = <span class="keyword">new</span> Hashtable();</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">FlyweightFactory</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="comment">//内部保留有限的对象数</span></div><div class="line">	flyweights.Add(<span class="string">"X"</span>, <span class="keyword">new</span> ConcreteFlyweight());</div><div class="line">	flyweights.Add(<span class="string">"Y"</span>, <span class="keyword">new</span> ConcreteFlyweight());</div><div class="line">	flyweights.Add(<span class="string">"Z"</span>, <span class="keyword">new</span> ConcreteFlyweight());</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> Flyweight <span class="title">GetFlyweight</span>(<span class="params"><span class="keyword">string</span> key</span>)</span>&#123;</div><div class="line">	<span class="keyword">return</span> ((Flyweight)flyweights[key]);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="解释器模式"><a href="#解释器模式" class="headerlink" title="解释器模式"></a>解释器模式</h4><ul>
-<li><p>同样的一个抽象操作，需要不同的实施方法，则考虑解释器模式</p>
-</li>
-<li><p>缺点在于需要维护多个解释器实现</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">AbstractExpression</span> &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">TerminalExpression: AbstractExpression &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">NonterminalExpression: AbstractExpression &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 全局信息</span></div><div class="line"><span class="keyword">class</span> <span class="title">Context</span> &#123;</div><div class="line"></div><div class="line">  <span class="keyword">private</span> <span class="keyword">string</span> input;</div><div class="line">  <span class="keyword">private</span> <span class="keyword">string</span> output;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span>&#123;</div><div class="line">  Context ctx = <span class="keyword">new</span> Context();</div><div class="line">  AbstractExpression terminal = <span class="keyword">new</span> TerminalExpression();</div><div class="line">  terminal.interpret(ctx);</div><div class="line">  AbstractExpression terminal = <span class="keyword">new</span> NonterminalExpression();</div><div class="line">  nonterminal.interpret(ctx);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="访问者模式"><a href="#访问者模式" class="headerlink" title="访问者模式"></a>访问者模式</h4><ul>
-<li><p>表示一个作用于某对象结构中的各元素的操作，它使你可以在不改变各元素的类前提下定义作用于这些元素的新操作。</p>
-</li>
-<li><p>访问者模式的目的是要把处理从数据结构分离出来，有稳定的数据结构，又有易于变化的算法，使用访问者模式就是比较合理的，因为增加算法的操作变得尤为容易</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Visitor</span> &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">useAlgorithmA</span>(<span class="params">concreteElementA A</span>)</span>;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">useAlgorithmB</span>(<span class="params">concreteElementB B</span>)</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">ConcreteVisitor1: Visitor &#123;</div><div class="line">  <span class="comment">// implements</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">ConcreteVisitor2: Visitor &#123;</div><div class="line">  <span class="comment">// implements</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Element</span>&#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>;</div><div class="line">&#125;</div><div class="line">	</div><div class="line">ConcreteElementr1 : Element &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</div><div class="line">	visitor.useAlgorithmA(<span class="keyword">this</span>);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">ConcreteElementr2 : Element &#123;</div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</div><div class="line">	visitor.useAlgorithmB(<span class="keyword">this</span>);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Contorller</span> &#123;</div><div class="line">  <span class="comment">//整合 visitor 和 element, 使得对外操作统一</span></div><div class="line">  <span class="keyword">private</span> IList&lt;Element&gt; elements = <span class="keyword">new</span> List&lt;Element&gt;();</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Attach</span>(<span class="params">Element element</span>)</span>&#123;</div><div class="line">	elements.Add(element);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Detach</span>(<span class="params">Element element</span>)</span>&#123;</div><div class="line">	elements.Remove(element);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</div><div class="line">	<span class="keyword">foreach</span>(Element e <span class="keyword">in</span> elements)&#123;</div><div class="line">	  e.Accept(visitor);</div><div class="line">	&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjfajwkvg0016fds6ttuy2mws" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-JS文档生成工具-Jsdoc" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/17/JS文档生成工具-Jsdoc/">JS文档生成工具-Jsdoc</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/17/JS文档生成工具-Jsdoc/">
-            <time datetime="2016-11-17T09:53:00.000Z" itemprop="datePublished">2016-11-17</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>, <a class="tag-link" href="/tags/工具/">工具</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>Jsdoc是一款JS文档的生成工具，提供了丰富的标签，写起文档来十分方便，具体标签用法参考 <a href="http://useJsdoc.org/" target="_blank" rel="external">Jsdoc</a>，这里就不多赘述。但它的用处，远远不止于生成文档，最近通过研究，发现利用Jsdoc工具，可以干更多的事情，待下面剖析。</p>
-<h4 id="生成原理"><a href="#生成原理" class="headerlink" title="生成原理"></a>生成原理</h4><p>首先来谈谈Jsdoc的生成原理，即如何从注释代码生成最后的网页。这个过程其实很简单，通过文档解析器<code>parser</code>对每个js文件进行分析，提取出文档信息，之后的一步很关键，Jsdoc将提取出来的信息存放到了<a href="http://www.taffydb.com/" target="_blank" rel="external">taffydb</a>中，进而根据这些信息来生成网页。</p>
-<p>为了更好的解释这个过程，来看Jsdoc的源码</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* templates/default/publish.js */</span></div><div class="line">exports.publish = <span class="function"><span class="keyword">function</span>(<span class="params">taffyData, opts, tutorials</span>) </span>&#123;</div><div class="line">	<span class="comment">//generate Jsdoc html	</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>生成html的代码逻辑，就在<code>publish</code>这关键函数中，从接受的参数来看，<code>taffyData</code>中已经存放好解析之后的文档信息，<code>opts</code>是<a href="http://useJsdoc.org/about-configuring-Jsdoc.html" target="_blank" rel="external">配置文件</a>的解析，<code>tutorials</code>是教程的信息，未做过多研究。那么taffyData中存放的信息试什么样子的呢？来看如下</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">***** Debug ******</div><div class="line">[ &#123; <span class="attr">comment</span>: <span class="string">'/**\n* &lt;p&gt;Start ...... @public\n* @since 1\n */'</span>,</div><div class="line">    <span class="attr">meta</span>:</div><div class="line">     &#123; <span class="attr">range</span>: [<span class="built_in">Object</span>],</div><div class="line">       <span class="attr">filename</span>: <span class="string">'LocationManager.js'</span>,</div><div class="line">       <span class="attr">lineno</span>: <span class="number">69</span>,</div><div class="line">       <span class="attr">code</span>: [<span class="built_in">Object</span>],</div><div class="line">       <span class="attr">vars</span>: [<span class="built_in">Object</span>] &#125;,</div><div class="line">    <span class="attr">description</span>: <span class="string">'&lt;p&gt;Start request location.&lt;/p&gt; ......more.&lt;/p&gt;\n'</span>,</div><div class="line">    <span class="attr">permission</span>: [ [<span class="built_in">Object</span>] ],</div><div class="line">    <span class="attr">see</span>: [ <span class="string">'[removeLocationU...r#removeLocationUpdates&#125;'</span> ],</div><div class="line">    <span class="attr">params</span>: [ [<span class="built_in">Object</span>] ],</div><div class="line">    <span class="attr">returns</span>: [ [<span class="built_in">Object</span>] ],</div><div class="line">    <span class="attr">access</span>: <span class="string">'public'</span>,</div><div class="line">    <span class="attr">since</span>: <span class="string">'1'</span>,</div><div class="line">    <span class="attr">name</span>: <span class="string">'requestLocationUpdates'</span>,</div><div class="line">    <span class="attr">longname</span>: <span class="string">'xxx.location.LocationManager#requestLocationUpdates'</span>,</div><div class="line">    <span class="attr">kind</span>: <span class="string">'function'</span>,</div><div class="line">    <span class="attr">memberof</span>: <span class="string">'xxx.location.LocationManager'</span>,</div><div class="line">    <span class="attr">scope</span>: <span class="string">'instance'</span>,</div><div class="line">    <span class="attr">___id</span>: <span class="string">'T000002R003347'</span>,</div><div class="line">    <span class="attr">___s</span>: <span class="literal">true</span> &#125; ]</div></pre></td></tr></table></figure>
-<p>以上信息就是taffyData中存放的文档信息，可以看到，关键的Jsdoc信息，比如<code>@since 1</code>解析成了<code>since:&#39;1&#39;</code>，<code>@public</code>解析成了<code>access:public</code>，<code>kind:&#39;function&#39;</code>，经过这般解析，taffyData中的数据已经足够可以用来生成网页，从而可以看出，在<code>publish</code>函数中，围绕着taffydb的数据，通过各种数据处理，可以做一些更多的事情，这里只是抛砖引玉，比如统计代码的各种信息、检查Jsdoc是否符合规范等等</p>
-<p>以一张图简要描述下Jsdoc的原理</p>
-<img src="/2016/11/17/JS文档生成工具-Jsdoc/jsdoc.png" alt="taffyData是Jsdoc的核心关键" title="taffyData是Jsdoc的核心关键">
-<p>至此，我们分析出了Jsdoc的关键信息：<strong>Jsdoc解析之后的信息全部存放到taffyData中，而这些信息作为接口publish的参数，提供了良好的扩展性</strong></p>
-<p>如果进一步了解信息转储，请查阅：<code>app.js # app.jsdoc.parser.parse -&gt; parser.js # parser.createParser</code> 这个方法</p>
-<h4 id="自定义扩展"><a href="#自定义扩展" class="headerlink" title="自定义扩展"></a>自定义扩展</h4><p>接下来来看看Jsdoc提供的三种自定义扩展方式，分别是：自定义<code>EventHandler</code>级别的插件，自定义标签，自定义抽象语法树访问器，下面来分别解释下这三种扩展方式的区别</p>
-<ul>
-<li><p>自定义EventHandler级别的插件</p>
-<p>  这种扩展方式是最高级别的扩展，如果学过监听器设计模式，看如下代码就一目了然了，一个<code>EventHandler</code>插件包含了以下几个阶段的监听</p>
-  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">exports.handlers = &#123;</div><div class="line">  <span class="attr">parseBegin</span>: <span class="function"><span class="keyword">function</span>(<span class="params">sourcefiles</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">fileBegin</span>: <span class="function"><span class="keyword">function</span>(<span class="params">filename</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">beforeParse</span>: <span class="function"><span class="keyword">function</span>(<span class="params">filename,content</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">JsdocCommentFound</span>: <span class="function"><span class="keyword">function</span>(<span class="params">filename, comment, lineno</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">symbolFound</span>: <span class="function"><span class="keyword">function</span>(<span class="params">..params</span>)</span>&#123; &#125;,</div><div class="line">  <span class="attr">newDoclet</span>: <span class="function"><span class="keyword">function</span>(<span class="params">doclet</span>) </span>&#123;&#125;,</div><div class="line">  <span class="attr">fileComplete</span>: <span class="function"><span class="keyword">function</span>(<span class="params">filename,content</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">parseComplete</span>: <span class="function"><span class="keyword">function</span>(<span class="params">sourcefiles, doclets</span>)</span>&#123;&#125;,</div><div class="line">  <span class="attr">processingComplete</span>: <span class="function"><span class="keyword">function</span>(<span class="params">doclets</span>)</span>&#123;&#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>  不难理解，Jsdoc在生成过程中，抛出了以上这些阶段事件供扩展，每个事件的不同参数，代表的当前阶段产生的中间结果。比如在解析之前(parseBegin)，传入的参数代表源文件文件名列表，可以做一些正比表达式的匹配，指定生成某些文件的文档。在解析完一个文件的Jsdoc信息时(newDoclet)，doclet中就包括了上面taffydb中的信息。有了这几个阶段，相信很轻松的就可以扩展出任何想要的插件，关键在于插件的行为是由哪些阶段完成的。</p>
-</li>
-<li><p>自定义标签</p>
-<p>  这种扩展方式是中间级别的扩展，主要用于当Jsdoc官方提供的标签不能满足文档注释需要的时候，选择自定义标签来补充完善Jsdoc的能力，比如，我需要在文档中注释一个权限声明的标签，@permission，那么可以这样做</p>
-  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">exports.defineTags = <span class="function"><span class="keyword">function</span>(<span class="params">dictionary</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> opts = &#123;</div><div class="line">	<span class="attr">canHaveName</span>: <span class="literal">true</span>,</div><div class="line">	<span class="attr">mustHaveValue</span>: <span class="literal">true</span>,</div><div class="line">	<span class="attr">onTagged</span>: <span class="function"><span class="keyword">function</span>(<span class="params">doclet, tag</span>) </span>&#123;</div><div class="line">	  doclet.permission = doclet.permission || [];</div><div class="line">	  doclet.permission.push(tag);</div><div class="line">	&#125;</div><div class="line">  &#125;</div><div class="line">  dictionary.defineTag(<span class="string">"permission"</span>, opts);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>  Jsdoc提供了<code>defineTags</code>接口来自定义标签，其参数dictionary可以理解为标签字典，如上述代码描述，将自定义标签和属性，添加到dictionary中，这样就能被Jsdoc在解析中识别了，onTagged方法定义了当解析到该标签时，Jsdoc应该做出的操作，这里还是<strong>doclet</strong>，还记得吗？就是那个taffydb的数据，翻到上面那个taffydb数据信息看看，permission就在其中。自定义标签相比上面的EventHandler级别的插件，实现起来简单、方便。</p>
-</li>
-<li><p>自定义抽象语法树访问器</p>
-<p>  这种扩展方式时最低级别的扩展，官方文档中用了(lowest)一词。同样，来看代码</p>
-  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">exports.astNodeVisitor = &#123;</div><div class="line">     <span class="attr">visitNode</span>: <span class="function"><span class="keyword">function</span>(<span class="params">node, e, parser, currentSourceName</span>) </span>&#123;</div><div class="line">       <span class="comment">// do all sorts of crazy things here</span></div><div class="line">     &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>  由于直接接触的对象是抽象语法数，那么可做的事情就更多了，就好比越是接近系统底层，可扩展的能力越高，越是上层的东西，可扩展能力就越小，Jsdoc提供了<code>astNodeVisitor</code>接口来扩展访问到AST每个节点的行为，感兴趣的同学可以好好实战一番，这里就不过多赘述了</p>
-</li>
-</ul>
-<h4 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h4><p>Jsdoc的主要原理和扩展方式在上面分析完了，更多完整功能用法，请参考<a href="http://useJsdoc.org/" target="_blank" rel="external">Jsdoc</a></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/11/17/JS文档生成工具-Jsdoc/" data-id="cjfajwkuz0004fds6hddl4426" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjfj3pq3w000robs6fzfcq3r8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2318,7 +1780,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2327,7 +1789,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

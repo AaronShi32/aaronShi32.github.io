@@ -5,31 +5,18 @@
     
     <title>读书笔记-程序员的自我修养（三） | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="目标文件（ELF） 详解
-目标文件 里有什么？
-
-目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的
-
-普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
+    <meta name="description" content="目标文件（ELF） 详解 目标文件 里有什么？  目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的  普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
+<meta name="keywords" content="读书">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读书笔记-程序员的自我修养（三）">
 <meta property="og:url" content="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="目标文件（ELF） 详解
-目标文件 里有什么？
-
-目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的
-
-普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
+<meta property="og:description" content="目标文件（ELF） 详解 目标文件 里有什么？  目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的  普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2017-05-09T02:20:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-程序员的自我修养（三）">
-<meta name="twitter:description" content="目标文件（ELF） 详解
-目标文件 里有什么？
-
-目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的
-
-普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
+<meta name="twitter:description" content="目标文件（ELF） 详解 目标文件 里有什么？  目标文件的格式，从 结构 上讲，它是已经 编译后的可执行文件，只是还 没有经过链接 的过程，其中可能有些符号或有些地址还没有被 调整，本身就是按照可执行文件格式存储的  普及 : 可执行文件格式（Executable） 主要是 Windows 下的 PE（Portable Executable） 和 Linux 下的 ELF（Executable">
     
 
     
@@ -158,7 +145,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -308,7 +295,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjfajwkvl001gfds6vax9nted" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjfj3pq4b001kobs69i3irtj6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -420,7 +407,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -429,7 +416,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

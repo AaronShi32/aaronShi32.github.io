@@ -5,25 +5,18 @@
     
     <title>SonarQube - 安装使用调试 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历
-安装与运行SonarQube分为两个部分：Server 和 Scanner，其中
-Server：https://www.sonarqube.org/downloads/
-Scanner：https://docs.">
+    <meta name="description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历 安装与运行SonarQube分为两个部分：Server 和 Scanner，其中 Server：https://www.sonarqube.org/downloads/ Scanner：https://docs.">
+<meta name="keywords" content="工具">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SonarQube - 安装使用调试">
 <meta property="og:url" content="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历
-安装与运行SonarQube分为两个部分：Server 和 Scanner，其中
-Server：https://www.sonarqube.org/downloads/
-Scanner：https://docs.">
+<meta property="og:description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历 安装与运行SonarQube分为两个部分：Server 和 Scanner，其中 Server：https://www.sonarqube.org/downloads/ Scanner：https://docs.">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2017-03-16T08:36:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SonarQube - 安装使用调试">
-<meta name="twitter:description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历
-安装与运行SonarQube分为两个部分：Server 和 Scanner，其中
-Server：https://www.sonarqube.org/downloads/
-Scanner：https://docs.">
+<meta name="twitter:description" content="最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历 安装与运行SonarQube分为两个部分：Server 和 Scanner，其中 Server：https://www.sonarqube.org/downloads/ Scanner：https://docs.">
     
 
     
@@ -152,7 +145,7 @@ Scanner：https://docs.">
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -226,14 +219,14 @@ Scanner：https://docs.">
             
             <p>最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历</p>
 <h5 id="安装与运行"><a href="#安装与运行" class="headerlink" title="安装与运行"></a>安装与运行</h5><p>SonarQube分为两个部分：Server 和 Scanner，其中</p>
-<p>Server：<a href="https://www.sonarqube.org/downloads/" target="_blank" rel="external">https://www.sonarqube.org/downloads/</a></p>
-<p>Scanner：<a href="https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code" target="_blank" rel="external">https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code</a></p>
+<p>Server：<a href="https://www.sonarqube.org/downloads/" target="_blank" rel="noopener">https://www.sonarqube.org/downloads/</a></p>
+<p>Scanner：<a href="https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code" target="_blank" rel="noopener">https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code</a></p>
 <p>其余安装环境就不赘述了：MySQL 和 Java</p>
-<p>参考这篇文章：<a href="http://blog.csdn.net/hunterno4/article/details/11687269" target="_blank" rel="external">http://blog.csdn.net/hunterno4/article/details/11687269</a></p>
+<p>参考这篇文章：<a href="http://blog.csdn.net/hunterno4/article/details/11687269" target="_blank" rel="noopener">http://blog.csdn.net/hunterno4/article/details/11687269</a></p>
 <h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><ol>
 <li>在配置了 sonar-project.properties 之后，运行 sonar-scanner 报如下错误：</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.sonarqube.ws.client.HttpException: Error 500 on http://localhost:9000/api/ce/submit?projectKey=xxx&amp;projectName=yyy : &#123;&quot;errors&quot;:[&#123;&quot;msg&quot;:&quot;An error has occurred. Please contact your administrator.&quot;&#125;]&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.sonarqube.ws.client.HttpException: Error 500 on http://localhost:9000/api/ce/submit?projectKey=xxx&amp;projectName=yyy : &#123;&quot;errors&quot;:[&#123;&quot;msg&quot;:&quot;An error has occurred. Please contact your administrator.&quot;&#125;]&#125;</span><br></pre></td></tr></table></figure>
 <p>解决方法如下：</p>
 <ul>
 <li><p>查看 <sonar-root>/logs/web.log 得知详细原因是：<code>Packet for query is too large (6082109 &gt; 4194304). You can change this value on the server by setting the max_allowed_packet&#39; variable</code></sonar-root></p>
@@ -244,7 +237,7 @@ Scanner：https://docs.">
 </li>
 </ul>
 <p>尝试分析一个工程，发现已经成功打通的整套流程，SonarQube的高集成特性以及丰富的插件，可以根据实际项目需要丰富的定制。接下来我会围绕它打造一个后期的基础质量保障“设施”，首先来看看如何调试自定义扩展插件</p>
-<h5 id="扩展插件"><a href="#扩展插件" class="headerlink" title="扩展插件"></a>扩展插件</h5><p>官方给出了扩展插件的示例：<a href="https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到" target="_blank" rel="external">https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到</a></p>
+<h5 id="扩展插件"><a href="#扩展插件" class="headerlink" title="扩展插件"></a>扩展插件</h5><p>官方给出了扩展插件的示例：<a href="https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到" target="_blank" rel="noopener">https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到</a></p>
 <ul>
 <li><p><code>org.sonarsource.plugins.example</code>， 插件入口目录，相当于 Main 函数的作用</p>
 </li>
@@ -262,9 +255,9 @@ Scanner：https://docs.">
 </li>
 </ul>
 <p>以上这些自定义的各个模块，分别作用于 SonarQube 的基本流程里，即：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Project project)</span> </span>&#123;  </div><div class="line">    ... </div><div class="line">    sensorsExecutor.execute(sensorContext);  </div><div class="line">    decoratorsExecutor.execute();  </div><div class="line">    persistenceManager.dump();  </div><div class="line">    persistenceManager.setDelayedMode(<span class="keyword">false</span>);  </div><div class="line">    <span class="keyword">if</span> (project.isRoot()) &#123;  </div><div class="line">        <span class="keyword">if</span> (updateStatusJob != <span class="keyword">null</span>) &#123;  </div><div class="line">            updateStatusJob.execute();  </div><div class="line">        &#125;  </div><div class="line">        postJobsExecutor.execute(sensorContext);   </div><div class="line">    &#125;  </div><div class="line">    ...</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Project project)</span> </span>&#123;  </span><br><span class="line">    ... </span><br><span class="line">    sensorsExecutor.execute(sensorContext);  </span><br><span class="line">    decoratorsExecutor.execute();  </span><br><span class="line">    persistenceManager.dump();  </span><br><span class="line">    persistenceManager.setDelayedMode(<span class="keyword">false</span>);  </span><br><span class="line">    <span class="keyword">if</span> (project.isRoot()) &#123;  </span><br><span class="line">        <span class="keyword">if</span> (updateStatusJob != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            updateStatusJob.execute();  </span><br><span class="line">        &#125;  </span><br><span class="line">        postJobsExecutor.execute(sensorContext);   </span><br><span class="line">    &#125;  </span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
 <p>首先，初始化整个分析过程，包括加载所有的分析任务，其次，分析这些任务（Sensor和Decorator），并且把结果存储到数据库，最后，执行postjob，做相关的一些分析，因此需要根据插件作用需要，可以自行在各个阶段模块中进行扩展</p>
-<h5 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h5><p>官方提供了调试方法：<a href="https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug" target="_blank" rel="external">https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug</a></p>
+<h5 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h5><p>官方提供了调试方法：<a href="https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug" target="_blank" rel="noopener">https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug</a></p>
 <p>这里总结下步骤，避免踩坑：</p>
 <ol>
 <li><p>在 conf/sonar.properties 中设置<code>sonar.web.javaAdditionalOpts=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8001</code></p>
@@ -287,7 +280,7 @@ Scanner：https://docs.">
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjfajwkv4000ffds63zz8unfd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjfj3pq3q000fobs668mlyw1c" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -399,7 +392,7 @@ Scanner：https://docs.">
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -408,7 +401,7 @@ Scanner：https://docs.">
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

@@ -9,6 +9,7 @@
 <meta property="og:title" content="着陆的橘子">
 <meta property="og:url" content="https://aaronshi32.github.io/index.html">
 <meta property="og:site_name" content="着陆的橘子">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="着陆的橘子">
     
@@ -139,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -174,6 +175,158 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-Redis 单机数据库的实现" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">读书笔记-Redis 单机数据库的实现</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">
+            <time datetime="2018-04-02T05:55:51.000Z" itemprop="datePublished">2018-04-02</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="Redis：单机数据库的实现"><a href="#Redis：单机数据库的实现" class="headerlink" title="Redis：单机数据库的实现"></a>Redis：单机数据库的实现</h3><h5 id="1-数据库"><a href="#1-数据库" class="headerlink" title="1. 数据库"></a>1. 数据库</h5><p>通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个数组, 保存着服务器中的所有数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器的数据库数量: 默认16个</span></span><br><span class="line">	<span class="keyword">int</span> dbnum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisClient</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 记录客户端当前正在使用的数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Redis 是一个键值对(key-value pair)数据库服务器, 服务器中的每个数据库都由一个 redisDb 接口表示</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisDb</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 数据库键空间, 保存着数据库中的所有键值对</span></span><br><span class="line">	dict *dict;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 过期字典, 保存着键的过期时间, EXPIRE 实际上是操作该键值</span></span><br><span class="line">	dict *expires;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>dict 内容是 &lt; StringObject - 对象 &gt; 的键值对, 当使用 Redis 命令对数据库进行读写时, 服务器不仅会对键空间执行指定的读写操作, 还会执行一些额外的维护操作, 其中包括:</p>
+<ol>
+<li><p>在读取一个键之后, 服务器会根据键是否存在来更新服务器的键空间命中(hit)次数或不命中(miss)次数, 这两个值可以在 INFO stats 命令的 keyspace_hits 属性和 keyspace_misses 属性中查看</p>
+</li>
+<li><p>在读取一个键之后, 服务器会更新键的 LRU 时间, 用于计算键的闲置时间, 使用 OBJECT idletime <key> 命令可以查看 key 的闲置时间</key></p>
+</li>
+<li><p>如果服务器在读取一个键时发现该键已经过期, 那么服务器会先删除这个过期键, 然后才执行余下的其他操作</p>
+</li>
+<li><p>如果有客户端使用 WATCH 命令监视了某个键, 那么服务器在对被监视的键进行修改之后, 会将这个键标记为 dirty, 从而让事务程序注意到这个键已经被修改过</p>
+</li>
+<li><p>服务器每次修改一个件之后, 都会对脏键计数器的值增 1, 这个计数器会触发服务器的持久化以及复制操作</p>
+</li>
+<li><p>如果服务器开启了数据库通知功能, 那么在对键进行修改之后, 服务器将按配置发送相应的数据库通知</p>
+</li>
+</ol>
+<p>当键过期时, Redis 提供了三种删除策略</p>
+<ol>
+<li><p>(主动)定时删除: 在设置键的过期时间的同时, 创建一个定时器(timer), 让定时器在键的过期时间来临时, 立即执行对键的删除操作, 省内存, 费CPU</p>
+</li>
+<li><p>(Redis使用)(被动)惰性删除: 放任键过期不管, 当获取的时候, 过期就删除, 未过期就返回, 省CPU, 费内存(expireIfNeeded)</p>
+</li>
+<li><p>(Redis使用)(主动)定期删除: 每隔一段时间, 程序就对数据库进行一次检查, 删除里面的过期键(算法), 折中(serverCron - activeExpireCycle)</p>
+</li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfj3pq420012obs63kojgjtj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-Java基础知识索引" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -199,6 +352,11 @@
 
                         
                         
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/基础知识/">基础知识</a>
+    </div>
+
                     </div>
                 
             </header>
@@ -212,7 +370,13 @@
 <li>ClassLoader 双亲委派模型, 隔离性</li>
 </ul>
 <blockquote>
-<p><a href="https://www.cnblogs.com/wxd0108/p/6681618.html" target="_blank" rel="external">https://www.cnblogs.com/wxd0108/p/6681618.html</a></p>
+<p><a href="https://www.cnblogs.com/wxd0108/p/6681618.html" target="_blank" rel="noopener">https://www.cnblogs.com/wxd0108/p/6681618.html</a></p>
+</blockquote>
+<ul>
+<li>CNAME, A, 重定向的区别</li>
+</ul>
+<blockquote>
+<p>A记录 —— 映射域名到一个或多个IP, 适应于独立主机、有固定IP地址<br>CNAME——映射域名到另一个域名（子域名）, 适应于虚拟主机、变动IP地址主机<br>URL转发——重定向一个域名到另一个URL地址，使用HTTP 301状态码, 适应于更换域名又不想抛弃老用户</p>
 </blockquote>
 
         
@@ -224,7 +388,137 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfajwkuu0001fds6lzjvd93p" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfj3pq3l0005obs617pgl0mg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-2018书单" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/03/28/2018书单/">2018书单</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/03/28/2018书单/">
+            <time datetime="2018-03-28T01:27:38.000Z" itemprop="datePublished">2018-03-28</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/日常/">日常</a>, <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h4 id="思想类"><a href="#思想类" class="headerlink" title="思想类"></a>思想类</h4><ul>
+<li>《激荡十年，水大鱼大》  吴晓波</li>
+</ul>
+<h4 id="小说类"><a href="#小说类" class="headerlink" title="小说类"></a>小说类</h4><h4 id="技术类"><a href="#技术类" class="headerlink" title="技术类"></a>技术类</h4><ul>
+<li>《Redis 设计与现实》 黄健宏</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjfj3pq3k0004obs6l0ep22kz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -339,7 +633,7 @@
         
             
             <h3 id="Redis：数据结构与对象"><a href="#Redis：数据结构与对象" class="headerlink" title="Redis：数据结构与对象"></a>Redis：数据结构与对象</h3><h5 id="1-SDS：简单动态字符串（Simple-Dynamic-String）"><a href="#1-SDS：简单动态字符串（Simple-Dynamic-String）" class="headerlink" title="1. SDS：简单动态字符串（Simple Dynamic String）"></a>1. SDS：简单动态字符串（Simple Dynamic String）</h5><p>在 Redis 里面，C 语言传统的字符只会作为常量，用在一些无须修改的字符串，其他字符串都用 SDS</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> sdshdr &#123;</div><div class="line">	<span class="comment">// 记录 buf 数组中已使用字节的数量</span></div><div class="line">	<span class="comment">// 等于 SDS 所保存字符串的长度</span></div><div class="line">	<span class="keyword">int</span> len;</div><div class="line">	<span class="comment">// 记录buf 数组中未使用字节的数量</span></div><div class="line">	<span class="keyword">int</span> <span class="built_in">free</span>;</div><div class="line">	<span class="comment">// 字节数组，用于保存字符串</span></div><div class="line">	<span class="keyword">char</span> buf[];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> &#123;</span></span><br><span class="line">	<span class="comment">// 记录 buf 数组中已使用字节的数量</span></span><br><span class="line">	<span class="comment">// 等于 SDS 所保存字符串的长度</span></span><br><span class="line">	<span class="keyword">int</span> len;</span><br><span class="line">	<span class="comment">// 记录buf 数组中未使用字节的数量</span></span><br><span class="line">	<span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line">	<span class="comment">// 字节数组，用于保存字符串</span></span><br><span class="line">	<span class="keyword">char</span> buf[];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>SDS 与 C 字符串的区别</p>
 <ol>
 <li><p>获取字符串长度：O(1)， len</p>
@@ -375,20 +669,20 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 </ol>
 <h5 id="2-LinkedList：链表"><a href="#2-LinkedList：链表" class="headerlink" title="2. LinkedList：链表"></a>2. LinkedList：链表</h5><p>在 Redis 中，链表建的操作，底层实现之一的数据结构就是链表，除此之外，发布与订阅、慢查询、监视器等功能也用的是链表</p>
 <p>链表节点（listNode）：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> listNode &#123;</div><div class="line">	</div><div class="line">	<span class="comment">// 前置节点</span></div><div class="line">	<span class="keyword">struct</span> listNode *prev;</div><div class="line">	</div><div class="line">	<span class="comment">// 后置节点</span></div><div class="line">	<span class="keyword">struct</span> listNode *next;</div><div class="line">	</div><div class="line">	<span class="comment">// 节点值</span></div><div class="line">	<span class="keyword">void</span> *value;</div><div class="line"></div><div class="line">&#125; listNode;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 前置节点</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 后置节点</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 节点值</span></span><br><span class="line">	<span class="keyword">void</span> *value;</span><br><span class="line"></span><br><span class="line">&#125; listNode;</span><br></pre></td></tr></table></figure>
 <p>链表（list）：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="built_in">list</span> &#123;</div><div class="line">	</div><div class="line">	<span class="comment">// 表头节点</span></div><div class="line">	listNode *head;</div><div class="line"></div><div class="line">	<span class="comment">// 表尾节点</span></div><div class="line">	listNode *tail;</div><div class="line"></div><div class="line">	<span class="comment">// 链表所包含的节点数</span></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> len;</div><div class="line"></div><div class="line">	<span class="comment">// 节点值复制函数</span></div><div class="line">	<span class="keyword">void</span> *(*dup) (<span class="keyword">void</span> *ptr);</div><div class="line"></div><div class="line">	<span class="comment">// 节点值释放函数</span></div><div class="line">	<span class="keyword">void</span> (*<span class="built_in">free</span>) (<span class="keyword">void</span> *ptr);</div><div class="line"></div><div class="line">	<span class="comment">// 节点值对比函数</span></div><div class="line">	<span class="keyword">int</span> (*match) (<span class="keyword">void</span> *ptr);</div><div class="line"></div><div class="line">&#125; <span class="built_in">list</span>;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span> &#123;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 表头节点</span></span><br><span class="line">	listNode *head;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 表尾节点</span></span><br><span class="line">	listNode *tail;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 链表所包含的节点数</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> len;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 节点值复制函数</span></span><br><span class="line">	<span class="keyword">void</span> *(*dup) (<span class="keyword">void</span> *ptr);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 节点值释放函数</span></span><br><span class="line">	<span class="keyword">void</span> (*<span class="built_in">free</span>) (<span class="keyword">void</span> *ptr);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 节点值对比函数</span></span><br><span class="line">	<span class="keyword">int</span> (*match) (<span class="keyword">void</span> *ptr);</span><br><span class="line"></span><br><span class="line">&#125; <span class="built_in">list</span>;</span><br></pre></td></tr></table></figure>
 <p>Redis 使用 list 结构持有链表，是 <strong>双端、无环、带表头指针和表尾指针，带链表长度计数器、多态（void * 接收各种类型的值）</strong> 性质的链表</p>
 <h5 id="3-Map：字典"><a href="#3-Map：字典" class="headerlink" title="3. Map：字典"></a>3. Map：字典</h5><p>在 Redis 中，字典是哈希键的底层实现之一，字典由哈希表实现，哈希表由哈希表节点实现，哈希表节点就是键值对</p>
 <p>哈希表节点</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> dictEntry&#123;</div><div class="line">	</div><div class="line">	<span class="comment">// 键</span></div><div class="line">	<span class="keyword">void</span> *key;</div><div class="line">	</div><div class="line">	<span class="comment">// 值</span></div><div class="line">	<span class="keyword">union</span> &#123;</div><div class="line">		<span class="keyword">void</span> *val;</div><div class="line">		<span class="keyword">uint64_t</span> u64;</div><div class="line">		<span class="keyword">int64_t</span> s64;</div><div class="line">	&#125; v;</div><div class="line">	</div><div class="line">	<span class="comment">// 指向下个了哈希表节点，形成链表：解决哈希冲突</span></div><div class="line">	<span class="keyword">struct</span> dictEntry *next;</div><div class="line"></div><div class="line">&#125; dictEntry;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span>&#123;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 键</span></span><br><span class="line">	<span class="keyword">void</span> *key;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 值</span></span><br><span class="line">	<span class="keyword">union</span> &#123;</span><br><span class="line">		<span class="keyword">void</span> *val;</span><br><span class="line">		<span class="keyword">uint64_t</span> u64;</span><br><span class="line">		<span class="keyword">int64_t</span> s64;</span><br><span class="line">	&#125; v;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指向下个了哈希表节点，形成链表：解决哈希冲突</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span></span><br><span class="line"></span><br><span class="line">&#125; dictEntry;</span><br></pre></td></tr></table></figure>
 <p>哈希表</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> dictht &#123;</div><div class="line">	</div><div class="line">	<span class="comment">// 哈希表数组</span></div><div class="line">	dictEntry **table;</div><div class="line"></div><div class="line">	<span class="comment">// 哈希表大小</span></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> size;</div><div class="line"></div><div class="line">	<span class="comment">// 哈希表大小掩码，用于计算哈希值：等于 size - 1</span></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;</div><div class="line"></div><div class="line">	<span class="comment">// 已有节点数量</span></div><div class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> used;</div><div class="line">	</div><div class="line">&#125; dictht;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 哈希表数组</span></span><br><span class="line">	dictEntry **table;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 哈希表大小</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> size;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 哈希表大小掩码，用于计算哈希值：等于 size - 1</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 已有节点数量</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> used;</span><br><span class="line">	</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
 <p>字典</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> dict &#123;</div><div class="line">	</div><div class="line">	<span class="comment">// 类型特定函数</span></div><div class="line">	dictType *type;</div><div class="line"></div><div class="line">	<span class="comment">// 私有数据</span></div><div class="line">	<span class="keyword">void</span> *privdata;</div><div class="line"></div><div class="line">	<span class="comment">// 哈希表：每个字典由两个哈希表，一个平时使用，一个仅在 rehash 时使用</span></div><div class="line">	dictht ht[<span class="number">2</span>];</div><div class="line"></div><div class="line">	<span class="comment">// rehash索引</span></div><div class="line">	<span class="keyword">int</span> trehashidx;</div><div class="line"></div><div class="line">&#125; dict;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 类型特定函数</span></span><br><span class="line">	dictType *type;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 私有数据</span></span><br><span class="line">	<span class="keyword">void</span> *privdata;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 哈希表：每个字典由两个哈希表，一个平时使用，一个仅在 rehash 时使用</span></span><br><span class="line">	dictht ht[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// rehash索引</span></span><br><span class="line">	<span class="keyword">int</span> trehashidx;</span><br><span class="line"></span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
 <p>其中，type  和 privdata 是针对不同类型的键值对，为创建多态字典而设置，type 是指向 dictType 结构的指针，每个结构保存了一簇用于操作特定类型键值对的函数，比如：不同类型的哈希函数</p>
 <p>ht 属性是一个包含两个项的数组，一般情况下，字典只使用 ht[0] 哈希表，ht[1] 当进行 rehash 时使用</p>
-<p>Redis 的哈希算法使用的是 <a href="https://github.com/aappleby/smhasher" target="_blank" rel="external">MurmurHash</a></p>
+<p>Redis 的哈希算法使用的是 <a href="https://github.com/aappleby/smhasher" target="_blank" rel="noopener">MurmurHash</a></p>
 <blockquote>
 <p>hash = dict -&gt; type -&gt; hashFunction(key)</p>
 <p>index = hash &amp; dict -&gt; ht[x].sizemask</p>
@@ -406,7 +700,55 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 </li>
 </ol>
 <p><strong>渐进 rehash</strong>：为了避免 rehash 对服务器性能造成影响，服务器不是一次性将 ht[0] 里面的所有键值对全部 rehash 到 ht[1]，而是分多次、渐进式的将 ht[0] 里面的键值对慢慢 rehash 到 ht[1]，采用分治的思想，随着操作，随着 rehash，期间新加入的值会直接进入 ht[1]，如果 ht[0] 中 get 不到，会自动去 ht[1] 里面查找</p>
-<h5 id="4-Skip-List：跳表"><a href="#4-Skip-List：跳表" class="headerlink" title="4. Skip List：跳表"></a>4. Skip List：跳表</h5><p>在 Redis 中，跳表作为有序集合键（Sorted Set）的底层实现之一，也作为集群节点内部的数据结构</p>
+<h5 id="4-Skip-List：跳表"><a href="#4-Skip-List：跳表" class="headerlink" title="4. Skip List：跳表"></a>4. Skip List：跳表</h5><ul>
+<li><p>跳跃表是有序集合的底层实现之一</p>
+</li>
+<li><p>Redis 的跳跃表实现由 zskiplist 和 zskiplistNode 两个结构组成, 其中 zskiplist 用于保存跳跃表信息（比如表头、表尾节点、长度）, 而 zskiplistNode 则用于表示跳跃表节点</p>
+</li>
+<li><p>每个跳跃表节点的层高都是 1 至 32 之间的随机数</p>
+</li>
+<li><p>在同一个跳跃表中, 多个节点可以包含相同的分值, 但每个节点的成员对象必须是唯一的</p>
+</li>
+<li><p>跳跃表中的节点按照分值大小进行排序, 当分值相同时, 节点按照成员对象的大小进行排序</p>
+</li>
+</ul>
+<h5 id="5-IntSet-整数集合"><a href="#5-IntSet-整数集合" class="headerlink" title="5. IntSet: 整数集合"></a>5. IntSet: 整数集合</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">intset</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 编码方式</span></span><br><span class="line">	<span class="keyword">uint32_t</span> encoding;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 集合包含的元素数量</span></span><br><span class="line">	<span class="keyword">uint32_t</span> length;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 保存元素的数组</span></span><br><span class="line">	<span class="keyword">int8_t</span> contents[];</span><br><span class="line"></span><br><span class="line">&#125; intset;</span><br></pre></td></tr></table></figure>
+<p>每次加入新的元素，都有可能引发升级: 1. 扩展空间, 2: 类型统一化, 3: 将新元素和老元素统一加入到扩展后的空间, 需要注意的是: 不支持降级</p>
+<ul>
+<li><p>整数集合是集合键的底层实现之一</p>
+</li>
+<li><p>整数集合的底层实现为数组, 这个数组以有序、无重复的方式保存集合元素, 在有需要时, 程序会根据新添加元素的类型, 改变这个数组的类型</p>
+</li>
+<li><p>升级操作为整数集合带来了操作上的灵活性, 并且尽可能的节约了内存</p>
+</li>
+<li><p>整数集合只支持升级操作, 不支持降级操作</p>
+</li>
+</ul>
+<h5 id="6-Zip-List-压缩列表"><a href="#6-Zip-List-压缩列表" class="headerlink" title="6. Zip List: 压缩列表"></a>6. Zip List: 压缩列表</h5><ul>
+<li><p>压缩列表是一种为节约内存而开发的顺序型数据结构</p>
+</li>
+<li><p>压缩列表被用作列表键和哈希键的底层实现之一</p>
+</li>
+<li><p>压缩列表可以包含多个节点, 每个节点可以保存一个字节数组或者整数值</p>
+</li>
+<li><p>添加新节点到压缩列表, 或者从压缩列表中删除节点, 可能会引发连锁更新操作, 但这种操作出现的几率并不高</p>
+</li>
+</ul>
+<h5 id="7-Object-对象"><a href="#7-Object-对象" class="headerlink" title="7. Object: 对象"></a>7. Object: 对象</h5><p>Redis 并没有直接使用这些数据结构来实现键值对数据库, 而是基于这些数据结构创建了一个对象系统, 这个系统包含 <strong>字符串对象、列表对象、哈希对象、集合对象和有序集合对象</strong> 五种, 根据命令, 判断哪种对象适合就用于执行</p>
+<ul>
+<li><p>Redis 数据库中的每个键值对的键和值都是一个对象</p>
+</li>
+<li><p>Redis 共有字符串、列表、哈希、集合、有序集合五种类型的对象, 每种类型的对象至少都要两种或以上的编码方式, 不同的编码可以在不同的使用场景上优化对象的使用效率</p>
+</li>
+<li><p>服务器在执行某些命令之前, 会先检查给定键的类型能否执行指定的命令, 而检查一个键的类型就是检查键的值对象的类型</p>
+</li>
+<li><p>Redis 的对象系统带有引用计数实现的内存回收机制</p>
+</li>
+<li><p>Redis 会共享值为 0 到 9999 的字符串对象</p>
+</li>
+<li><p>对象会记录自己的最后一次被访问的时间, 这个时间可以用于计算对象的空转时间</p>
+</li>
+</ul>
 
         
         </div>
@@ -417,7 +759,140 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfajwkve0013fds6csv2kbxl" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfj3pq47001cobs6r8vtcr6f" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-加密算法" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/01/16/加密算法/">加密算法</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/01/16/加密算法/">
+            <time datetime="2018-01-16T06:02:03.000Z" itemprop="datePublished">2018-01-16</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>工作中需要使用一种加密算法，来验证消息的来源，故借此了解下这个专题</p>
+<p>常见的加密算法可以分为三类：对称加密，非对称加密，哈希</p>
+<p>首先是对称加密，即加密和解密使用相同的秘钥（K），优势在于速度快，当 K 很长时候，破解难度异常大，缺点是加密通路有 N 条，比如  Encrypt（A，B）和 Encrypt（B，A）是两条加密通路，则需要 N 个秘钥，其中 A，B 分别获有自己的和对方的秘钥，这就带来了秘钥泄露的风险，如果多个通路公用一个秘钥的话，一旦泄露，保密性也就无从谈起</p>
+<p>常见的加密算法有：<strong>AES</strong>，DES，3DES，Blowfish，IDEA，RC4，RC5，RC6</p>
+<p>接下来是非对称加密，即加密和解密使用不同的秘钥（K，K’），又称为公钥和私钥，使用公钥进行加密，使用私钥进行解密，优势在于私钥是唯一的，其他用户除了可以可以通过信息发送者的公钥来验证信息的来源是否真实，还可以确保发送者无法否认曾发送过该信息，缺点在于速度慢</p>
+<p>常见的非对称加密算法有：<strong>RSA，ECC，DSA</strong>，Diffie-Hellman，EI Gamal</p>
+<p>最后是哈希算法，它是一种单向的算法，即可以将目标信息通过 Hash 算法生成具有一定长度的 Hash 值，却不能通过这个 Hash 值从新获得目标信息，因此常用于不可还原的密码存储，信息完整性校验等</p>
+<p>常见的哈希算法有： <strong>MD5，SHA</strong>，MD2，MD4，HAVAL</p>
+<p>由于项目的本身需要，加密端在 PC，解密端在移动设备，且需要根据加密消息进行相关有效性验证，故最终选择 ECC 算法来</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfj40j7w0000tms6e09hg073" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -562,12 +1037,12 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 </li>
 </ul>
 <h3 id="HashMap-实现原理：数组-链表"><a href="#HashMap-实现原理：数组-链表" class="headerlink" title="HashMap 实现原理：数组 + 链表"></a>HashMap 实现原理：数组 + 链表</h3><p>数组</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</div><div class="line">	<span class="keyword">final</span> <span class="keyword">int</span> hash;</div><div class="line">	<span class="keyword">final</span> K key;</div><div class="line">	V value;</div><div class="line">	Node&lt;K,V&gt; next;</div><div class="line">	</div><div class="line">	Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</div><div class="line">		<span class="keyword">this</span>.hash = hash;</div><div class="line">		<span class="keyword">this</span>.key = key;</div><div class="line">		<span class="keyword">this</span>.value = value;</div><div class="line">		<span class="keyword">this</span>.next = next;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span>        </span>&#123; <span class="keyword">return</span> key; &#125;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span>      </span>&#123; <span class="keyword">return</span> value; &#125;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> key + <span class="string">"="</span> + value; &#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> Objects.hashCode(key) ^ Objects.hashCode(value);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V newValue)</span> </span>&#123;</div><div class="line">		V oldValue = value;</div><div class="line">		value = newValue;</div><div class="line">		<span class="keyword">return</span> oldValue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (o == <span class="keyword">this</span>)</div><div class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">		<span class="keyword">if</span> (o <span class="keyword">instanceof</span> Map.Entry) &#123;</div><div class="line">			Map.Entry&lt;?,?&gt; e = (Map.Entry&lt;?,?&gt;)o;</div><div class="line">			<span class="keyword">if</span> (Objects.equals(key, e.getKey()) &amp;&amp; Objects.equals(value, e.getValue())) </div><div class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">int</span> hash;</span><br><span class="line">	<span class="keyword">final</span> K key;</span><br><span class="line">	V value;</span><br><span class="line">	Node&lt;K,V&gt; next;</span><br><span class="line">	</span><br><span class="line">	Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">		<span class="keyword">this</span>.hash = hash;</span><br><span class="line">		<span class="keyword">this</span>.key = key;</span><br><span class="line">		<span class="keyword">this</span>.value = value;</span><br><span class="line">		<span class="keyword">this</span>.next = next;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span>        </span>&#123; <span class="keyword">return</span> key; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span>      </span>&#123; <span class="keyword">return</span> value; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> key + <span class="string">"="</span> + value; &#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Objects.hashCode(key) ^ Objects.hashCode(value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V newValue)</span> </span>&#123;</span><br><span class="line">		V oldValue = value;</span><br><span class="line">		value = newValue;</span><br><span class="line">		<span class="keyword">return</span> oldValue;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (o == <span class="keyword">this</span>)</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">if</span> (o <span class="keyword">instanceof</span> Map.Entry) &#123;</span><br><span class="line">			Map.Entry&lt;?,?&gt; e = (Map.Entry&lt;?,?&gt;)o;</span><br><span class="line">			<span class="keyword">if</span> (Objects.equals(key, e.getKey()) &amp;&amp; Objects.equals(value, e.getValue())) </span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 <p>HashMap 其实就是一个 以上 Entry 数组，Entry 对象中包含了键和值，其中 next 也是一个 Entry 对象，它就是用来处理 hash 冲突的，形成一个链表</p>
 <p>几个重要的因素</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//实际存储的key-value键值对的个数</span></div><div class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;</div><div class="line"><span class="comment">//阈值，当table == &#123;&#125;时，该值为初始容量（初始容量默认为16）；当table被填充了，也就是为table分配内存空间后，threshold一般为 capacity*loadFactory。HashMap在进行扩容时需要参考threshold，后面会详细谈到</span></div><div class="line"><span class="keyword">int</span> threshold;</div><div class="line"><span class="comment">//负载因子，代表了table的填充度有多少，默认是0.75</span></div><div class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;</div><div class="line"><span class="comment">//用于快速失败，由于HashMap非线程安全，在对HashMap进行迭代时，如果期间其他线程的参与导致HashMap的结构发生变化了（比如put，remove等操作），需要抛出异常ConcurrentModificationException</span></div><div class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//实际存储的key-value键值对的个数</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;</span><br><span class="line"><span class="comment">//阈值，当table == &#123;&#125;时，该值为初始容量（初始容量默认为16）；当table被填充了，也就是为table分配内存空间后，threshold一般为 capacity*loadFactory。HashMap在进行扩容时需要参考threshold，后面会详细谈到</span></span><br><span class="line"><span class="keyword">int</span> threshold;</span><br><span class="line"><span class="comment">//负载因子，代表了table的填充度有多少，默认是0.75</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;</span><br><span class="line"><span class="comment">//用于快速失败，由于HashMap非线程安全，在对HashMap进行迭代时，如果期间其他线程的参与导致HashMap的结构发生变化了（比如put，remove等操作），需要抛出异常ConcurrentModificationException</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;</span><br></pre></td></tr></table></figure>
 <p>哈希函数</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//这是一个神奇的函数，用了很多的异或，移位等运算，对key的hashcode进一步进行计算以及二进制位的调整等来保证最终获取的存储位置尽量分布均匀</span></div><div class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object k)</span> </span>&#123;</div><div class="line">	<span class="keyword">int</span> h = hashSeed;</div><div class="line">	<span class="keyword">if</span> (<span class="number">0</span> != h &amp;&amp; k <span class="keyword">instanceof</span> String) &#123;</div><div class="line">		<span class="keyword">return</span> sun.misc.Hashing.stringHash32((String) k);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	h ^= k.hashCode();</div><div class="line"></div><div class="line">	h ^= (h &gt;&gt;&gt; <span class="number">20</span>) ^ (h &gt;&gt;&gt; <span class="number">12</span>);</div><div class="line">	<span class="keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="number">7</span>) ^ (h &gt;&gt;&gt; <span class="number">4</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//这是一个神奇的函数，用了很多的异或，移位等运算，对key的hashcode进一步进行计算以及二进制位的调整等来保证最终获取的存储位置尽量分布均匀</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object k)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> h = hashSeed;</span><br><span class="line">	<span class="keyword">if</span> (<span class="number">0</span> != h &amp;&amp; k <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">		<span class="keyword">return</span> sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	h ^= k.hashCode();</span><br><span class="line"></span><br><span class="line">	h ^= (h &gt;&gt;&gt; <span class="number">20</span>) ^ (h &gt;&gt;&gt; <span class="number">12</span>);</span><br><span class="line">	<span class="keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="number">7</span>) ^ (h &gt;&gt;&gt; <span class="number">4</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>注意：</p>
 <ol>
 <li><p>重写 equals 方法需同时重写 hashCode 方法，因为 HashMap 是通过 hashCode 进行映射的，如果不重写则映射不到 value</p>
@@ -585,7 +1060,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfajwkv9000pfds61hamltz4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfj3pq3x000tobs61kp4ld1u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -729,7 +1204,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 <p>7）ConcurrentHashMap 是用 lock 实现并发（锁的方式是稍微细粒度的。将hash表分为16个桶（默认值），诸如get, put, remove等常用操作只锁当前需要用到的桶）而 HashTable 是用 synchronized 实现并发（对整个集合加锁，加锁期间集合不可访问）</p>
 <p>Q：<strong>String 类是不可变的吗</strong></p>
 <p>A：从语法上来讲，是的，因为 String 类是用 final 修饰的，绝对吗？不绝对，因为可以用 UnSafe 来修改 String 值；多个相同值的 String，可以用 intern（） 来返回存储在字符串池的值，需要注意：采用new 创建的字符串对象不进入字符串池，见以下代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">String str1 = <span class="string">"a"</span>;  </div><div class="line">	String str2 = <span class="string">"b"</span>;  </div><div class="line">	String str3 = <span class="string">"ab"</span>;  </div><div class="line">	String str4 = str1 + str2;  </div><div class="line">	String str5 = <span class="keyword">new</span> String(<span class="string">"ab"</span>);  </div><div class="line">   </div><div class="line">	System.out.println(str5.equals(str3));       <span class="comment">// true</span></div><div class="line">	System.out.println(str5 == str3);            <span class="comment">// false</span></div><div class="line">	System.out.println(str5.intern() == str3);   <span class="comment">// true: str3 是直接声明的，进入字符串池  </span></div><div class="line">	System.out.println(str5.intern() == str4);   <span class="comment">// false: str5 是 new 声明的，不进入字符串池</span></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">String str1 = <span class="string">"a"</span>;  </span><br><span class="line">	String str2 = <span class="string">"b"</span>;  </span><br><span class="line">	String str3 = <span class="string">"ab"</span>;  </span><br><span class="line">	String str4 = str1 + str2;  </span><br><span class="line">	String str5 = <span class="keyword">new</span> String(<span class="string">"ab"</span>);  </span><br><span class="line">   </span><br><span class="line">	System.out.println(str5.equals(str3));       <span class="comment">// true</span></span><br><span class="line">	System.out.println(str5 == str3);            <span class="comment">// false</span></span><br><span class="line">	System.out.println(str5.intern() == str3);   <span class="comment">// true: str3 是直接声明的，进入字符串池  </span></span><br><span class="line">	System.out.println(str5.intern() == str4);   <span class="comment">// false: str5 是 new 声明的，不进入字符串池</span></span><br></pre></td></tr></table></figure>
         
         </div>
         <footer class="article-footer">
@@ -739,7 +1214,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfajwkvc000wfds66witswor" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfj3pq3y000vobs6eyqrn2f3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -873,7 +1348,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 <li><p>Client 发送 ACK 给 Server，Client 状态置为 TIME-WAIT，Server 收到后状态置为 CLOSE</p>
 </li>
 </ol>
-<img src="/2017/11/25/基础知识-Http%20和%20Https/三次握手和四次挥手.png" alt="流程图" title="流程图">
+<img src="/2017/11/25/基础知识-Http%20和%20Https/三次握手和四次挥手.png" title="流程图">
 <h3 id="Http-和-Https"><a href="#Http-和-Https" class="headerlink" title="Http 和 Https"></a>Http 和 Https</h3><p>HTTP是应用层协议，位于HTTP协议之下是传输协议TCP。TCP负责传输，HTTP则定义了数据如何进行包装</p>
 <blockquote>
 <p>HTTP - TCP（明文传输）</p>
@@ -889,7 +1364,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfajwkva000rfds6aimzhub9" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfj3pq410010obs6wdanqxed" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1010,7 +1485,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 <li><p>使用 Maven 初始化, 有两种方式, 以此解决 Maven 不支持多 parent 的问题</p>
 <ul>
 <li><p>继承默认的 parent</p>
-  <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Inherit defaults from Spring Boot --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div></pre></td></tr></table></figure>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Inherit defaults from Spring Boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
@@ -1019,11 +1494,11 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 </ul>
 <pre><code>    - 将 SpringBoot 的依赖添加到 dependencyManagement 中，并且设置  scope=import 
 
-        <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">		<span class="comment">&lt;!-- Override Spring Data release train provided by Spring Boot --&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.data<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-data-releasetrain<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>Fowler-SR2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">		<span class="comment">&lt;!-- Spring Boot basic dependencies --&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div></pre></td></tr></table></figure>
+        <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Override Spring Data release train provided by Spring Boot --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.data<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-data-releasetrain<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>Fowler-SR2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Spring Boot basic dependencies --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 2. Maven用户可以继承 spring-boot-starter-parent 项目来获取合适的默认设置。该parent项目提供以下特性
 
-    <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">- 默认编译级别为Java 1.6</div><div class="line">- 源码编码为 UTF-8</div><div class="line">- 一个 dependency management 节点，允许你省略常见依赖的 &lt;version&gt; 标签，继承自 spring-boot-dependencies POM。</div><div class="line">- 恰到好处的资源过滤</div><div class="line">- 恰到好处的插件配置（exec插件，surefire，Git commit ID，shade）</div><div class="line">- 恰到好处的对 application.properties 和 application.yml 进行筛选，</div><div class="line">- 包括特定 profile（profile-specific）的文件，比如 applicationfoo.</div><div class="line">- properties 和 application-foo.yml</div></pre></td></tr></table></figure>
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- 默认编译级别为Java 1.6</span><br><span class="line">- 源码编码为 UTF-8</span><br><span class="line">- 一个 dependency management 节点，允许你省略常见依赖的 &lt;version&gt; 标签，继承自 spring-boot-dependencies POM。</span><br><span class="line">- 恰到好处的资源过滤</span><br><span class="line">- 恰到好处的插件配置（exec插件，surefire，Git commit ID，shade）</span><br><span class="line">- 恰到好处的对 application.properties 和 application.yml 进行筛选，</span><br><span class="line">- 包括特定 profile（profile-specific）的文件，比如 applicationfoo.</span><br><span class="line">- properties 和 application-foo.yml</span><br></pre></td></tr></table></figure>
 
 3. Spring Boot Starters 列表
 
@@ -1033,14 +1508,14 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 4. 配置工程自检功能：`spring-boot-starter-actuator`
 
-    <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+    <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 
     配置文件中增加：management.security.enabled=false
 
     访问以下网站：
 
-    <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">http://localhost:8080/beans</div><div class="line">http://localhost:8080/env</div><div class="line">http://localhost:8080/health</div><div class="line">http://localhost:8080/metrics</div><div class="line">http://localhost:8080/trace</div><div class="line">http://localhost:8080/mappings</div></pre></td></tr></table></figure>
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/beans</span><br><span class="line">http://localhost:8080/env</span><br><span class="line">http://localhost:8080/health</span><br><span class="line">http://localhost:8080/metrics</span><br><span class="line">http://localhost:8080/trace</span><br><span class="line">http://localhost:8080/mappings</span><br></pre></td></tr></table></figure>
 </code></pre><ul>
 <li><p><strong>默认</strong> 的奥秘，来源于：<code>spring-boot-autoconfigure 的 JAR 文件</code></p>
 <ol>
@@ -1116,7 +1591,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfajwkv10008fds6gl57rg9j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfj3pq3r000hobs6gi9c80i0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1237,7 +1712,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 <li>Buffer 是内存拷贝，而不是内存共享</li>
 <li>Buffer 占用内存被解释为一个数组，而不是字节数组。比如，new Uint32Array(new Buffer([1,2,3,4])) 创建了 4 个 Uint32Array，它的成员为 [1,2,3,4]，而不是 [0x1020304] 或 [0x4030201]</li>
 </ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 4KB 作为界限的由来：createPool 判断条件</span></div><div class="line">Buffer.poolSize = <span class="number">8</span> * <span class="number">1024</span>; </div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">allocate</span>(<span class="params">size</span>) </span>&#123;</div><div class="line">  <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">if</span> (size &lt; (Buffer.poolSize &gt;&gt;&gt; <span class="number">1</span>)) &#123;</div><div class="line">    <span class="keyword">if</span> (size &gt; (poolSize - poolOffset))</div><div class="line">      createPool();</div><div class="line">    <span class="keyword">var</span> b = <span class="keyword">new</span> FastBuffer(allocPool, poolOffset, size);</div><div class="line">    poolOffset += size;</div><div class="line">    alignPool();</div><div class="line">    <span class="keyword">return</span> b;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="keyword">return</span> createUnsafeBuffer(size);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4KB 作为界限的由来：createPool 判断条件</span></span><br><span class="line">Buffer.poolSize = <span class="number">8</span> * <span class="number">1024</span>; </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">allocate</span>(<span class="params">size</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (size &lt; (Buffer.poolSize &gt;&gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (size &gt; (poolSize - poolOffset))</span><br><span class="line">      createPool();</span><br><span class="line">    <span class="keyword">var</span> b = <span class="keyword">new</span> FastBuffer(allocPool, poolOffset, size);</span><br><span class="line">    poolOffset += size;</span><br><span class="line">    alignPool();</span><br><span class="line">    <span class="keyword">return</span> b;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> createUnsafeBuffer(size);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><strong>四种</strong> 内存分配的 API</p>
 <ul>
 <li><p>Buffer.from</p>
@@ -1249,13 +1724,13 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 <li><p>Buffer.allocUnSafeSlow</p>
 </li>
 </ul>
-<img src="/2017/08/29/NodeJS%20-%20理解%20Buffer/buffer-allocate.png" alt="Buffer内存分配机制" title="Buffer内存分配机制">
+<img src="/2017/08/29/NodeJS%20-%20理解%20Buffer/buffer-allocate.png" title="Buffer内存分配机制">
 <h4 id="支持与字符串相互转换"><a href="#支持与字符串相互转换" class="headerlink" title="支持与字符串相互转换"></a>支持与字符串相互转换</h4><p>目前支持的字符串编码类型有：ASCII，UTF-8，UTF-16LE/UCS-2，Base64，Binary，Hex，可以用 isEncoding() 来判断是否支持编码</p>
 <p>对于不支持的编码类型，可以通过 <code>iconv</code> 和 <code>iconv-lite</code> 两个模块来支持更多编码类型转换</p>
 <p>转换成 Buffer：new Buffer(str，[encoding]) 和 buf.write(string，[offset]，[length]，[encoding])</p>
 <p>转换成 String：buf.toString([encoding]，[start]，[end])</p>
 <h4 id="正确的拼接方式"><a href="#正确的拼接方式" class="headerlink" title="正确的拼接方式"></a>正确的拼接方式</h4><p>用一个数组来存储接收到的所有 Buffer 片段并记录下所有片段的总长度，然后调用 Buffer.concat() 方法生成一个合并的 Buffer 对象</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">Buffer.concat = <span class="function"><span class="keyword">function</span> <span class="title">concat</span>(<span class="params">list, length</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> i;</div><div class="line">  <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(list))</div><div class="line">    <span class="keyword">throw</span> kConcatErr;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (list.length === <span class="number">0</span>)</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (length === <span class="literal">undefined</span>) &#123;</div><div class="line">    length = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++)</div><div class="line">      length += list[i].length;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    length = length &gt;&gt;&gt; <span class="number">0</span>;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> buffer = Buffer.allocUnsafe(length);</div><div class="line">  <span class="keyword">var</span> pos = <span class="number">0</span>;</div><div class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</div><div class="line">    <span class="keyword">var</span> buf = list[i];</div><div class="line">    <span class="keyword">if</span> (!isUint8Array(buf))</div><div class="line">      <span class="keyword">throw</span> kConcatErr;</div><div class="line">    _copy(buf, buffer, pos);</div><div class="line">    pos += buf.length;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// Note: `length` is always equal to `buffer.length` at this point</span></div><div class="line">  <span class="keyword">if</span> (pos &lt; length) &#123;</div><div class="line">    <span class="comment">// Zero-fill the remaining bytes if the specified `length` was more than</span></div><div class="line">    <span class="comment">// the actual total length, i.e. if we have some remaining allocated bytes</span></div><div class="line">    <span class="comment">// there were not initialized.</span></div><div class="line">    buffer.fill(<span class="number">0</span>, pos, length);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> buffer;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Buffer.concat = <span class="function"><span class="keyword">function</span> <span class="title">concat</span>(<span class="params">list, length</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> i;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(list))</span><br><span class="line">    <span class="keyword">throw</span> kConcatErr;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (list.length === <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (length === <span class="literal">undefined</span>) &#123;</span><br><span class="line">    length = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++)</span><br><span class="line">      length += list[i].length;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    length = length &gt;&gt;&gt; <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> buffer = Buffer.allocUnsafe(length);</span><br><span class="line">  <span class="keyword">var</span> pos = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> buf = list[i];</span><br><span class="line">    <span class="keyword">if</span> (!isUint8Array(buf))</span><br><span class="line">      <span class="keyword">throw</span> kConcatErr;</span><br><span class="line">    _copy(buf, buffer, pos);</span><br><span class="line">    pos += buf.length;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Note: `length` is always equal to `buffer.length` at this point</span></span><br><span class="line">  <span class="keyword">if</span> (pos &lt; length) &#123;</span><br><span class="line">    <span class="comment">// Zero-fill the remaining bytes if the specified `length` was more than</span></span><br><span class="line">    <span class="comment">// the actual total length, i.e. if we have some remaining allocated bytes</span></span><br><span class="line">    <span class="comment">// there were not initialized.</span></span><br><span class="line">    buffer.fill(<span class="number">0</span>, pos, length);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> buffer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h4 id="Buffer-与性能"><a href="#Buffer-与性能" class="headerlink" title="Buffer 与性能"></a>Buffer 与性能</h4><ul>
 <li><p>网络传输用 Buffer 比直接传字符串要快很多</p>
 <p>  通过预先转换静态内容为 Buffer 对象，可以有效地减少 CPU 的重复使用，节省服务器资源。在构建 Web 应用中，可以选择将页面中的动态内容和静态内容分离，静态内容部分可以通过预先转换为 Buffer 的方式，是性能得到提升。由于文件自身是二进制数据，所以在不需要改变内容的场景下，尽量只读取 Buffer，然后直接传输，不做额外的转换，避免损耗</p>
@@ -1274,532 +1749,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfajwkv10007fds6lar10ylr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-NodeJS - 理解 内存控制" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/08/29/NodeJS - 理解 内存控制/">NodeJS - 理解 内存控制</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/08/29/NodeJS - 理解 内存控制/">
-            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>V8 具有内存限制，所有的 JavaScript 对象都是通过堆来进行分配的，可以通过 <code>process.memoryUsage()</code> 来查看内存信息，其中 heapTotal 和 heapUsed 分别代表了已申请到的对内存和当前使用的量。如果当前代码已申请的堆空闲内存不够分配新的对象，将就申请堆内存，知道堆的大小超过 V8 的内存限制为止</p>
-<p>为何采取 V8 内存限制：一次小的垃圾回收需要 50ms 以上，一次非增量式的垃圾回收甚至需要 1s 以上，这是垃圾回收引起的 JS 线程暂停执行的时间，应用的性能和响应时间都会大幅度下降</p>
-<h4 id="V8-的垃圾回收机制"><a href="#V8-的垃圾回收机制" class="headerlink" title="V8 的垃圾回收机制"></a>V8 的垃圾回收机制</h4><p>采用 node –trace-gc xxx 命令行参数来查看内存垃圾回收日志，使用 –prof 可以得到 V8 执行时的性能分析数据，配合 tick-processor 工具查看统计信息</p>
-<h5 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h5><ul>
-<li><p>基于分代式垃圾回收（解决不同的对象生命周期不同）</p>
-<p>  <code>--max-old-space-size</code> 指定老生代内存空间的最大值 <strong>+</strong>  <code>--max-new-space-size</code> 指定新生代内存空间的最大值 <strong>=</strong> V8 堆的整体大小</p>
-</li>
-<li><p>新生代的回收算法：Scavenge（base on Cheney）</p>
-<p>  核心思想：空间一分为二，从 From 空间 <strong>复制</strong> 到 To 空间，缺点是只能使用堆内存的一般，好处是以空间换取时间（块），适合新生代频繁的内存回收</p>
-<p>  对象<strong>晋升</strong>两个条件：是否经历过 Scavenge 回收，To空间的内存占用是否超过了比例（25%）</p>
-</li>
-<li><p>老生代的回收算法：Mark-Sweep &amp; Mark-Compact</p>
-<p>  核心思想：标记 - 清楚 - 整理内存碎片</p>
-</li>
-<li><p>回收策略：延迟清理（lazy sweeping）和 增量式整理（incremental compaction）</p>
-<p>  为了降低全堆垃圾回收带来的线程停顿问题，采用增量标记来减少由于垃圾回收造成的停顿时间</p>
-</li>
-</ul>
-<h5 id="高效使用内存"><a href="#高效使用内存" class="headerlink" title="高效使用内存"></a>高效使用内存</h5><p>在正常的 JavaScript 执行中，无法立即回收的内存有必报和全局变量引用这两种情况，由于 V8 的内存限制，要十分小心此类变量是否无限制的增加，因为他会导致老生代的对象增多</p>
-<h4 id="内存指标"><a href="#内存指标" class="headerlink" title="内存指标"></a>内存指标</h4><ul>
-<li>使用 <code>process.memoryUsage()</code> 查看 Node 进程的内存占用情况</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// outofmemory.js</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMem</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> mem = process.memoryUsage();</div><div class="line">	<span class="keyword">var</span> format = <span class="function"><span class="keyword">function</span>(<span class="params">bytes</span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> (bytes / <span class="number">1024</span> / <span class="number">1024</span>).toFixed(<span class="number">2</span>) + <span class="string">'MB'</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">`Process: heapTotal <span class="subst">$&#123;format(mem.heapTotal)&#125;</span> heapUsed <span class="subst">$&#123;format(mem.heapUsed)&#125;</span> rss <span class="subst">$&#123;mem.rss&#125;</span>`</span>)；</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> useMem = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> size = <span class="number">20</span> * <span class="number">1024</span> * <span class="number">1024</span>;</div><div class="line">	<span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(size);</div><div class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; size; i++)&#123;</div><div class="line">		arr[i] = <span class="number">0</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> arr;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> total = [];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>； j++)&#123;</div><div class="line">	showMem();</div><div class="line">	total.push(useMem());</div><div class="line">&#125;</div><div class="line">showMem();</div></pre></td></tr></table></figure>
-<ul>
-<li><p>使用 <code>os.totalmem()</code> 和 <code>os.freemem()</code> 查看 操作系统 的内存情况</p>
-</li>
-<li><p>堆外内存：那些不是通过 V8 分配的内存 - Buffer 对象</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjfajwkv2000afds67d28ci1y" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-程序员的自我修养（十一）" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/07/05/读书笔记-程序员的自我修养（十一）/">读书笔记-程序员的自我修养（十一）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/07/05/读书笔记-程序员的自我修养（十一）/">
-            <time datetime="2017-07-05T02:51:46.000Z" itemprop="datePublished">2017-07-05</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="系统调用与API"><a href="#系统调用与API" class="headerlink" title="系统调用与API"></a>系统调用与API</h3><ul>
-<li><p><strong>普及</strong>：现代操作系统中程序本身是 <strong>没有权利访问过多系统资源</strong> 的，为了防止程序访问冲突，操作系统将可能产生冲突的系统资源给<strong> 保护起来</strong></p>
-</li>
-<li><p><strong>普及</strong>：每个操作系统都会提供 <strong>一套接口</strong>，以供应用程序使用，这些接口往往通过 <strong>中断</strong> 来实现，比如 Linux 使用 <strong>0x80</strong> 号中断作为系统调用的入口，Windows 采用 <strong>0x2E</strong> 号中断作为系统调用入口</p>
-</li>
-<li><p><strong>系统调用的弊端</strong></p>
-<ul>
-<li><p><strong>使用不便</strong>，操作系统提供的系统调用接口往往过于原始，程序员需要了解很多与操作系统相关的细节</p>
-</li>
-<li><p><strong>各个操作系统之间系统调用不兼容</strong>，定义和实现都不大一样</p>
-</li>
-<li><p><strong>为此：运行时库将不同的操作系统的系统调用包装为统一固定的接口，使得童颜的代码，在不同的操作系统下都可以直接编译，并产生一致的效果，这就是源码级上的可移植性</strong></p>
-</li>
-</ul>
-</li>
-<li><p><strong>系统调用的原理</strong></p>
-<ul>
-<li><p><strong>用户态</strong> 和 <strong>内核态</strong>：现代操作系统的CPU在不同特权级别下执行不同的指令，称之为 <strong>用户模式（User Mode）</strong> 和 <strong>内核模式（Kernel Mode）</strong></p>
-</li>
-<li><p><strong>系统调用</strong> 是运行在内核态的，而 <strong>应用程序</strong> 基本都是运行在用户态的</p>
-</li>
-<li><p>操作系统一般通过 <strong>中断</strong> 来从用户态 <strong>切换</strong> 到内核态，中断是一个硬件或软件发出的 <strong>请求</strong>，要求 CPU 暂停当前的工作 <strong>转手去处理</strong> 更加重要的事情</p>
-<ul>
-<li><p>中断的两个属性：<strong>中断号（Interrupt Number）（中断类型）</strong> 和 <strong>中断处理程序（Interrupt Service Routine）（既然中断了就要告诉CPU去干什么）</strong></p>
-</li>
-<li><p><strong>中断向量表（Interrupt Vector Table）</strong>：是个数组，第 n 项包含了指向第 n 号中断的中断处理程序的 <strong>指针</strong></p>
-</li>
-<li><p><strong>中断的流程：当中断到来时，CPU 会暂停当前执行的代码，根据中断号，在中断向量表中找到对应的中断处理程序，并调用它。中断处理程序执行完成之后，CPU 会继续执行之前的代码</strong></p>
-</li>
-<li><p><strong>硬件中断</strong> 和 <strong>软件中断</strong>：硬件中断通常来源于硬件的异常或其他事情的发生，软件中断通常是一条 <strong>指令</strong>（i386 下是 int），带有一个参数记录中断号，使用这条指令用户可以手动触发某个中断并执行其终端处理程序，<strong>比如 int 0x80 会调用第 0x80 号中断的处理程序</strong></p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Windows API</strong></p>
-<ul>
-<li><p>Windows API 是以 DLL 导出函数的形式暴露给应用开发者的，规模上非常庞大，其中一个头文件 “Windows.h” 包含了核心部分</p>
-</li>
-<li><p>基本服务：kernel32.dll、图形设备接口：gdi32.dll、用户接口：user32.dll、高级服务：advapi32.dll、通用对话框：comdlg32.dll、通用控件：comctl32.dll、Shell：shell32.dll、网络服务：ws2_32.dll</p>
-</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjfajwkvs001vfds64vw03d5v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-程序员的自我修养（十）" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/06/26/读书笔记-程序员的自我修养（十）/">读书笔记-程序员的自我修养（十）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/06/26/读书笔记-程序员的自我修养（十）/">
-            <time datetime="2017-06-26T03:03:20.000Z" itemprop="datePublished">2017-06-26</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="运行库"><a href="#运行库" class="headerlink" title="运行库"></a>运行库</h3><ul>
-<li><p><strong>入口函数和程序初始化</strong></p>
-<ul>
-<li><p><strong>普及</strong>：操作系统装载程序之后，首先运行的代码并不是 main 的第一行，而是 <strong>某些别的代码</strong>，这写代码负责准备好 main 函数执行所需要的环境，并且负责调用 main 函数，我们称这写代码为 <strong>入口函数</strong> 或 <strong>入口点（Entry Point）</strong></p>
-</li>
-<li><p><strong>程序初始化：Main函数之前有个入口函数</strong></p>
-</li>
-</ul>
-<ol>
-<li><p>操作系统在创建进程后，把控制权交到了程序的入口，这个入口往往是运行库中的某个入口函数</p>
-</li>
-<li><p>入口函数对运行库和程序运行环境进行初始化，包括堆、I/O、线程、全局变量构造等</p>
-</li>
-<li><p>入口函数在完成初始化之后，调用 main 函数，正式开始执行程序主体部分</p>
-</li>
-<li><p>main 函数执行完毕以后，返回到入口函数，入口函数进行清理工作，然后进行系统调用结束进程</p>
-</li>
-</ol>
-<ul>
-<li><p><strong>入口函数示例</strong></p>
-<ul>
-<li><p><strong>GLIBC（Linux）</strong>：__start -&gt; __libc_start_main -&gt; exit -&gt; _exit，即在  <strong>__libc_start_main</strong> 执行之前，做了参数压入栈，寄存器初始化，全局变量赋值等操作</p>
-</li>
-<li><p><strong>MSVC CRT（Windows）</strong>：初始化和 OS 版本有关的全局变量，<strong>初始化堆</strong>，<strong>初始化 I/O</strong>，获取命令行参数和环境变量，初始化C库的一些数据，<strong>调用 main 并记录返回值</strong>，检查错误并将 main 的返回值返回</p>
-<ul>
-<li><p><strong>堆</strong> 初始化：mainCRTStartup –&gt; heap_init() –&gt; <strong>HeapCreate</strong> 方法</p>
-</li>
-<li><p><strong>I/O</strong> 初始化：<strong>建立</strong> 打开文件表，如果能够继承自父进程，那么从父进程 <strong>获取</strong> 继承的句柄，<strong>初始化</strong> 标准输入输出</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>运行库与 I/O</strong></p>
-<ul>
-<li><p><strong>对于程序来说，I/O 涵盖的范围还要广一些，一个程序的 I/O 指代了程序与外界的交互，包括文件、管道、网络、命令行、信号等</strong></p>
-</li>
-<li><p><strong>I/O 初始化函数需要在用户空间中建立 stdin、stdout、stderr 及其 对应的 FILE 结构，是的程序进入 main 之后可以直接使用 printf，scanf 等函数</strong></p>
-</li>
-</ul>
-</li>
-<li><p><strong>C++运行库</strong></p>
-<ul>
-<li><p><strong>普及</strong>：任何一个 C 程序，它的背后都有一套庞大的代码来进行支撑，以使得该程序能够正常运行。这套代码至少包括入口函数，及其所以来的函数所构成的函数集合，当然，他还理应包括各种标砖函数的实现，我们称之为 <strong>运行时库（Runtime Library）</strong>，亦或 <strong>C运行库（CRT）</strong></p>
-</li>
-<li><p><strong>CRT大致包含了如下功能</strong>：</p>
-<ul>
-<li><p><strong>启动与退出</strong>：包括入口函数及入口函数所依赖的其他函数等</p>
-</li>
-<li><p><strong>标准函数</strong>：由C语言标准规定的 C语言标准库 所拥有的函数实现</p>
-</li>
-<li><p><strong>I/O</strong>：I/O功能的封装和实现</p>
-</li>
-<li><p><strong>堆</strong>：堆的封装和实现</p>
-</li>
-<li><p><strong>语言实现</strong>：语言中一些特殊功能的实现</p>
-</li>
-<li><p><strong>调试</strong>：实现调试功能的代码</p>
-</li>
-</ul>
-</li>
-<li><p><strong>C语言标准库由 24 个 C头文件 组成</strong>：标准输入输出（<strong>stdio.h</strong>），文件操作（<strong>stdio.h</strong>），字符操作（<strong>ctype.h</strong>），字符串操作（<strong>string.h</strong>），数学函数（<strong>math.h</strong>），资源管理（<strong>stdlib.h</strong>），格式转换（<strong>stdlib.h</strong>），时间/日期（<strong>time.h</strong>），断言（<strong>assert.h</strong>），各种类型上的常熟（<strong>limits.h &amp; float.h</strong>），变长参数（<strong>stdarg.h</strong>），非局部跳转（<strong>setjump.h</strong>）</p>
-</li>
-<li><p>运行库是和平台（操作系统）<strong>强相关</strong> 的，提供了不同操作系统平台的底层抽象，Linux 和 Window 平台下的两个主要 C 语言运行库分别为： <strong>glibc （GNC C Library）</strong> 和 <strong>MSVCRT（Microsoft Visual C Run-time）</strong></p>
-</li>
-</ul>
-</li>
-<li><p><strong>运行库与多线程</strong></p>
-<ul>
-<li><p><strong>Window API</strong> ：CreateThread() 和 ExitThread() </p>
-</li>
-<li><p><strong>MSVCRT</strong>：_beginThread() / _beginthreadex 和 _endthread()</p>
-</li>
-<li><p><strong>Glibc</strong>：pthread_create() 和 pthread_exit()</p>
-</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjfajwkvs001xfds6dimibmge" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfj3pq3n0008obs6o5lvrksu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1888,7 +1838,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1897,7 +1847,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

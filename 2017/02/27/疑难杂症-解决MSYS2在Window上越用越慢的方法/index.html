@@ -6,11 +6,13 @@
     <title>疑难杂症-解决MSYS2在Window上越用越慢的方法 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="最近折腾电脑真是费了不少脑细胞，谁让咱用着 window 还操着 linux 的心呢，事情起因是因为习惯了在 cmd 中使用 linux 的命令，但是 cygwin 新版的界面真是不该恭维的美感，所以就把 git/bin 目录加到了 PATH 中，这样一举两得，谁知 git for windows 现在用的是 MSYS2 的环境，运行个 ls，grep要等上 1 分钟才能出结果，于是乎忍无可忍，终">
+<meta name="keywords" content="疑难杂症">
 <meta property="og:type" content="article">
 <meta property="og:title" content="疑难杂症-解决MSYS2在Window上越用越慢的方法">
 <meta property="og:url" content="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/index.html">
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="最近折腾电脑真是费了不少脑细胞，谁让咱用着 window 还操着 linux 的心呢，事情起因是因为习惯了在 cmd 中使用 linux 的命令，但是 cygwin 新版的界面真是不该恭维的美感，所以就把 git/bin 目录加到了 PATH 中，这样一举两得，谁知 git for windows 现在用的是 MSYS2 的环境，运行个 ls，grep要等上 1 分钟才能出结果，于是乎忍无可忍，终">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2017-03-16T08:39:44.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="疑难杂症-解决MSYS2在Window上越用越慢的方法">
@@ -143,7 +145,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -217,10 +219,10 @@
             
             <p>最近折腾电脑真是费了不少脑细胞，谁让咱用着 window 还操着 linux 的心呢，事情起因是因为习惯了在 cmd 中使用 linux 的命令，但是 cygwin 新版的界面真是不该恭维的美感，所以就把 git/bin 目录加到了 PATH 中，这样一举两得，谁知 git for windows 现在用的是 MSYS2 的环境，运行个 ls，grep要等上 1 分钟才能出结果，于是乎忍无可忍，终于在今天解决了这个问题</p>
 <h5 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h5><p>解决 MSYS2 在使用过程中越用越慢的问题</p>
-<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">mkpasswd -l -c &gt; /etc/passwd</div><div class="line"></div><div class="line">mkgroup -l -c &gt; /etc/group</div><div class="line"></div><div class="line"># 如果是window系统就在 git/etc 下面执行</div><div class="line"></div><div class="line"># 修改 /etc/nsswitch.conf，其中</div><div class="line"></div><div class="line">passwd: files #db</div><div class="line"></div><div class="line">group: files #db</div></pre></td></tr></table></figure>
+<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mkpasswd -l -c &gt; /etc/passwd</span><br><span class="line"></span><br><span class="line">mkgroup -l -c &gt; /etc/group</span><br><span class="line"></span><br><span class="line"># 如果是window系统就在 git/etc 下面执行</span><br><span class="line"></span><br><span class="line"># 修改 /etc/nsswitch.conf，其中</span><br><span class="line"></span><br><span class="line">passwd: files #db</span><br><span class="line"></span><br><span class="line">group: files #db</span><br></pre></td></tr></table></figure>
 <h5 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h5><ul>
-<li><a href="https://gist.github.com/k-takata/9b8d143f0f3fef5abdab" target="_blank" rel="external">https://gist.github.com/k-takata/9b8d143f0f3fef5abdab</a></li>
-<li><a href="http://bjg.io/guide/cygwin-ad/" target="_blank" rel="external">http://bjg.io/guide/cygwin-ad/</a></li>
+<li><a href="https://gist.github.com/k-takata/9b8d143f0f3fef5abdab" target="_blank" rel="noopener">https://gist.github.com/k-takata/9b8d143f0f3fef5abdab</a></li>
+<li><a href="http://bjg.io/guide/cygwin-ad/" target="_blank" rel="noopener">http://bjg.io/guide/cygwin-ad/</a></li>
 </ul>
 <p>终于，系统恢复了丝滑版的顺畅~</p>
 
@@ -233,7 +235,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjfajwkvd000zfds62c52yr3s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjfj3pq40000yobs6rlj4egvi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -345,7 +347,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -354,7 +356,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

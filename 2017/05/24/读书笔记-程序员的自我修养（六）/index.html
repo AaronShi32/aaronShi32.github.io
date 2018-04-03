@@ -5,28 +5,18 @@
     
     <title>读书笔记-程序员的自我修养（六） | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行
-
-程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念
-
-每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
+    <meta name="description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行  程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念  每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
+<meta name="keywords" content="读书">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读书笔记-程序员的自我修养（六）">
 <meta property="og:url" content="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行
-
-程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念
-
-每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
+<meta property="og:description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行  程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念  每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2017-05-24T02:27:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-程序员的自我修养（六）">
-<meta name="twitter:description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行
-
-程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念
-
-每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
+<meta name="twitter:description" content="可执行文件的装载与进程前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行  程序 和 进程：前者理解为一些预先编译好的指令和数据集合的一个 文件，是一个 静态 的概念，后者理解为程序运行时的一个 过程，是一个 动态 的概念  每个进程都被操作系统分配以 虚拟的地址空间（Virtual Address Space） 来供运行时分配使用，如果被操作系统捕">
     
 
     
@@ -155,7 +145,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -334,7 +324,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfajwkvq001sfds6ptt0riln" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfj3pq4i001wobs6kwwu5q6z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -446,7 +436,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -455,7 +445,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

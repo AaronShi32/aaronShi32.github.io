@@ -9,6 +9,7 @@
 <meta property="og:title" content="着陆的橘子">
 <meta property="og:url" content="https://aaronshi32.github.io/page/2/index.html">
 <meta property="og:site_name" content="着陆的橘子">
+<meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="着陆的橘子">
     
@@ -139,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -174,6 +175,531 @@
 
             
             <section id="main">
+    <article id="post-NodeJS - 理解 内存控制" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/08/29/NodeJS - 理解 内存控制/">NodeJS - 理解 内存控制</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/29/NodeJS - 理解 内存控制/">
+            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>V8 具有内存限制，所有的 JavaScript 对象都是通过堆来进行分配的，可以通过 <code>process.memoryUsage()</code> 来查看内存信息，其中 heapTotal 和 heapUsed 分别代表了已申请到的对内存和当前使用的量。如果当前代码已申请的堆空闲内存不够分配新的对象，将就申请堆内存，知道堆的大小超过 V8 的内存限制为止</p>
+<p>为何采取 V8 内存限制：一次小的垃圾回收需要 50ms 以上，一次非增量式的垃圾回收甚至需要 1s 以上，这是垃圾回收引起的 JS 线程暂停执行的时间，应用的性能和响应时间都会大幅度下降</p>
+<h4 id="V8-的垃圾回收机制"><a href="#V8-的垃圾回收机制" class="headerlink" title="V8 的垃圾回收机制"></a>V8 的垃圾回收机制</h4><p>采用 node –trace-gc xxx 命令行参数来查看内存垃圾回收日志，使用 –prof 可以得到 V8 执行时的性能分析数据，配合 tick-processor 工具查看统计信息</p>
+<h5 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h5><ul>
+<li><p>基于分代式垃圾回收（解决不同的对象生命周期不同）</p>
+<p>  <code>--max-old-space-size</code> 指定老生代内存空间的最大值 <strong>+</strong>  <code>--max-new-space-size</code> 指定新生代内存空间的最大值 <strong>=</strong> V8 堆的整体大小</p>
+</li>
+<li><p>新生代的回收算法：Scavenge（base on Cheney）</p>
+<p>  核心思想：空间一分为二，从 From 空间 <strong>复制</strong> 到 To 空间，缺点是只能使用堆内存的一般，好处是以空间换取时间（块），适合新生代频繁的内存回收</p>
+<p>  对象<strong>晋升</strong>两个条件：是否经历过 Scavenge 回收，To空间的内存占用是否超过了比例（25%）</p>
+</li>
+<li><p>老生代的回收算法：Mark-Sweep &amp; Mark-Compact</p>
+<p>  核心思想：标记 - 清楚 - 整理内存碎片</p>
+</li>
+<li><p>回收策略：延迟清理（lazy sweeping）和 增量式整理（incremental compaction）</p>
+<p>  为了降低全堆垃圾回收带来的线程停顿问题，采用增量标记来减少由于垃圾回收造成的停顿时间</p>
+</li>
+</ul>
+<h5 id="高效使用内存"><a href="#高效使用内存" class="headerlink" title="高效使用内存"></a>高效使用内存</h5><p>在正常的 JavaScript 执行中，无法立即回收的内存有必报和全局变量引用这两种情况，由于 V8 的内存限制，要十分小心此类变量是否无限制的增加，因为他会导致老生代的对象增多</p>
+<h4 id="内存指标"><a href="#内存指标" class="headerlink" title="内存指标"></a>内存指标</h4><ul>
+<li>使用 <code>process.memoryUsage()</code> 查看 Node 进程的内存占用情况</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// outofmemory.js</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMem</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> mem = process.memoryUsage();</span><br><span class="line">	<span class="keyword">var</span> format = <span class="function"><span class="keyword">function</span>(<span class="params">bytes</span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (bytes / <span class="number">1024</span> / <span class="number">1024</span>).toFixed(<span class="number">2</span>) + <span class="string">'MB'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">`Process: heapTotal <span class="subst">$&#123;format(mem.heapTotal)&#125;</span> heapUsed <span class="subst">$&#123;format(mem.heapUsed)&#125;</span> rss <span class="subst">$&#123;mem.rss&#125;</span>`</span>)；</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> useMem = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> size = <span class="number">20</span> * <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line">	<span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(size);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">		arr[i] = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> total = [];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>； j++)&#123;</span><br><span class="line">	showMem();</span><br><span class="line">	total.push(useMem());</span><br><span class="line">&#125;</span><br><span class="line">showMem();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>使用 <code>os.totalmem()</code> 和 <code>os.freemem()</code> 查看 操作系统 的内存情况</p>
+</li>
+<li><p>堆外内存：那些不是通过 V8 分配的内存 - Buffer 对象</p>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjfj3pq3o000aobs6qv91h3q5" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-读书笔记-程序员的自我修养（十一）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/07/05/读书笔记-程序员的自我修养（十一）/">读书笔记-程序员的自我修养（十一）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/07/05/读书笔记-程序员的自我修养（十一）/">
+            <time datetime="2017-07-05T02:51:46.000Z" itemprop="datePublished">2017-07-05</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="系统调用与API"><a href="#系统调用与API" class="headerlink" title="系统调用与API"></a>系统调用与API</h3><ul>
+<li><p><strong>普及</strong>：现代操作系统中程序本身是 <strong>没有权利访问过多系统资源</strong> 的，为了防止程序访问冲突，操作系统将可能产生冲突的系统资源给<strong> 保护起来</strong></p>
+</li>
+<li><p><strong>普及</strong>：每个操作系统都会提供 <strong>一套接口</strong>，以供应用程序使用，这些接口往往通过 <strong>中断</strong> 来实现，比如 Linux 使用 <strong>0x80</strong> 号中断作为系统调用的入口，Windows 采用 <strong>0x2E</strong> 号中断作为系统调用入口</p>
+</li>
+<li><p><strong>系统调用的弊端</strong></p>
+<ul>
+<li><p><strong>使用不便</strong>，操作系统提供的系统调用接口往往过于原始，程序员需要了解很多与操作系统相关的细节</p>
+</li>
+<li><p><strong>各个操作系统之间系统调用不兼容</strong>，定义和实现都不大一样</p>
+</li>
+<li><p><strong>为此：运行时库将不同的操作系统的系统调用包装为统一固定的接口，使得童颜的代码，在不同的操作系统下都可以直接编译，并产生一致的效果，这就是源码级上的可移植性</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>系统调用的原理</strong></p>
+<ul>
+<li><p><strong>用户态</strong> 和 <strong>内核态</strong>：现代操作系统的CPU在不同特权级别下执行不同的指令，称之为 <strong>用户模式（User Mode）</strong> 和 <strong>内核模式（Kernel Mode）</strong></p>
+</li>
+<li><p><strong>系统调用</strong> 是运行在内核态的，而 <strong>应用程序</strong> 基本都是运行在用户态的</p>
+</li>
+<li><p>操作系统一般通过 <strong>中断</strong> 来从用户态 <strong>切换</strong> 到内核态，中断是一个硬件或软件发出的 <strong>请求</strong>，要求 CPU 暂停当前的工作 <strong>转手去处理</strong> 更加重要的事情</p>
+<ul>
+<li><p>中断的两个属性：<strong>中断号（Interrupt Number）（中断类型）</strong> 和 <strong>中断处理程序（Interrupt Service Routine）（既然中断了就要告诉CPU去干什么）</strong></p>
+</li>
+<li><p><strong>中断向量表（Interrupt Vector Table）</strong>：是个数组，第 n 项包含了指向第 n 号中断的中断处理程序的 <strong>指针</strong></p>
+</li>
+<li><p><strong>中断的流程：当中断到来时，CPU 会暂停当前执行的代码，根据中断号，在中断向量表中找到对应的中断处理程序，并调用它。中断处理程序执行完成之后，CPU 会继续执行之前的代码</strong></p>
+</li>
+<li><p><strong>硬件中断</strong> 和 <strong>软件中断</strong>：硬件中断通常来源于硬件的异常或其他事情的发生，软件中断通常是一条 <strong>指令</strong>（i386 下是 int），带有一个参数记录中断号，使用这条指令用户可以手动触发某个中断并执行其终端处理程序，<strong>比如 int 0x80 会调用第 0x80 号中断的处理程序</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Windows API</strong></p>
+<ul>
+<li><p>Windows API 是以 DLL 导出函数的形式暴露给应用开发者的，规模上非常庞大，其中一个头文件 “Windows.h” 包含了核心部分</p>
+</li>
+<li><p>基本服务：kernel32.dll、图形设备接口：gdi32.dll、用户接口：user32.dll、高级服务：advapi32.dll、通用对话框：comdlg32.dll、通用控件：comctl32.dll、Shell：shell32.dll、网络服务：ws2_32.dll</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjfj3pq4j001zobs6zznssuhz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-读书笔记-程序员的自我修养（十）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/06/26/读书笔记-程序员的自我修养（十）/">读书笔记-程序员的自我修养（十）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/06/26/读书笔记-程序员的自我修养（十）/">
+            <time datetime="2017-06-26T03:03:20.000Z" itemprop="datePublished">2017-06-26</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="运行库"><a href="#运行库" class="headerlink" title="运行库"></a>运行库</h3><ul>
+<li><p><strong>入口函数和程序初始化</strong></p>
+<ul>
+<li><p><strong>普及</strong>：操作系统装载程序之后，首先运行的代码并不是 main 的第一行，而是 <strong>某些别的代码</strong>，这写代码负责准备好 main 函数执行所需要的环境，并且负责调用 main 函数，我们称这写代码为 <strong>入口函数</strong> 或 <strong>入口点（Entry Point）</strong></p>
+</li>
+<li><p><strong>程序初始化：Main函数之前有个入口函数</strong></p>
+</li>
+</ul>
+<ol>
+<li><p>操作系统在创建进程后，把控制权交到了程序的入口，这个入口往往是运行库中的某个入口函数</p>
+</li>
+<li><p>入口函数对运行库和程序运行环境进行初始化，包括堆、I/O、线程、全局变量构造等</p>
+</li>
+<li><p>入口函数在完成初始化之后，调用 main 函数，正式开始执行程序主体部分</p>
+</li>
+<li><p>main 函数执行完毕以后，返回到入口函数，入口函数进行清理工作，然后进行系统调用结束进程</p>
+</li>
+</ol>
+<ul>
+<li><p><strong>入口函数示例</strong></p>
+<ul>
+<li><p><strong>GLIBC（Linux）</strong>：__start -&gt; __libc_start_main -&gt; exit -&gt; _exit，即在  <strong>__libc_start_main</strong> 执行之前，做了参数压入栈，寄存器初始化，全局变量赋值等操作</p>
+</li>
+<li><p><strong>MSVC CRT（Windows）</strong>：初始化和 OS 版本有关的全局变量，<strong>初始化堆</strong>，<strong>初始化 I/O</strong>，获取命令行参数和环境变量，初始化C库的一些数据，<strong>调用 main 并记录返回值</strong>，检查错误并将 main 的返回值返回</p>
+<ul>
+<li><p><strong>堆</strong> 初始化：mainCRTStartup –&gt; heap_init() –&gt; <strong>HeapCreate</strong> 方法</p>
+</li>
+<li><p><strong>I/O</strong> 初始化：<strong>建立</strong> 打开文件表，如果能够继承自父进程，那么从父进程 <strong>获取</strong> 继承的句柄，<strong>初始化</strong> 标准输入输出</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>运行库与 I/O</strong></p>
+<ul>
+<li><p><strong>对于程序来说，I/O 涵盖的范围还要广一些，一个程序的 I/O 指代了程序与外界的交互，包括文件、管道、网络、命令行、信号等</strong></p>
+</li>
+<li><p><strong>I/O 初始化函数需要在用户空间中建立 stdin、stdout、stderr 及其 对应的 FILE 结构，是的程序进入 main 之后可以直接使用 printf，scanf 等函数</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>C++运行库</strong></p>
+<ul>
+<li><p><strong>普及</strong>：任何一个 C 程序，它的背后都有一套庞大的代码来进行支撑，以使得该程序能够正常运行。这套代码至少包括入口函数，及其所以来的函数所构成的函数集合，当然，他还理应包括各种标砖函数的实现，我们称之为 <strong>运行时库（Runtime Library）</strong>，亦或 <strong>C运行库（CRT）</strong></p>
+</li>
+<li><p><strong>CRT大致包含了如下功能</strong>：</p>
+<ul>
+<li><p><strong>启动与退出</strong>：包括入口函数及入口函数所依赖的其他函数等</p>
+</li>
+<li><p><strong>标准函数</strong>：由C语言标准规定的 C语言标准库 所拥有的函数实现</p>
+</li>
+<li><p><strong>I/O</strong>：I/O功能的封装和实现</p>
+</li>
+<li><p><strong>堆</strong>：堆的封装和实现</p>
+</li>
+<li><p><strong>语言实现</strong>：语言中一些特殊功能的实现</p>
+</li>
+<li><p><strong>调试</strong>：实现调试功能的代码</p>
+</li>
+</ul>
+</li>
+<li><p><strong>C语言标准库由 24 个 C头文件 组成</strong>：标准输入输出（<strong>stdio.h</strong>），文件操作（<strong>stdio.h</strong>），字符操作（<strong>ctype.h</strong>），字符串操作（<strong>string.h</strong>），数学函数（<strong>math.h</strong>），资源管理（<strong>stdlib.h</strong>），格式转换（<strong>stdlib.h</strong>），时间/日期（<strong>time.h</strong>），断言（<strong>assert.h</strong>），各种类型上的常熟（<strong>limits.h &amp; float.h</strong>），变长参数（<strong>stdarg.h</strong>），非局部跳转（<strong>setjump.h</strong>）</p>
+</li>
+<li><p>运行库是和平台（操作系统）<strong>强相关</strong> 的，提供了不同操作系统平台的底层抽象，Linux 和 Window 平台下的两个主要 C 语言运行库分别为： <strong>glibc （GNC C Library）</strong> 和 <strong>MSVCRT（Microsoft Visual C Run-time）</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>运行库与多线程</strong></p>
+<ul>
+<li><p><strong>Window API</strong> ：CreateThread() 和 ExitThread() </p>
+</li>
+<li><p><strong>MSVCRT</strong>：_beginThread() / _beginthreadex 和 _endthread()</p>
+</li>
+<li><p><strong>Glibc</strong>：pthread_create() 和 pthread_exit()</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjfj3pq4k0021obs6w8hhcrub" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-程序员的自我修养（九）" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -278,7 +804,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfajwkvl001ifds6j7my6hno" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfj3pq4c001mobs6cottjqlj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -459,7 +985,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfajwkvq001qfds6k9w7wgls" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfj3pq4h001uobs6cg6cfk4p" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -690,7 +1216,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfajwkvj001dfds66rtgmtd2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfj3pq4a001hobs6fbzeai60" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -911,7 +1437,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfajwkvq001sfds6ptt0riln" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfj3pq4i001wobs6kwwu5q6z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1088,7 +1614,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfajwkvp001nfds6p1lduqzw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfj3pq4f001robs6lcbiw33c" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1255,7 +1781,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjfajwkvt0020fds65g75ifih" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjfj3pq4m0024obs6qj7f4o94" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1447,543 +1973,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjfajwkvl001gfds6vax9nted" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-程序员的自我修养（二）" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/08/读书笔记-程序员的自我修养（二）/">读书笔记-程序员的自我修养（二）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/08/读书笔记-程序员的自我修养（二）/">
-            <time datetime="2017-05-08T02:24:26.000Z" itemprop="datePublished">2017-05-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="编译和链接"><a href="#编译和链接" class="headerlink" title="编译和链接"></a>编译和链接</h3><ul>
-<li><p>编译和链接： 通常将编译和链接合并到一起的过程称为 <strong>构建（Build）</strong>，可以分解成以下 4 个步骤</p>
-<ul>
-<li><p><strong>预编译（Propressing）</strong></p>
-<p>  源文件 和 头文件 被预编译器预编译成一个 <strong>.i</strong> 或者 <strong>.ii</strong>（cpp）的文件</p>
-<p>  期间主要处理那些源代码文件中的以 <strong>#</strong> 开始的预编译命令，比如 <strong> #include，#define </strong> 等</p>
-<p>  经过预编译后的 .i 文件 <strong>不包含任何宏定义</strong>，<strong>并且引用的文件已经全部被插入到  .i 文件中</strong>，<strong>删除了所有注释</strong>，<strong>处理了所有条件预编译指令（#if，#ifdef，#elif，#else，#endif）</strong>，<strong>保留了所有#progma编译器命令</strong></p>
-<p>  为此，当需要判断 <strong>宏定义</strong>，<strong>包含的头文件</strong>是否正确时，可以查看预编译后的文件来确定问题（gcc -E hello.c -o hello.i）</p>
-</li>
-<li><p><strong>编译（Compilation）</strong></p>
-<p>  编译过程就是把预编译完的文件（.i / .ii）进行一些列 <strong>词法分析，语法分析，语义分析及优化</strong> 后生成相应的 <strong>汇编代码文件</strong>（.s）</p>
-<p>  如今GCC已经把预编译和编译两个步骤合二为一了，使用叫做 <strong>cc1</strong> 的程序来完成（gcc -S hello.c -o hello.s）</p>
-<p>  实际 <strong>gcc</strong> 这个命令只是这些后台程序的 <strong>包装</strong>，它会根据不同的参数要求去调用预编译编译程序 <strong>cc1</strong>，汇编器 <strong>as</strong>，链接器 <strong>Id</strong></p>
-</li>
-<li><p><strong>汇编（Assembly）</strong></p>
-<p>  汇编过程只是根据汇编指令和机器指令的对照表一一翻译就可以了（gcc -c hello.s -o hello.o），生成 <strong>目标文件（Object File）</strong></p>
-</li>
-<li><p><strong>链接（Linking）</strong></p>
-<p>  目标文件 到 可执行文件，需要链接许多内容（静态链接和动态链接），后文会详细介绍</p>
-<p>  ld <strong>-static crt1.o crti.o crtbeginT.o</strong> hello.o <strong>–start-group -lgcc -lgcc_eh -lc -end-group crtend.o crtn.o</strong></p>
-</li>
-</ul>
-</li>
-<li><p>编译的过程： <strong>编译器</strong> 从源代码（Source Code）到最终目标代码（Final Target Code）过程，做了以下 6 个步骤</p>
-<ul>
-<li><p><strong>词法分析</strong></p>
-<p>  通过扫描器，运用一种类似于 <strong>有限状态机（Final State Machine）</strong> 的算法，将源代码的字符序列分割成一系列的 <strong>记号（Token）</strong></p>
-<p>  词法分析产生的记号一般分为以下几类：<strong>关键字、标识符、字面量（包含数字、字符串等）和 特殊符号（如加号、等号）</strong>，并将它们放到对应的 <strong>表</strong> 中</p>
-<p>  <strong>lex</strong> 程序可以实现词法分析，支持自定义词法规则</p>
-</li>
-<li><p><strong>语法分析</strong></p>
-<p>  通过 <strong>语法分析器（Grammar Parser）</strong>，采用 <strong>上下文无关语法（Context-free Grammar）</strong> 的分析手段，将由扫描器产生的记号生成 <strong>语法树（Syntax Tree）</strong></p>
-<p>  语法树就是以 <strong>表达式（Expression）</strong> 为节点的树，如果出现了表达式不合法，编译器就会报告语法分析阶段的错误</p>
-<p>  <strong>yacc</strong> 程序可以实现语法分析，构建一颗语法树，支持自定义语法规则</p>
-</li>
-<li><p><strong>语义分析</strong></p>
-<p>  <strong>语义分析器（Semantic Analyzer）</strong> 只对表达式完成语法层面的分析，不关心是否真正有意义，通常可以分为以下两种</p>
-<p>  <strong>静态语义（Static Semantic）</strong> 通常包括声明和类型的匹配，类型的转换，最简单的例子：赋值类型转换</p>
-<p>  <strong>动态语义（Dynamic Semantic）</strong> 一般指在运行期出现的语义相关问题，比如将0作为除数</p>
-<p>  经过语义分析之后，整个语法树的表达式都被标识了 <strong>类型</strong>，如果有些类型需要做隐式转换，语义分析程序会在语法树中 <strong>插入</strong> 相应的转换节点</p>
-</li>
-<li><p><strong>中间语言生成</strong></p>
-<p>  现代的编译器都包含 <strong>源码级优化器（Source Code Optimizer）</strong>，在源代码级别有一个优化过程（比如能在编译期间确定表达式值）</p>
-<p>  直接在语法树上做优化比较困难，所以将整个语法树转换成 <strong>中间代码（Intermediate Code）</strong>，比较常见的有：<strong>三地址码（Three-address Code）</strong> 和 <strong>P-代码（P-Code）</strong></p>
-<p>  <strong>跨平台原理</strong>：中间代码使得编译器可以被分为前端和后端。编译器前端负责产生机器无关的中间代码，编译器后端将中间代码转换成目标机器代码。这样对于一些可以跨平台的编译器而言，他们可以针对不同的平台使用同一个前端和针对不同机器平台的数个后端</p>
-</li>
-<li><p><strong>目标代码生成与优化</strong></p>
-<p>  源代码级优化器产出的结果：中间代码，标志着下面的过程都属于编译器后端，包括 <strong>代码生成器（Code Generator）</strong> 和 <strong>目标代码优化器（Target Code Optimizer）</strong></p>
-<p>  <strong>代码生成器（Code Generator）</strong> 主要是将中间代码转换成目标机器代码，依赖于目标机器的环境</p>
-<p>  <strong>目标代码优化器（Target Code Optimizer）</strong> 主要针对目标代码，在合适的寻址方式，使用位移来代替乘法运算，删除多余的指令等方面，进行优化，涉及到的技术比如： <strong>基址比例变址寻址（Base Index Scale Addressing）</strong></p>
-<p>  <strong>问题：此时，目标机器代码（汇编）已经生成，但是目标代码中的变量地址还没有确定，这个地址可以是本程序内定义的，也可以是其他程序模块中的，那么运行时该如何寻址？在介绍链接器之前，先说明下链接器的作用对象：目标文件都包括什么</strong></p>
-</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjfajwkvn001lfds6mx7amdst" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-程序员的自我修养（一）" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/06/读书笔记-程序员的自我修养（一）/">读书笔记-程序员的自我修养（一）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/06/读书笔记-程序员的自我修养（一）/">
-            <time datetime="2017-05-06T02:50:04.000Z" itemprop="datePublished">2017-05-06</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="计算机基础知识回顾"><a href="#计算机基础知识回顾" class="headerlink" title="计算机基础知识回顾"></a>计算机基础知识回顾</h3><ul>
-<li><p>SMP（Symmetrical Multi-Processing）对称多处理器：每个CPU在系统中所处的地位和所发挥的功能都是一样的。通常情况下的程序不可能分解成多个不相干的子问题，除非商用的计算环境（充分发挥每个CPU的能力），所以多核处理器（Mutli-core Processor）和 SMP 通常是一个概念。</p>
-</li>
-<li><p>层次结构，计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。开发工具与应用程序属于同一个层次，因为它们都使用运行库提供的 <strong>应用程序编程接口（Application Programming Interface）</strong>。运行库使用操作系统提供的 <strong>系统调用接口（System call Interface）</strong>，通常以软件中断方式实现提供。操作系统内核层使用硬件层提供的 <strong>硬件规格（Hardware Specification）</strong></p>
-</li>
-<li><p>操作系统的一个功能是提供抽象的接口，另一个主要功能是管理硬件资源（CPU，存储器（内存和磁盘）和 I/O 设备）</p>
-<ul>
-<li><p>不要让CPU打盹：早期的CPU是 <strong>单一</strong> 服务式，简直浪费，后来出现了分时系统（Time-Sharing System），以 <strong>协作</strong> 的方式主动让闲CPU，供其他程序使用，再到现在，操作系统接管了所有硬件资源，本身运行在一个受硬件保护的级别，所有程序都以进程的方式运转，并且允许 <strong>抢占式</strong> 的CPU分配方式</p>
-</li>
-<li><p>设备驱动（Device Driver），操作系统 <strong>将硬件逐渐抽象成一些列的概念</strong>。比如：UNIX 中硬件设备的访问形式跟访问普通的文件形式一样，Windows 中，图像硬件被抽象成 GDI，声音和多媒体设备被抽象成 DirectX 对象等，向上提供统一的接口供程序使用，设备驱动完成向下对硬件的适配</p>
-</li>
-<li><p>I/O 设备：内存和磁盘的读取和写入是通过 I/O 端口寄存器来实现的，提供读取和写入的地址，来完成磁盘数据操作</p>
-<p>即操作系统以进程概念，使得每个进程从逻辑上来看都是独占计算机资源，实质上操作系统以抢占式的 CPU 策略，I/O 抽象模型的方式来管理这些资源</p>
-</li>
-</ul>
-</li>
-<li><p>操作系统是如何管理内存的</p>
-<ul>
-<li><p>解决的问题：如何将计算机 <strong>有限</strong> 的物理内存分配给 <strong>多个</strong> 程序使用</p>
-</li>
-<li><p>直接分配物理内存的弊端：地址空间不隔离（程序直接访问物理内存），内存使用效率低（缺乏有效的内存管理机制，使得频繁换入换出数据，内存的使用分配以程序为单位（粒度太大）），程序运行的地址不固定（程序每次装入内存执行时，数据和指令跳转涉及到重定位问题）</p>
-</li>
-<li><p>解决方法： 增加中间层来 <strong>隔离</strong>，把程序给出的地址看作是一种 <strong>虚拟地址（Virtual Address）</strong>，通过某些映射方法，保证任意一个程序所能够访问的物理内存区域跟另外一个程序相互不重叠，以达到地址空间隔离的效果</p>
-</li>
-<li><p>分段（Segmentation）：段映射，以程序所使用的的内存为单位，从虚拟地址映射到物理地址，映射结果唯一，解决了隔离和程序地址不固定的问题</p>
-</li>
-<li><p>分页（Paging）：页分割，把常用的数据和代码页装载到内存中，把不常用的代码和数据保存在磁盘里，当用到的时候再取出来。若用到的页不在内存中，操作系统会受到页错误（Page Fault），然后将需要的页装载到内存中。硬件级别：<strong>MMU（Memory Management Unit）</strong>用来支持虚拟地址到物理地址的转换，已集成到CPU内部</p>
-</li>
-</ul>
-</li>
-<li><p>程序执行流最小单元：线程（Thread），又称为轻量级进程（Lightweight Process，LWP）</p>
-<ul>
-<li><p>基础概念</p>
-<p>  <strong>线程私有</strong>（局部变量，函数的参数，TLS数据），<strong>线程之间共享</strong>（全局变量，堆数据，函数里的静态变量，程序代码，打开的文件，这些就是进程所有的东西）</p>
-<p>  <strong>调度</strong>（线程数&gt;处理器时（或者单处理器应对多线程时），会模拟出来一种并发的状态，即切换不同的线程行为，称之为线程调度 </p>
-<p>  <strong>至少三种状态</strong>：运行，就绪，等待，以时间片的改变作为区分 </p>
-<p>  <strong>调度算法</strong>：优先级调度（Priority Schedule），轮转法（Round Robin），也区分出 <strong>IO密集型线程（IO Bound Thread）</strong> 和 <strong>CPU密集型线程（CPU Bound Thread）</strong>，IO 总比 CPU 能获得更高的优先级 </p>
-<p>  为了防止 <strong>饿死（Starvation）</strong> 现象： 用户指定优先级/根据进入等待状态的频繁程序提升或降低优先级/长时间得不到执行而被提升优先级，也出现了 <strong>可抢占式线程（Preemption）</strong></p>
-</li>
-<li><p>线程安全</p>
-<p>  <strong>竞争与原子操作</strong>：多个线程同时访问一个共享数据，为此引出 <strong>原子性（Atomic）</strong>，但原子性操作只适用于简单的操作，更复杂的数据结构访问，通常用 <strong>锁</strong> 的手段</p>
-<p>  <strong>同步与锁</strong>：<strong>同步（Synchronization）</strong> 是一种机制：保证线程访问数据的原子性。<strong>锁（Lock）</strong> 是一种手段，每个线程在访问数据或资源之前，首先试图 <strong>获取（Accquire）</strong> 锁，并在访问结束之后 <strong>释放（Release）</strong> 锁</p>
-<p>  <strong>锁的演进</strong>：<strong>二元信号量（Binary Semaphore）</strong>，只允许一个线程独占，其状态有两个：占用 和 非占用，可以由一个线程获取，另一个线程释放；<strong>多元信号量（N Semaphore）</strong>，允许 N 个线程并发访问共享资源；<strong>互斥量（Mutex）</strong>，类似于二元信号量，但谁获得谁负责释放；<strong>临界区（Critical Section）</strong>：不同于之前的信号量，互斥量（作用域为进程内的所有线程），临界区的作用范围仅限于本线程，其他线程无法获取临界区的锁，因此也就无法访问；<strong>条件变量（Condition Variable）</strong>，使用条件变量可以让许多线程一起等待某个事件的发生，当事件发生时，所有线程可以一起恢复执行</p>
-<p>  <strong>读写锁（Read-Write Lock）</strong>：三种状态分别是，<strong>自由（Free），共享（Shared）和独占（Exclusive）</strong>，当处于自由状态时，试图以任何一种方式获取锁都能成功，并将锁至于对应的状态。如果锁处于共享状态，其他线程以共享的方式获取锁仍会成功（读），此时这个锁分配给了多个线程。如果其他线程试图以独占的方式获取已经处于共享状态的锁，那么他将必须等在锁被所有的线程释放后，才能将锁的状态置成独占（写）</p>
-<p>  <strong>可重入（Reentrant）</strong>：即幂等性的函数，可以称为可重入函数</p>
-<p>  <strong>过度优化</strong>：使用 volatile 关键字，解决 1. 阻止编译器为了提高速度将一个变量缓存到寄存器内而不写回，2. 阻止编译器调整操作 volatile 变量的质量顺序，<strong>但还是无法阻止CPU动态调度换序</strong></p>
-</li>
-<li><p>线程内部三种模型</p>
-<p>  多线程库的实现方式：对用户来说如果有三个线程在同时执行（<strong>用户态线程（User Thread）</strong>），对内核来说很可能只有一个线程（<strong>内核线程（Kernel Thread）</strong>），下面提及的模型都是 <strong>UT：KT</strong></p>
-<p>  <strong>一对一模型</strong>：真正意义上的并发调度，缺点是受内核线程数量限制，内核线程上下文切换调度开销较大，使得用户线程执行效率低下</p>
-<p>  <strong>多对一模型</strong>：高效的上下文切换和几乎无限制的线程数量，缺点是一个用户线程阻塞了，那么所有线程都将无法执行</p>
-<p>  <strong>多对多模型</strong>：多个用户线程映射到多个内核线程，切换方便且避免了一个阻塞全局的情况</p>
-</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjfajwkvi001bfds6ccbc6gxl" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-SonarQube安装使用调试" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/03/14/SonarQube安装使用调试/">SonarQube - 安装使用调试</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/03/14/SonarQube安装使用调试/">
-            <time datetime="2017-03-14T02:57:08.000Z" itemprop="datePublished">2017-03-14</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/工具/">工具</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>最近研究了下SonarQube工程，发现其如此强大，可以用于质量保证的任何阶段，刚好由于项目需要建立一个完整的基础质量保证”设施”，所以快马加鞭，赶紧安装部署了下，这里总结一些问题和经历</p>
-<h5 id="安装与运行"><a href="#安装与运行" class="headerlink" title="安装与运行"></a>安装与运行</h5><p>SonarQube分为两个部分：Server 和 Scanner，其中</p>
-<p>Server：<a href="https://www.sonarqube.org/downloads/" target="_blank" rel="external">https://www.sonarqube.org/downloads/</a></p>
-<p>Scanner：<a href="https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code" target="_blank" rel="external">https://docs.sonarqube.org/display/SCAN/Analyzing+Source+Code</a></p>
-<p>其余安装环境就不赘述了：MySQL 和 Java</p>
-<p>参考这篇文章：<a href="http://blog.csdn.net/hunterno4/article/details/11687269" target="_blank" rel="external">http://blog.csdn.net/hunterno4/article/details/11687269</a></p>
-<h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><ol>
-<li>在配置了 sonar-project.properties 之后，运行 sonar-scanner 报如下错误：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.sonarqube.ws.client.HttpException: Error 500 on http://localhost:9000/api/ce/submit?projectKey=xxx&amp;projectName=yyy : &#123;&quot;errors&quot;:[&#123;&quot;msg&quot;:&quot;An error has occurred. Please contact your administrator.&quot;&#125;]&#125;</div></pre></td></tr></table></figure>
-<p>解决方法如下：</p>
-<ul>
-<li><p>查看 <sonar-root>/logs/web.log 得知详细原因是：<code>Packet for query is too large (6082109 &gt; 4194304). You can change this value on the server by setting the max_allowed_packet&#39; variable</code></sonar-root></p>
-</li>
-<li><p>修改 MySQL 的配置，用命令行登入执行：<code>show VARIABLES like &#39;%max_allowed_packet%&#39;; SET GLOBAL max_allowed_packet=268435456;</code></p>
-</li>
-<li><p>重启 MySQL 和 Sonar-Server 服务</p>
-</li>
-</ul>
-<p>尝试分析一个工程，发现已经成功打通的整套流程，SonarQube的高集成特性以及丰富的插件，可以根据实际项目需要丰富的定制。接下来我会围绕它打造一个后期的基础质量保障“设施”，首先来看看如何调试自定义扩展插件</p>
-<h5 id="扩展插件"><a href="#扩展插件" class="headerlink" title="扩展插件"></a>扩展插件</h5><p>官方给出了扩展插件的示例：<a href="https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到" target="_blank" rel="external">https://github.com/SonarSource/sonar-custom-plugin-example，下载下来导入工程，可以清晰的看到</a></p>
-<ul>
-<li><p><code>org.sonarsource.plugins.example</code>， 插件入口目录，相当于 Main 函数的作用</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.hooks</code> ，工具钩子，可以在各个阶段自定义一些需要的操作，继承自：PostJob/PostProjectAnalysisTask</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.languages</code> ，自定义语言支持，继承自：AbstractLanguage</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.measures</code>， 自定义质量阀的衡量标准，继承自：Metrics</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.rules</code>，自定义代码规则，继承自：Sensor</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.settings</code>，自定义设置，继承自：Sensor</p>
-</li>
-<li><p><code>org.sonarsource.plugins.example.web</code>，自定义网页显示部分，继承自：web.xxx</p>
-</li>
-</ul>
-<p>以上这些自定义的各个模块，分别作用于 SonarQube 的基本流程里，即：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Project project)</span> </span>&#123;  </div><div class="line">    ... </div><div class="line">    sensorsExecutor.execute(sensorContext);  </div><div class="line">    decoratorsExecutor.execute();  </div><div class="line">    persistenceManager.dump();  </div><div class="line">    persistenceManager.setDelayedMode(<span class="keyword">false</span>);  </div><div class="line">    <span class="keyword">if</span> (project.isRoot()) &#123;  </div><div class="line">        <span class="keyword">if</span> (updateStatusJob != <span class="keyword">null</span>) &#123;  </div><div class="line">            updateStatusJob.execute();  </div><div class="line">        &#125;  </div><div class="line">        postJobsExecutor.execute(sensorContext);   </div><div class="line">    &#125;  </div><div class="line">    ...</div></pre></td></tr></table></figure>
-<p>首先，初始化整个分析过程，包括加载所有的分析任务，其次，分析这些任务（Sensor和Decorator），并且把结果存储到数据库，最后，执行postjob，做相关的一些分析，因此需要根据插件作用需要，可以自行在各个阶段模块中进行扩展</p>
-<h5 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h5><p>官方提供了调试方法：<a href="https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug" target="_blank" rel="external">https://docs.sonarqube.org/display/DEV/Build+Plugin#BuildPlugin-Debug</a></p>
-<p>这里总结下步骤，避免踩坑：</p>
-<ol>
-<li><p>在 conf/sonar.properties 中设置<code>sonar.web.javaAdditionalOpts=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8001</code></p>
-</li>
-<li><p>将插件打包部署到 extensions/plugins 中</p>
-</li>
-<li><p><strong>如果你安装了SonarQube服务，请先关掉</strong>，然后用 bin/StartSonar启动，可以检查是否出现：Listening for transport dt_socket at address: 8001</p>
-</li>
-<li><p>在IDE中新建远程调试，<strong>打上断点</strong>，启动调试，<strong>打开localhost:8001</strong>，此时IDE会进到debug模式</p>
-</li>
-</ol>
-<p>好了，学会了调试，接下来就可以进一步打造我们的插件了</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjfajwkv4000ffds63zz8unfd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjfj3pq4b001kobs69i3irtj6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2072,7 +2062,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2081,7 +2071,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 

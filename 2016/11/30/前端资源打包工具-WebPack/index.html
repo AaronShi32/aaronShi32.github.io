@@ -6,11 +6,13 @@
     <title>前端资源打包工具-WebPack | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="WebPack 是一个前端资源打包工具，借助于Loader它可以将任何前端资源(js/image/css/…)统一转换为原生JS 代码，通过静态分析构建模块之间的依赖关系，将涉及到资源分类打包成不同的模块，这些模块在浏览器，Nodejs 中可以按需进行加载，可提升加载效率。同时，WebPack 的打包也非常高效，Webpack 使用异步 I/O 和多级缓存提高运行效率，这使得 Webpack 能够">
+<meta name="keywords" content="JavaScript,工具">
 <meta property="og:type" content="article">
 <meta property="og:title" content="前端资源打包工具-WebPack">
 <meta property="og:url" content="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/index.html">
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="WebPack 是一个前端资源打包工具，借助于Loader它可以将任何前端资源(js/image/css/…)统一转换为原生JS 代码，通过静态分析构建模块之间的依赖关系，将涉及到资源分类打包成不同的模块，这些模块在浏览器，Nodejs 中可以按需进行加载，可提升加载效率。同时，WebPack 的打包也非常高效，Webpack 使用异步 I/O 和多级缓存提高运行效率，这使得 Webpack 能够">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2016-11-30T05:48:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端资源打包工具-WebPack">
@@ -143,7 +145,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                33
+                36
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -216,7 +218,7 @@
         
             
             <p>WebPack 是一个前端资源打包工具，借助于<code>Loader</code>它可以将任何前端资源(js/image/css/…)统一转换为原生JS 代码，通过静态分析构建模块之间的依赖关系，将涉及到资源分类打包成不同的模块，这些模块在浏览器，Nodejs 中可以按需进行加载，可提升加载效率。同时，WebPack 的打包也非常高效，Webpack 使用异步 I/O 和多级缓存提高运行效率，这使得 Webpack 能够以令人难以置信的速度快速增量编译。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">官方文档：http://webpack.github.io/docs/</div><div class="line">中文文档：http://webpackdoc.com/index.html</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">官方文档：http://webpack.github.io/docs/</span><br><span class="line">中文文档：http://webpackdoc.com/index.html</span><br></pre></td></tr></table></figure>
 <p>以上两个文档已经非常全面的阐述了 WebPack 强大的功能，下面针对几个关键点进行实战</p>
 <h4 id="解释一切资源：Loaders"><a href="#解释一切资源：Loaders" class="headerlink" title="解释一切资源：Loaders"></a>解释一切资源：Loaders</h4><p>由于 WebPack 打包的来源只能是原生 JS 代码，因此许多静态资源(图片/CSS), 非JS写的代码(Coffee 和 JSX)需要以一种转换方式转换成 JS 代码，为此 Loader 应运而生</p>
 <p>Loader 作为一个单独的模块，其具有以下几个特征：</p>
@@ -232,17 +234,17 @@
 </ol>
 <p>总而言之，Loader 作为一个JS代码的转义器，有任何需要被 WebPack 打包的非原生 JS 资源，都可以通过内置/自定义的 Loader 加以转换，供打包使用</p>
 <p>使用方式：<code>npm install xxx-loader --save-dev</code></p>
-<p><strong>Loader列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-loaders.html" target="_blank" rel="external">List of Loaders</a></p>
+<p><strong>Loader列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-loaders.html" target="_blank" rel="noopener">List of Loaders</a></p>
 <h4 id="丰富的插件：Plugins"><a href="#丰富的插件：Plugins" class="headerlink" title="丰富的插件：Plugins"></a>丰富的插件：Plugins</h4><p>在打包过程中，WebPack 还允许借助各种插件，对打包过程、生成的结果进行处理，比如最简单的借助于 UglifyJS 实现压缩和混淆，使用如下命令：</p>
 <p><code>new webpack.optimize.UglifyJsPlugin([options])</code></p>
 <p>即可生成压缩混淆之后的打包文件，同理，内置的插件可以做更多的事情</p>
 <p>使用方式：在配置文件中配置</p>
-<p><strong>Plugin列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-plugins.html" target="_blank" rel="external">List of Plugin</a></p>
+<p><strong>Plugin列表参考</strong>： <a href="http://webpack.github.io/docs/list-of-plugins.html" target="_blank" rel="noopener">List of Plugin</a></p>
 <h4 id="配置文件：webpack-config-js"><a href="#配置文件：webpack-config-js" class="headerlink" title="配置文件：webpack.config.js"></a>配置文件：webpack.config.js</h4><p>在大型项目中，WebPack 通常借助于配置文件 <code>webpack.config.js</code> 将打包过程所需执行的步骤，插件统一进行管理，同时方便发布系统实时监控打包，配置文件的内容通常如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//WebPack配置文件</span></div><div class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  <span class="attr">entry</span>: <span class="string">'./entry.js'</span>,</div><div class="line">  <span class="attr">output</span>: &#123;</div><div class="line">	<span class="attr">path</span>: __dirname,</div><div class="line">	<span class="attr">filename</span>: <span class="string">'bundle.js'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="attr">module</span>: &#123;</div><div class="line">	<span class="attr">loaders</span>: [&#123;</div><div class="line">	  <span class="attr">test</span>: <span class="regexp">/\.css$/</span>,</div><div class="line">	  <span class="attr">loader</span>: <span class="string">'style!css'</span></div><div class="line">	&#125;]</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">plugins</span>: [</div><div class="line">	<span class="keyword">new</span> webpack.optimize.UglifyJsPlugin(&#123;</div><div class="line">	  <span class="attr">mangle</span>: <span class="literal">false</span>,</div><div class="line">	  <span class="attr">compress</span>: <span class="literal">false</span></div><div class="line">	&#125;),</div><div class="line">	<span class="keyword">new</span> webpack.BannerPlugin(<span class="string">'This file is created by ChenS'</span>)</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//WebPack配置文件</span></span><br><span class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./entry.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">	path: __dirname,</span><br><span class="line">	filename: <span class="string">'bundle.js'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">	loaders: [&#123;</span><br><span class="line">	  test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">	  loader: <span class="string">'style!css'</span></span><br><span class="line">	&#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">	<span class="keyword">new</span> webpack.optimize.UglifyJsPlugin(&#123;</span><br><span class="line">	  mangle: <span class="literal">false</span>,</span><br><span class="line">	  compress: <span class="literal">false</span></span><br><span class="line">	&#125;),</span><br><span class="line">	<span class="keyword">new</span> webpack.BannerPlugin(<span class="string">'This file is created by ChenS'</span>)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看出，<code>entry</code>中配置要打包的文件，<code>output</code>打包之后的文件输出路径，<code>module</code>里配置各种 Loader，以 test 的正则表达式匹配资源文件格式，Loader 传入名称，在<code>plugins</code>里配置各种插件以及选项，比如上述 UglifyJsPlugin 禁用了混淆和压缩，有了这个配置文件，在使用 WebPack时就可以直接运行<code>webpack</code>命令，一切轻松搞定</p>
 <p>以上Demo工程可点此下载：<a href="/2016/11/30/前端资源打包工具-WebPack/node-webpack.rar" title="node-webpack-demo">node-webpack-demo</a></p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>WebPack 的基础实战在上面分析完了，更多完整功能用法，请参考<a href="http://webpack.github.io/docs/" target="_blank" rel="external">WebPack</a></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>WebPack 的基础实战在上面分析完了，更多完整功能用法，请参考<a href="http://webpack.github.io/docs/" target="_blank" rel="noopener">WebPack</a></p>
 
         
         </div>
@@ -253,7 +255,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjfajwkvb000ufds65nkocnut" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjfj3pq3w000robs6fzfcq3r8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -338,9 +340,9 @@
         </a>
     
     
-        <a href="/2016/11/17/读书笔记-Effective JavaScript/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2016/11/17/读书笔记-大话设计模式/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">读书笔记-Effective JavaScript</div>
+            <div class="article-nav-title">读书笔记-大话设计模式</div>
         </a>
     
 </nav>
@@ -365,7 +367,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -374,7 +376,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">18</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">21</span></li></ul>
         </div>
     </div>
 
