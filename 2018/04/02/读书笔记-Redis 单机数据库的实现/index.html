@@ -5,19 +5,19 @@
     
     <title>读书笔记-Redis 单机数据库的实现 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量: 默认16个	int dbnum;&amp;#125;struct">
+    <meta name="description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314151617181920212223242526272829struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量">
 <meta name="keywords" content="读书">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读书笔记-Redis 单机数据库的实现">
 <meta property="og:url" content="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量: 默认16个	int dbnum;&amp;#125;struct">
+<meta property="og:description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314151617181920212223242526272829struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis%20单机数据库的实现/RDB.png">
-<meta property="og:updated_time" content="2018-04-04T03:34:03.945Z">
+<meta property="og:updated_time" content="2018-04-05T02:13:49.666Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-Redis 单机数据库的实现">
-<meta name="twitter:description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量: 默认16个	int dbnum;&amp;#125;struct">
+<meta name="twitter:description" content="Redis：单机数据库的实现1. 数据库通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素 1234567891011121314151617181920212223242526272829struct redisServer &amp;#123;	// 一个数组, 保存着服务器中的所有数据库	redisDb *db;	// 服务器的数据库数量">
 <meta name="twitter:image" content="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis%20单机数据库的实现/RDB.png">
     
 
@@ -220,7 +220,7 @@
         
             
             <h3 id="Redis：单机数据库的实现"><a href="#Redis：单机数据库的实现" class="headerlink" title="Redis：单机数据库的实现"></a>Redis：单机数据库的实现</h3><h5 id="1-数据库"><a href="#1-数据库" class="headerlink" title="1. 数据库"></a>1. 数据库</h5><p>通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个数组, 保存着服务器中的所有数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器的数据库数量: 默认16个</span></span><br><span class="line">	<span class="keyword">int</span> dbnum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisClient</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 记录客户端当前正在使用的数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个数组, 保存着服务器中的所有数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器的数据库数量: 默认16个</span></span><br><span class="line">	<span class="keyword">int</span> dbnum;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// AOF 缓冲区: 记录写操作</span></span><br><span class="line">	sds aof_buf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// AOF 重写缓冲区: 记录在 AOF 重写机制期间的所有写操作, 用于完成数据一致性</span></span><br><span class="line">	sds aof_rewrite_buf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个链表, 保存了所有客户端状态</span></span><br><span class="line">	<span class="built_in">list</span> *clients;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisClient</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 记录客户端当前正在使用的数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 输入缓冲区: 用于保存客户端发送的命令请求</span></span><br><span class="line">	sds querybuf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 命令的实现函数</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">redisCommand</span> *<span class="title">cmd</span>;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Redis 是一个键值对(key-value pair)数据库服务器, 服务器中的每个数据库都由一个 redisDb 结构表示</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisDb</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 数据库键空间, 保存着数据库中的所有键值对</span></span><br><span class="line">	dict *dict;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 过期字典, 保存着键的过期时间, EXPIRE 实际上是操作该键值</span></span><br><span class="line">	dict *expires;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>主要由 dict 和 expires 两个字典构成, 其中 dict 字典负责保存键值对, 而 expires 字典则负责保存键的过期时间</p>
@@ -264,6 +264,7 @@
 <h5 id="2-RDB-持久化"><a href="#2-RDB-持久化" class="headerlink" title="2. RDB 持久化"></a>2. RDB 持久化</h5><p>RDB 持久化操作, 即执行 SAVE/BGSAVE 命令, 是由配置文件中的 save 选项生效的, 由周期性操作函数 serverCron 每个 100ms 检查是否满足持久化条件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// default</span><br><span class="line">save 900 1     900秒内对数据库至少1次修改</span><br><span class="line">save 300 10    300秒内对数据库至少10次修改</span><br><span class="line">save 60 10000  60秒内对数据库至少10000次修改</span><br></pre></td></tr></table></figure>
 <img src="/2018/04/02/读书笔记-Redis%20单机数据库的实现/RDB.png" title="RDB 文件结构">
+<p>使用 od 命令工具可以查看 RDB 内容</p>
 <ul>
 <li><p>SAVE 命令由服务器进程直接执行保存操作, 会阻塞服务器</p>
 </li>
@@ -276,7 +277,55 @@
 <li><p>对于不同类型的键值对, RDB 文件会使用不同的方式来保存它们</p>
 </li>
 </ul>
-<h5 id="3-AOF-持久化"><a href="#3-AOF-持久化" class="headerlink" title="3. AOF 持久化"></a>3. AOF 持久化</h5>
+<h5 id="3-AOF-持久化"><a href="#3-AOF-持久化" class="headerlink" title="3. AOF 持久化"></a>3. AOF 持久化</h5><ol>
+<li><p>AOF 持久化是通过保存 Redis 服务器所执行的写命令(SET、SADD、RPUSH)来记录数据库状态的, 这个保存的过程是由 serverCron 函数中的 flushAppendOnlyFile 来完成的, 也是由配置文件中的 appendfsync 选项来设置的</p>
+</li>
+<li><p>随着服务器时间的运行, AOF 中记录的写操作越来越多, 文件体积也越来越大, 使用 AOF 文件来进行数据还原所需的时间也就越多, 因此 AOF 文件重写机制: 通过读取服务器当前的数据库状态, 然后用一条命令去记录键值对, 代替之前记录这个键值对的多条命令 </p>
+</li>
+<li><p>AOF 重写机制采用后台子进程的方式来实现, 虽然不阻塞服务器继续处理命令请求, 但随之而来带来了数据同步不一致的问题, 因此 Redis 服务器设置了一个 AOF 重写缓存区, 每次子进程重写完成时, 服务器进程将 AOF 缓冲区的记录追加到新的 AOF 文件末尾, 这也是 BGREWRITEAOF 命令的实现原理</p>
+</li>
+</ol>
+<h5 id="4-事件"><a href="#4-事件" class="headerlink" title="4. 事件"></a>4. 事件</h5><ul>
+<li><p>Redis 服务器是一个事件驱动程序, 服务器处理的事件分为时间事件和文件事件两类</p>
+</li>
+<li><p>文件事件处理器是基于 Reactor 模式实现的网络通信程序</p>
+</li>
+<li><p>文件事件是对套接字操作的抽象: 每次套接字变为可应答(acceptable), 可写(writable)或者可读(readable)时, 相应的文件事件就会产生</p>
+</li>
+<li><p>文件事件分为 AE_READABLE 和 AE_WRITABLE 两类事件</p>
+</li>
+<li><p>时间事件分为定时事件和周期性事件</p>
+</li>
+<li><p>服务器一般情况下只执行 serverCron 函数的一个时间事件, 并且这个事件是周期性事件</p>
+</li>
+<li><p>时间事件的实际处理时间通常比设定的到达时间晚一些</p>
+</li>
+</ul>
+<h5 id="5-客户端"><a href="#5-客户端" class="headerlink" title="5. 客户端"></a>5. 客户端</h5><p>通过使用由 I/O 多路复用技术实现的文件处理器, Redis 服务器使用单线程单进程的方式来处理命令请求, 并与多个客户端进行网络通信</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; CLIENT list</span><br><span class="line">id=5 addr=127.0.0.1:58793 fd=8 name= age=0 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=client</span><br></pre></td></tr></table></figure>
+<p>通过客户端的标志属性 flags 可以查明客户端的角色, 以及目前客户端所处的状态, 例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 客户端是一个主服务器</span><br><span class="line">REDIS_MASTER</span><br><span class="line"># 客户端正在被列表命令阻塞</span><br><span class="line">REDIS_BLOCKED</span><br><span class="line"># 客户端正在执行事务, 但事务的安全性已被破坏</span><br><span class="line">REDIS_MULTI | REDIS_DIRTY_CAS</span><br><span class="line"># 客户端是一个从服务器, 并且版本低于 Redis 2.8</span><br><span class="line">REDIS_SLAVE | REDIS_PRE_PSYNC</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>服务器状态结构使用 clients 链表连接多个客户端状态, 新添加的客户端状态会被放到链表的末尾</p>
+</li>
+<li><p>客户端状态的 flags 属性使用不同标志来表示客户端的角色, 以及客户端当前所处的状态</p>
+</li>
+<li><p>输入缓冲区记录了客户端发送的命令请求, 这个缓冲区的大小不能超过 1GB</p>
+</li>
+<li><p>命令参数和参数个数会被记录在客户端状态的 argv 和 argc 属性里面, 而 cmd 属性则记录对了客户端要执行命令是实现函数</p>
+</li>
+<li><p>客户端有固定大小缓冲区和可变大小缓冲区两种缓冲区可用, 其中固定大小缓冲区的最大大小为 16KB, 而可变大小缓冲区的最大大小不能超过服务器设置的硬性限制</p>
+</li>
+<li><p>输出缓冲区限制值有两种, 如果输出缓冲区的大小超过了服务器设置的硬性限制, 那么客户端会被立即关闭; 除此之外, 如果客户端在一定时间内, 一直超过服务器设置的软性限制, 那么客户端也会被关闭</p>
+</li>
+<li><p>当一个客户端通过网络连接上服务器时, 服务器会为这个客户端创建相应的客户端状态, 网络连接关闭、发送了不合协议格式的命令请求、成为 CLIENT KILL 命令的目标、空转时间超时、输出缓冲区的大小超出限制, 以上这些原因都会造客户端被关闭</p>
+</li>
+<li><p>处理 LUA 脚本的伪客户端在服务器初始化时创建, 这个客户端会一直存在, 直到服务器关闭</p>
+</li>
+<li><p>载入 AOF 文件时使用的伪客户端在载入工作开始时动态创建, 载入工作完毕之后关闭</p>
+</li>
+</ul>
+<h5 id="6-服务器"><a href="#6-服务器" class="headerlink" title="6. 服务器"></a>6. 服务器</h5>
         
         </div>
         <footer class="article-footer">
@@ -286,7 +335,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfkjhhh20017zns6qzjgd5td" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjflw10pz00179us60x8mskev" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
