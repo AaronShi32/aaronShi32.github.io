@@ -3,20 +3,17 @@
 <head>
     <meta charset="utf-8">
     
-    <title>加密算法 | 着陆的橘子</title>
+    <title>读书笔记-Redis 多机数据库的实现 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="工作中需要使用一种加密算法，来验证消息的来源，故借此了解下这个专题 常见的加密算法可以分为三类：对称加密，非对称加密，哈希 首先是对称加密，即加密和解密使用相同的秘钥（K），优势在于速度快，当 K 很长时候，破解难度异常大，缺点是加密通路有 N 条，比如  Encrypt（A，B）和 Encrypt（B，A）是两条加密通路，则需要 N 个秘钥，其中 A，B 分别获有自己的和对方的秘钥，这就带来了秘">
-<meta name="keywords" content="读书">
+    <meta name="keywords" content="读书">
 <meta property="og:type" content="article">
-<meta property="og:title" content="加密算法">
-<meta property="og:url" content="https://aaronshi32.github.io/2018/01/16/加密算法/index.html">
+<meta property="og:title" content="读书笔记-Redis 多机数据库的实现">
+<meta property="og:url" content="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="工作中需要使用一种加密算法，来验证消息的来源，故借此了解下这个专题 常见的加密算法可以分为三类：对称加密，非对称加密，哈希 首先是对称加密，即加密和解密使用相同的秘钥（K），优势在于速度快，当 K 很长时候，破解难度异常大，缺点是加密通路有 N 条，比如  Encrypt（A，B）和 Encrypt（B，A）是两条加密通路，则需要 N 个秘钥，其中 A，B 分别获有自己的和对方的秘钥，这就带来了秘">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-03T03:34:08.634Z">
+<meta property="og:updated_time" content="2018-04-05T09:56:43.008Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="加密算法">
-<meta name="twitter:description" content="工作中需要使用一种加密算法，来验证消息的来源，故借此了解下这个专题 常见的加密算法可以分为三类：对称加密，非对称加密，哈希 首先是对称加密，即加密和解密使用相同的秘钥（K），优势在于速度快，当 K 很长时候，破解难度异常大，缺点是加密通路有 N 条，比如  Encrypt（A，B）和 Encrypt（B，A）是两条加密通路，则需要 N 个秘钥，其中 A，B 分别获有自己的和对方的秘钥，这就带来了秘">
+<meta name="twitter:title" content="读书笔记-Redis 多机数据库的实现">
     
 
     
@@ -179,7 +176,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-加密算法" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-读书笔记-Redis 多机数据库的实现" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -187,7 +184,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            加密算法
+            读书笔记-Redis 多机数据库的实现
         </h1>
     
 
@@ -196,8 +193,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2018/01/16/加密算法/">
-            <time datetime="2018-01-16T06:02:03.000Z" itemprop="datePublished">2018-01-16</time>
+        <a href="/2018/04/05/读书笔记-Redis 多机数据库的实现/">
+            <time datetime="2018-04-05T09:56:15.000Z" itemprop="datePublished">2018-04-05</time>
         </a>
     </div>
 
@@ -217,16 +214,7 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>工作中需要使用一种加密算法，来验证消息的来源，故借此了解下这个专题</p>
-<p>常见的加密算法可以分为三类：对称加密，非对称加密，哈希</p>
-<p>首先是对称加密，即加密和解密使用相同的秘钥（K），优势在于速度快，当 K 很长时候，破解难度异常大，缺点是加密通路有 N 条，比如  Encrypt（A，B）和 Encrypt（B，A）是两条加密通路，则需要 N 个秘钥，其中 A，B 分别获有自己的和对方的秘钥，这就带来了秘钥泄露的风险，如果多个通路公用一个秘钥的话，一旦泄露，保密性也就无从谈起</p>
-<p>常见的加密算法有：<strong>AES</strong>，DES，3DES，Blowfish，IDEA，RC4，RC5，RC6</p>
-<p>接下来是非对称加密，即加密和解密使用不同的秘钥（K，K’），又称为公钥和私钥，使用公钥进行加密，使用私钥进行解密，优势在于私钥是唯一的，其他用户除了可以可以通过信息发送者的公钥来验证信息的来源是否真实，还可以确保发送者无法否认曾发送过该信息，缺点在于速度慢</p>
-<p>常见的非对称加密算法有：<strong>RSA，ECC，DSA</strong>，Diffie-Hellman，EI Gamal</p>
-<p>最后是哈希算法，它是一种单向的算法，即可以将目标信息通过 Hash 算法生成具有一定长度的 Hash 值，却不能通过这个 Hash 值从新获得目标信息，因此常用于不可还原的密码存储，信息完整性校验等</p>
-<p>常见的哈希算法有： <strong>MD5，SHA</strong>，MD2，MD4，HAVAL</p>
-<p>由于项目的本身需要，加密端在 PC，解密端在移动设备，且需要根据加密消息进行相关有效性验证，故最终选择 ECC 算法来</p>
-
+            
         
         </div>
         <footer class="article-footer">
@@ -236,7 +224,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfmckljb000spxs61paopn4s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfmckljk001bpxs6b3qasgu7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -311,19 +299,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2018/02/02/读书笔记-Redis 数据结构与对象/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    读书笔记-Redis 数据结构与对象
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/12/25/基础知识-HashMap实现与原理/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/04/02/读书笔记-Redis 单机数据库的实现/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">基础知识-HashMap实现与原理</div>
+            <div class="article-nav-title">读书笔记-Redis 单机数据库的实现</div>
         </a>
     
 </nav>
