@@ -213,7 +213,32 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            
+            <h3 id="Redis：多机数据库的实现"><a href="#Redis：多机数据库的实现" class="headerlink" title="Redis：多机数据库的实现"></a>Redis：多机数据库的实现</h3><h5 id="1-复制"><a href="#1-复制" class="headerlink" title="1. 复制"></a>1. 复制</h5><h5 id="1-1-旧版本复制功能的实现-2-8版本以前"><a href="#1-1-旧版本复制功能的实现-2-8版本以前" class="headerlink" title="1.1 旧版本复制功能的实现(2.8版本以前)"></a>1.1 旧版本复制功能的实现(2.8版本以前)</h5><p>复制功能分为 同步(sync) 和 命令传播(command propagate) 两个操作</p>
+<img src="/2018/04/05/读书笔记-Redis%20多机数据库的实现/redis-copy.png" title="复制操作流程图"> 
+<p>SYNC 命令是一个非常耗费资源的操作, 生成 RDB 占据了大量的 CPU, 内存和磁盘 I/O 资源, 传输 RDB 占据了大量的网络资源, 接收并载入 RDB 会导致阻塞, 而旧版本的复制无法高效的完成: <strong>断线重复制的情况</strong>, 即从服务器断线后的一致性保证, 哪怕只有几秒的短线, 只能通过 SYNC 来保证</p>
+<h5 id="1-2-新版本复制功能的实现-2-8版本以后"><a href="#1-2-新版本复制功能的实现-2-8版本以后" class="headerlink" title="1.2 新版本复制功能的实现(2.8版本以后)"></a>1.2 新版本复制功能的实现(2.8版本以后)</h5><p>PSYNC 命令, 具备完整重同步(适用于初次复制的情况) 和 部分重同步(适用于断线重复制)</p>
+<p>部分重同步功能由以下三个部分构成:</p>
+<ol>
+<li><p>主服务器的复制偏移量(replication offset) 和 从服务器的复制偏移量</p>
+</li>
+<li><p>主服务器的复制积压缓冲区(replication backlog)</p>
+</li>
+<li><p>服务器的运行 ID(run ID)</p>
+</li>
+</ol>
+<p>通过对比主从服务器的复制偏移量, 程序可以很容易的指导主从服务器是否处于一致状态</p>
+<p>复制积压缓冲区是一个固定长度的FIFO队列, 保存着主服务器的写命令, 如果它里面操作的复制偏移量小于主从不一致的偏移量, 则完整重同步, 反之大于, 则部分重同步, 这个复制积压缓冲区的大小可以配置, 约等于: </p>
+<blockquote>
+<p>service_reready_seconds <em> write_size_per_second  服务平均恢复时长 </em> 每秒写命令产生的数据大小</p>
+</blockquote>
+<p>服务器的运行ID是检测 从服务器前后是否连接的是相同的主服务器, 若是的话则部分重同步, 若不是只能完整重同步</p>
+<ul>
+<li><p>在复制操作刚开始的时候, 从服务器会成为主服务器的客户端, 并通过向主服务器发送命令请求来执行复制操作, 而在复制操作的后期, 主从服务器会相互成为对方的客户端, 涵盖了: 设置主服务器的地址和端口/建立套接字连接/发送PING命令/身份验证/发送端口信息/同步/命令传播 等操作</p>
+</li>
+<li><p>主服务器通过向从服务器传播命令来更新从服务器的状态, 保持主从服务器一致, 而从服务器则通过向主服务器发送命令来进行心跳检测, 以及命令丢失检测(偏移量校验)</p>
+</li>
+</ul>
+<h5 id="2-Sentinel"><a href="#2-Sentinel" class="headerlink" title="2. Sentinel"></a>2. Sentinel</h5>
         
         </div>
         <footer class="article-footer">
@@ -223,7 +248,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfmckljk001bpxs6b3qasgu7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfq9hr51001b0hs676n95j82" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -461,7 +486,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfmckljh0016pxs6zlwueheg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfq9hr5000190hs6bfk3htgs" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -598,7 +623,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfmckliv0004pxs67dsgkmqv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfq9hr4c00040hs6u8hqi8n3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -728,7 +753,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjfmcklip0001pxs67vc62u5t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjfq9hr4800010hs6rx43a8b0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -969,7 +994,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfmckljm001epxs6y8j30h0r" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfq9hr54001j0hs6n3eugw9g" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1102,7 +1127,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfmckljb000spxs61paopn4s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfq9hr4s000s0hs6xu3t993t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1270,7 +1295,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfmckljc000upxs6eimcfz9b" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfq9hr4t000u0hs6bth968ya" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1424,7 +1449,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfmcklje000zpxs6o83yev5g" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfq9hr4z00160hs6eqiz6bur" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1574,7 +1599,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfmckljd000wpxs62nhiuzin" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfq9hr4u000w0hs6nasoaehi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1801,7 +1826,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfmcklj7000kpxs616i5gy10" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfq9hr4n000h0hs68siupvyu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
