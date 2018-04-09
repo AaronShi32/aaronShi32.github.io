@@ -14,7 +14,7 @@
 <meta property="og:description" content="Redis：多机数据库的实现1. 复制1.1 旧版本复制功能的实现(2.8版本以前)复制功能分为 同步(sync) 和 命令传播(command propagate) 两个操作   SYNC 命令是一个非常耗费资源的操作, 生成 RDB 占据了大量的 CPU, 内存和磁盘 I/O 资源, 传输 RDB 占据了大量的网络资源, 接收并载入 RDB 会导致阻塞, 而旧版本的复制无法高效的完成: 断线重">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis%20多机数据库的实现/redis-copy.png">
-<meta property="og:updated_time" content="2018-04-08T03:41:48.900Z">
+<meta property="og:updated_time" content="2018-04-09T08:27:38.770Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-Redis 多机数据库的实现">
 <meta name="twitter:description" content="Redis：多机数据库的实现1. 复制1.1 旧版本复制功能的实现(2.8版本以前)复制功能分为 同步(sync) 和 命令传播(command propagate) 两个操作   SYNC 命令是一个非常耗费资源的操作, 生成 RDB 占据了大量的 CPU, 内存和磁盘 I/O 资源, 传输 RDB 占据了大量的网络资源, 接收并载入 RDB 会导致阻塞, 而旧版本的复制无法高效的完成: 断线重">
@@ -244,7 +244,36 @@
 <li><p>主服务器通过向从服务器传播命令来更新从服务器的状态, 保持主从服务器一致, 而从服务器则通过向主服务器发送命令来进行心跳检测, 以及命令丢失检测(偏移量校验)</p>
 </li>
 </ul>
-<h5 id="2-Sentinel"><a href="#2-Sentinel" class="headerlink" title="2. Sentinel"></a>2. Sentinel</h5>
+<h5 id="2-Sentinel"><a href="#2-Sentinel" class="headerlink" title="2. Sentinel"></a>2. Sentinel</h5><p>Sentinel 是 Redis 高可用性的解决方案: 由一个或多个 Sentinel 实例组成的 Sentinel 系统, 监视着 Redis 的主从服务器, <strong>当发现主服务器下线了, 会从从服务器中选择一个当主服务器, 并继续监控下线的主服务器, 一旦恢复上线, 会设置为新的主服务器的从服务器</strong></p>
+<p>启动一个 Sentinel 命令如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-sentinel /path/to/your/sentinel.conf</span><br><span class="line">or</span><br><span class="line">redis-server /path/to/your/sentinel.conf --sentinel</span><br></pre></td></tr></table></figure>
+<p>配置项:</p>
+<p>down-after-milliseconds 选项指定了 Sentinel 判断实例进入主观下线所需要的时间长度, 多个 Sentinel 监视同一个主服务器的标准是不同的</p>
+<p>主观下线靠 PING 返回无效命令的累计时长, 客观下线靠询问其他 Sentinel 状态</p>
+<p>选择 Sentinel 领头羊的算法为: <a href="https://www.cnblogs.com/mindwind/p/5231986.html" target="_blank" rel="noopener">Raft</a></p>
+<ul>
+<li><p>Sentinel 只是一个运行在特殊模式下的 Redis 服务器, 它使用了和普通模式不同的命令表, 所以 Sentinel 模式能够使用的命令和普通 Redis 服务器能够使用的命令不同</p>
+</li>
+<li><p>Sentinel 会读入用户指定的配置文件, 为每个要被监视的主服务器创建相应的实例结构, 并创建连向主服务器的命令连接和订阅连接, 其中命令连接用于向主服务器发送命令请求, 而订阅连接则用于接收指定频道的消息</p>
+</li>
+<li><p>Sentinel 通过向主服务器发送 INFO 命令来获得主服务器属下所有从服务器的地址信息, 并为这些从服务器创建相应的实例结构, 以及连向这些从服务器的命令连接和订阅连接</p>
+</li>
+<li><p>在一般情况下, Sentinel 以每十秒一次的频率向被监视的主服务器和从服务器发送 INFO 命令, 当主服务器处于下线状态, 或者 Sentinel 正在对主服务器进行故障转移操作时, Sentinel 向从服务器发送 INFO 命令的频率会改为每秒一次</p>
+</li>
+<li><p>对于监视同一个主服务器和从服务器的多个 Sentinel 来说, 它们会以每两秒一次的频率, 通过向被监视服务器的 <em>sentinel</em>:hello 频道发送消息来向其他 Sentinel 宣告自己的存在</p>
+</li>
+<li><p>每个 Sentinel 也会从 <em>sentinel</em>:hello 频道中接收其他 Sentinel 发来的信息, 并根据这些信息为其他 Sentinel 创建相应的实例结构, 以及命令连接</p>
+</li>
+<li><p>Sentinel 只会与主服务器和从服务器创建命令连接和订阅连接, Sentinel 之间只创建命令连接</p>
+</li>
+<li><p>Sentinel 以每秒一次的频率向实例(包括主服务器、从服务器、其他 Sentinel)发送 PING 命令, 并根据实例对 PING 命令的恢复来判断实例是否在线, 当一个实例在指定的时长中连续向 Sentinel 发送无效的回复时, Sentinel 会将这个实例判断为主观下线</p>
+</li>
+<li><p>当 Sentinel 将一个主服务器判断为主观下线时, 它会向同样监视这个主服务器的其他 Sentinel进行询问, 看他们是否同意这个主服务器已经进入主观下线状态</p>
+</li>
+<li><p>当 Sentinel 收集到足够多的主观下线投票时, 它会将主服务器判断为客观下线, 并发起一次针对主服务器的故障转移操作</p>
+</li>
+</ul>
+
         
         </div>
         <footer class="article-footer">
@@ -254,7 +283,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfq9hr51001b0hs676n95j82" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfrz58c4001bles6p811qgt2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
