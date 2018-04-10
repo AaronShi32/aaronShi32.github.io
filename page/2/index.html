@@ -140,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                37
+                38
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -175,7 +175,7 @@
 
             
             <section id="main">
-    <article id="post-NodeJS - 理解 Buffer" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-SpringBoot 问题汇总" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -183,7 +183,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/08/29/NodeJS - 理解 Buffer/">NodeJS - 理解 Buffer</a>
+            <a class="article-title" href="/2017/10/16/SpringBoot 问题汇总/">SpringBoot 问题汇总</a>
         </h1>
     
 
@@ -192,8 +192,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/08/29/NodeJS - 理解 Buffer/">
-            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
+        <a href="/2017/10/16/SpringBoot 问题汇总/">
+            <time datetime="2017-10-16T03:22:52.000Z" itemprop="datePublished">2017-10-16</time>
         </a>
     </div>
 
@@ -202,7 +202,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
+        <a class="tag-link" href="/tags/框架/">框架</a>
     </div>
 
                     </div>
@@ -213,38 +213,107 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>Buffer 是一个像 Array 的对象，主要用于操作字节，数组元素为 16 进制的两位数，即 0 到 255的数值，如果超出或者不足，小数等情况，会使用叠加，递减，省略小数部分的措施保证元素数值合法性，此外，采用 JavaScript 和 C++ 相结合的模式，将性能部分用 C++ 来实现，非性能相关的部分用 JavaScript 来实现</p>
-<h4 id="内存分配机制"><a href="#内存分配机制" class="headerlink" title="内存分配机制"></a>内存分配机制</h4><p>Buffer 对象的内存分配不是在 V8 的堆内存中，而是在 Node 的 C++ 层面实现内存的申请，采用 slab 动态内存管理机制（先申请，后分配），以 4KB 作为界限来区分 Buffer 是大对象还是小对象，针对大对象，每次都 alloc 一个足够长的 SlowBuffer 对象（C++层）作为 slab 单元，针对小对象，则共用一个 slab，当不足以分配时（可分配小于 4KB），才会 alloc 一个新的 slab 内存进行再分配。<strong>需要注意的是当且仅当一个 slab 上面的所有小对象在作用域释放并都可以回收时，slab 的 8KB 才会被回收，此处会存在由于编码不当导致的内存泄漏，浪费问题</strong></p>
-<p>在 Buffer 中创建一个数组，需要注意以下规则：</p>
+            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>最近上手项目, 开始接触了 SpringBoot, 相比较 SpringMVC 而言, 省去了繁琐的配置, 秉承默认大于配置的原则, 使用起来更加简单方便。但越是<br>黑盒(简单), 使用起来越不安, 这里将学习过程中遇到的问题记录下来, 慢慢地打开这个黑盒</p>
 <ul>
-<li>Buffer 是内存拷贝，而不是内存共享</li>
-<li>Buffer 占用内存被解释为一个数组，而不是字节数组。比如，new Uint32Array(new Buffer([1,2,3,4])) 创建了 4 个 Uint32Array，它的成员为 [1,2,3,4]，而不是 [0x1020304] 或 [0x4030201]</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4KB 作为界限的由来：createPool 判断条件</span></span><br><span class="line">Buffer.poolSize = <span class="number">8</span> * <span class="number">1024</span>; </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">allocate</span>(<span class="params">size</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (size &lt; (Buffer.poolSize &gt;&gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (size &gt; (poolSize - poolOffset))</span><br><span class="line">      createPool();</span><br><span class="line">    <span class="keyword">var</span> b = <span class="keyword">new</span> FastBuffer(allocPool, poolOffset, size);</span><br><span class="line">    poolOffset += size;</span><br><span class="line">    alignPool();</span><br><span class="line">    <span class="keyword">return</span> b;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> createUnsafeBuffer(size);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>四种</strong> 内存分配的 API</p>
+<li><p>初始化工程问题</p>
+<ol>
+<li><p>使用 Maven 初始化, 有两种方式, 以此解决 Maven 不支持多 parent 的问题</p>
 <ul>
-<li><p>Buffer.from</p>
-</li>
-<li><p>Buffer.alloc</p>
-</li>
-<li><p>Buffer.allocUnSafe</p>
-</li>
-<li><p>Buffer.allocUnSafeSlow</p>
+<li><p>继承默认的 parent</p>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Inherit defaults from Spring Boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<img src="/2017/08/29/NodeJS%20-%20理解%20Buffer/buffer-allocate.png" title="Buffer内存分配机制">
-<h4 id="支持与字符串相互转换"><a href="#支持与字符串相互转换" class="headerlink" title="支持与字符串相互转换"></a>支持与字符串相互转换</h4><p>目前支持的字符串编码类型有：ASCII，UTF-8，UTF-16LE/UCS-2，Base64，Binary，Hex，可以用 isEncoding() 来判断是否支持编码</p>
-<p>对于不支持的编码类型，可以通过 <code>iconv</code> 和 <code>iconv-lite</code> 两个模块来支持更多编码类型转换</p>
-<p>转换成 Buffer：new Buffer(str，[encoding]) 和 buf.write(string，[offset]，[length]，[encoding])</p>
-<p>转换成 String：buf.toString([encoding]，[start]，[end])</p>
-<h4 id="正确的拼接方式"><a href="#正确的拼接方式" class="headerlink" title="正确的拼接方式"></a>正确的拼接方式</h4><p>用一个数组来存储接收到的所有 Buffer 片段并记录下所有片段的总长度，然后调用 Buffer.concat() 方法生成一个合并的 Buffer 对象</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Buffer.concat = <span class="function"><span class="keyword">function</span> <span class="title">concat</span>(<span class="params">list, length</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> i;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(list))</span><br><span class="line">    <span class="keyword">throw</span> kConcatErr;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (list.length === <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (length === <span class="literal">undefined</span>) &#123;</span><br><span class="line">    length = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++)</span><br><span class="line">      length += list[i].length;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    length = length &gt;&gt;&gt; <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> buffer = Buffer.allocUnsafe(length);</span><br><span class="line">  <span class="keyword">var</span> pos = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> buf = list[i];</span><br><span class="line">    <span class="keyword">if</span> (!isUint8Array(buf))</span><br><span class="line">      <span class="keyword">throw</span> kConcatErr;</span><br><span class="line">    _copy(buf, buffer, pos);</span><br><span class="line">    pos += buf.length;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Note: `length` is always equal to `buffer.length` at this point</span></span><br><span class="line">  <span class="keyword">if</span> (pos &lt; length) &#123;</span><br><span class="line">    <span class="comment">// Zero-fill the remaining bytes if the specified `length` was more than</span></span><br><span class="line">    <span class="comment">// the actual total length, i.e. if we have some remaining allocated bytes</span></span><br><span class="line">    <span class="comment">// there were not initialized.</span></span><br><span class="line">    buffer.fill(<span class="number">0</span>, pos, length);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> buffer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h4 id="Buffer-与性能"><a href="#Buffer-与性能" class="headerlink" title="Buffer 与性能"></a>Buffer 与性能</h4><ul>
-<li><p>网络传输用 Buffer 比直接传字符串要快很多</p>
-<p>  通过预先转换静态内容为 Buffer 对象，可以有效地减少 CPU 的重复使用，节省服务器资源。在构建 Web 应用中，可以选择将页面中的动态内容和静态内容分离，静态内容部分可以通过预先转换为 Buffer 的方式，是性能得到提升。由于文件自身是二进制数据，所以在不需要改变内容的场景下，尽量只读取 Buffer，然后直接传输，不做额外的转换，避免损耗</p>
 </li>
-<li><p>文件读取速度与 highWaterMark 有关</p>
-<p>  这个值代表了每次读取的长度，对 Buffer 内存的分配和使用有一定影响，设置过小，可能导致系统调用的次数过多，在读取一个相同的大文件时，该值越大，读取的速度越快</p>
+</ol>
+</li>
+</ul>
+<pre><code>    - 将 SpringBoot 的依赖添加到 dependencyManagement 中，并且设置  scope=import 
+
+        <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Override Spring Data release train provided by Spring Boot --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.data<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-data-releasetrain<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>Fowler-SR2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Spring Boot basic dependencies --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+2. Maven用户可以继承 spring-boot-starter-parent 项目来获取合适的默认设置。该parent项目提供以下特性
+
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- 默认编译级别为Java 1.6</span><br><span class="line">- 源码编码为 UTF-8</span><br><span class="line">- 一个 dependency management 节点，允许你省略常见依赖的 &lt;version&gt; 标签，继承自 spring-boot-dependencies POM。</span><br><span class="line">- 恰到好处的资源过滤</span><br><span class="line">- 恰到好处的插件配置（exec插件，surefire，Git commit ID，shade）</span><br><span class="line">- 恰到好处的对 application.properties 和 application.yml 进行筛选，</span><br><span class="line">- 包括特定 profile（profile-specific）的文件，比如 applicationfoo.</span><br><span class="line">- properties 和 application-foo.yml</span><br></pre></td></tr></table></figure>
+
+3. Spring Boot Starters 列表
+
+    官方：https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#using-boot-starter
+
+    中文：http://blog.csdn.net/chszs/article/details/50610474
+
+4. 配置工程自检功能：`spring-boot-starter-actuator`
+
+    <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+    配置文件中增加：management.security.enabled=false
+
+    访问以下网站：
+
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/beans</span><br><span class="line">http://localhost:8080/env</span><br><span class="line">http://localhost:8080/health</span><br><span class="line">http://localhost:8080/metrics</span><br><span class="line">http://localhost:8080/trace</span><br><span class="line">http://localhost:8080/mappings</span><br></pre></td></tr></table></figure>
+</code></pre><ul>
+<li><p><strong>默认</strong> 的奥秘，来源于：<code>spring-boot-autoconfigure 的 JAR 文件</code></p>
+<ol>
+<li><p>@SpringBootApplication 注解等价于以默认属性使用 @Configuration ， @EnableAutoConfiguration 和 @ComponentScan，即开启组件扫描和自动配置</p>
+</li>
+<li><p>application.properties（yml） 默认加载路径：当前目录下 /config 子目录，当前目录，classpath 下的 /config，classpath 根路径。如果不喜欢将 application.properties 作为配置文件名，你可以通过指定 spring.config.name 环境属性来切换其他的名称，也可以使用spring.config.location 环境属性引用一个明确的路径（目录位置或文件路径列表以逗号分割）</p>
+</li>
+<li><p>Spring 4.0 的条件化配置是自动配置的基础，当满足一定条件时才会执行某段程序，比如在 classpath 中发现了 JdbcTemplate 时才自动注入，这使得众多 autoconfig 选项得以简化</p>
+</li>
+<li><p>配置的加载顺序</p>
+<p> Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对属性值进行合理的覆盖，属性会以如下的顺序进行设值：</p>
+<ol>
+<li><p>home目录下的devtools全局设置属性（ ~/.spring-bootdevtools.properties ，如果devtools激活）</p>
+</li>
+<li><p>测试用例上的@TestPropertySource注解</p>
+</li>
+<li><p>测试用例上的@SpringBootTest#properties注解</p>
+</li>
+<li><p>命令行参数</p>
+</li>
+<li><p>来自 SPRING_APPLICATION_JSON 的属性（环境变量或系统属性中内嵌的内联JSON）</p>
+</li>
+<li><p>ServletConfig 初始化参数</p>
+</li>
+<li><p>ServletContext 初始化参数</p>
+</li>
+<li><p>来自于 java:comp/env 的JNDI属性</p>
+</li>
+<li><p>Java系统属性（System.getProperties()）</p>
+</li>
+<li><p>操作系统环境变量</p>
+</li>
+<li><p>RandomValuePropertySource，只包含 random.* 中的属性</p>
+</li>
+<li><p>没有打进jar包的Profile-specific应用属性（ application-{profile}.properties 和YAML变量）</p>
+</li>
+<li><p>打进jar包中的Profile-specific应用属性（ application-{profile}.properties 和YAML变量）</p>
+</li>
+<li><p>没有打进jar包的应用配置（ application.properties 和YAML变量）</p>
+</li>
+<li><p>打进jar包中的应用配置（ application.properties 和YAML变量）</p>
+</li>
+<li><p>@Configuration 类上的 @PropertySource 注解</p>
+</li>
+<li><p>默认属性（使用 SpringApplication.setDefaultProperties 指定）</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>开发调试问题</p>
+<ol>
+<li><p>使用 spring-boot-devtools 来实现热部署（TODO）</p>
+</li>
+<li><p>Maven 构建插件的主要功能是把项目打包成一个可执行的超级 JAR（uber-JAR），包括把应用程序的所有依赖打入 JAR 文件内，并为 JAR 添加一个描述文件，其中的内容能够通过 <code>java -jar</code> 来运行应用程序</p>
+</li>
+</ol>
+</li>
+<li><p>Spring 启动问题</p>
+<p>  精辟：读取配置说明（xml，java配置，Groovy配置，其他类型配置），再应用程序上下文里初始化 Bean，将 Bean 注入依赖他们的其他 Bean 中，Spring 帮你通过 组件扫描，自动织入和生命切面等额外辅助功能，帮你简单的做了初始化的事情</p>
+</li>
+<li><p>导入的 starter 是如何 在 application.properties 中给出配置提示的</p>
+<p>  starter 的包 /META-INF/spring.factories 中会有 org.springframework.boot.autoconfigure.EnableAutoConfiguration 自动配置的实现类，打开这个类可以看到实现了 ImportBeanDefinitionRegistrar 接口的 registerBeanDefinitions 方法，如此一来，配置文件中就会给出提示啦</p>
 </li>
 </ul>
 
@@ -257,7 +326,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfrz58bo000ales6epiu1n7f" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjft1cq3i000gu0s60q048mbg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -410,7 +479,165 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjfrz58bm0008les6lh0wymlm" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjft1cq3g000bu0s6mtgroc73" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-NodeJS - 理解 Buffer" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/08/29/NodeJS - 理解 Buffer/">NodeJS - 理解 Buffer</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/29/NodeJS - 理解 Buffer/">
+            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>Buffer 是一个像 Array 的对象，主要用于操作字节，数组元素为 16 进制的两位数，即 0 到 255的数值，如果超出或者不足，小数等情况，会使用叠加，递减，省略小数部分的措施保证元素数值合法性，此外，采用 JavaScript 和 C++ 相结合的模式，将性能部分用 C++ 来实现，非性能相关的部分用 JavaScript 来实现</p>
+<h4 id="内存分配机制"><a href="#内存分配机制" class="headerlink" title="内存分配机制"></a>内存分配机制</h4><p>Buffer 对象的内存分配不是在 V8 的堆内存中，而是在 Node 的 C++ 层面实现内存的申请，采用 slab 动态内存管理机制（先申请，后分配），以 4KB 作为界限来区分 Buffer 是大对象还是小对象，针对大对象，每次都 alloc 一个足够长的 SlowBuffer 对象（C++层）作为 slab 单元，针对小对象，则共用一个 slab，当不足以分配时（可分配小于 4KB），才会 alloc 一个新的 slab 内存进行再分配。<strong>需要注意的是当且仅当一个 slab 上面的所有小对象在作用域释放并都可以回收时，slab 的 8KB 才会被回收，此处会存在由于编码不当导致的内存泄漏，浪费问题</strong></p>
+<p>在 Buffer 中创建一个数组，需要注意以下规则：</p>
+<ul>
+<li>Buffer 是内存拷贝，而不是内存共享</li>
+<li>Buffer 占用内存被解释为一个数组，而不是字节数组。比如，new Uint32Array(new Buffer([1,2,3,4])) 创建了 4 个 Uint32Array，它的成员为 [1,2,3,4]，而不是 [0x1020304] 或 [0x4030201]</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4KB 作为界限的由来：createPool 判断条件</span></span><br><span class="line">Buffer.poolSize = <span class="number">8</span> * <span class="number">1024</span>; </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">allocate</span>(<span class="params">size</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (size &lt; (Buffer.poolSize &gt;&gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (size &gt; (poolSize - poolOffset))</span><br><span class="line">      createPool();</span><br><span class="line">    <span class="keyword">var</span> b = <span class="keyword">new</span> FastBuffer(allocPool, poolOffset, size);</span><br><span class="line">    poolOffset += size;</span><br><span class="line">    alignPool();</span><br><span class="line">    <span class="keyword">return</span> b;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> createUnsafeBuffer(size);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>四种</strong> 内存分配的 API</p>
+<ul>
+<li><p>Buffer.from</p>
+</li>
+<li><p>Buffer.alloc</p>
+</li>
+<li><p>Buffer.allocUnSafe</p>
+</li>
+<li><p>Buffer.allocUnSafeSlow</p>
+</li>
+</ul>
+<img src="/2017/08/29/NodeJS%20-%20理解%20Buffer/buffer-allocate.png" title="Buffer内存分配机制">
+<h4 id="支持与字符串相互转换"><a href="#支持与字符串相互转换" class="headerlink" title="支持与字符串相互转换"></a>支持与字符串相互转换</h4><p>目前支持的字符串编码类型有：ASCII，UTF-8，UTF-16LE/UCS-2，Base64，Binary，Hex，可以用 isEncoding() 来判断是否支持编码</p>
+<p>对于不支持的编码类型，可以通过 <code>iconv</code> 和 <code>iconv-lite</code> 两个模块来支持更多编码类型转换</p>
+<p>转换成 Buffer：new Buffer(str，[encoding]) 和 buf.write(string，[offset]，[length]，[encoding])</p>
+<p>转换成 String：buf.toString([encoding]，[start]，[end])</p>
+<h4 id="正确的拼接方式"><a href="#正确的拼接方式" class="headerlink" title="正确的拼接方式"></a>正确的拼接方式</h4><p>用一个数组来存储接收到的所有 Buffer 片段并记录下所有片段的总长度，然后调用 Buffer.concat() 方法生成一个合并的 Buffer 对象</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Buffer.concat = <span class="function"><span class="keyword">function</span> <span class="title">concat</span>(<span class="params">list, length</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> i;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(list))</span><br><span class="line">    <span class="keyword">throw</span> kConcatErr;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (list.length === <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FastBuffer();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (length === <span class="literal">undefined</span>) &#123;</span><br><span class="line">    length = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++)</span><br><span class="line">      length += list[i].length;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    length = length &gt;&gt;&gt; <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> buffer = Buffer.allocUnsafe(length);</span><br><span class="line">  <span class="keyword">var</span> pos = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> buf = list[i];</span><br><span class="line">    <span class="keyword">if</span> (!isUint8Array(buf))</span><br><span class="line">      <span class="keyword">throw</span> kConcatErr;</span><br><span class="line">    _copy(buf, buffer, pos);</span><br><span class="line">    pos += buf.length;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Note: `length` is always equal to `buffer.length` at this point</span></span><br><span class="line">  <span class="keyword">if</span> (pos &lt; length) &#123;</span><br><span class="line">    <span class="comment">// Zero-fill the remaining bytes if the specified `length` was more than</span></span><br><span class="line">    <span class="comment">// the actual total length, i.e. if we have some remaining allocated bytes</span></span><br><span class="line">    <span class="comment">// there were not initialized.</span></span><br><span class="line">    buffer.fill(<span class="number">0</span>, pos, length);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> buffer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="Buffer-与性能"><a href="#Buffer-与性能" class="headerlink" title="Buffer 与性能"></a>Buffer 与性能</h4><ul>
+<li><p>网络传输用 Buffer 比直接传字符串要快很多</p>
+<p>  通过预先转换静态内容为 Buffer 对象，可以有效地减少 CPU 的重复使用，节省服务器资源。在构建 Web 应用中，可以选择将页面中的动态内容和静态内容分离，静态内容部分可以通过预先转换为 Buffer 的方式，是性能得到提升。由于文件自身是二进制数据，所以在不需要改变内容的场景下，尽量只读取 Buffer，然后直接传输，不做额外的转换，避免损耗</p>
+</li>
+<li><p>文件读取速度与 highWaterMark 有关</p>
+<p>  这个值代表了每次读取的长度，对 Buffer 内存的分配和使用有一定影响，设置过小，可能导致系统调用的次数过多，在读取一个相同的大文件时，该值越大，读取的速度越快</p>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjft1cq3e0007u0s6irj95xaq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -578,7 +805,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjfrz58cj0023les6zcrjjp8o" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjft1cq480025u0s6yxdjvbzw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -782,7 +1009,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjfrz58ck0025les6uwglg8qu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjft1cq4a0028u0s6oghgyh7j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -962,7 +1189,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfrz58cg001vles6zgtjli2q" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjft1cq45001vu0s67abop2nx" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1143,7 +1370,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfrz58ch001yles6y2cahpsu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjft1cq460020u0s6b8ytb6eh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1374,7 +1601,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfrz58c9001jles6p8nufdn4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjft1cq42001ou0s67tw6m4zi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1595,7 +1822,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfrz58ci0020les6v65gzvy9" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjft1cq480023u0s6d6b0gf2y" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1772,174 +1999,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfrz58cf001tles6secd23uv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-程序员的自我修养（四）" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/13/读书笔记-程序员的自我修养（四）/">读书笔记-程序员的自我修养（四）</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/13/读书笔记-程序员的自我修养（四）/">
-            <time datetime="2017-05-13T02:50:07.000Z" itemprop="datePublished">2017-05-13</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="链接的接口：符号"><a href="#链接的接口：符号" class="headerlink" title="链接的接口：符号"></a>链接的接口：符号</h3><ul>
-<li><p><strong>普及</strong> : 链接的过程 <strong>实际上</strong> 就是 <strong>相互拼合</strong> 的过程，即目标文件中的（函数和变量） <strong>地址引用</strong>。<strong>符号</strong> 是拼合剂</p>
-</li>
-<li><p><strong>普及</strong> : 我们将函数和变量统称为 <strong>符号（Symbol）</strong>，函数名货变量名就是 <strong>符号名（Symbol Name）</strong></p>
-</li>
-<li><p><strong>普及</strong>：符号统一存放在目标文件的 <strong>符号表（Symbol Table）</strong> 中，每个定义的符号有一个对应的 <strong>符号值（Symbol Value）</strong></p>
-</li>
-<li><p>主要关注的 <strong>链接对象</strong> 有：1. 定义在本目标文件的 <strong>全局符号</strong>，可以被其他目标文件引用 2. 在本目标文件中引用的 <strong>全局符号</strong>，却没有定义在本目标文件中，这一般叫做外部符号</p>
-</li>
-<li><p>ELF符号表 [<strong>.symtab</strong>]  <strong>结构详解</strong>：</p>
-<ul>
-<li><p><strong>逻辑结构</strong>：<strong>Elf32_Sym</strong> 结构体 对应一个符号，符号表是一个 <strong>数组</strong>，其中</p>
-<ul>
-<li><p><strong>符号类型和绑定信息（st_info）</strong>：类型：局部，全局，<strong>弱引用</strong>，绑定信息：位置，对象，函数，段，文件</p>
-</li>
-<li><p><strong>符号所在段（st_shndx）</strong>：符号定义在本目标文件中，即对应段的下表，如不在，则跟 <strong>深入静态链接</strong> 的 <strong>COMMON块</strong> 有关</p>
-</li>
-<li><p><strong>符号值（st_value）</strong>：依据符号所在段不同，值也会有不同的类型</p>
-</li>
-</ul>
-</li>
-<li><p><strong>特殊符号</strong>：有些符号并没有在你的程序中定义，但是你可以直接声明并且引用它，称之为特殊符号，比如：<strong>__executable_start</strong>，<strong>__etext</strong>，<strong>__edata</strong>，<strong>__end</strong> 这些符号当且仅在 <strong>链接过程中控制</strong></p>
-</li>
-<li><p><strong>符号的管理</strong></p>
-<ul>
-<li><p>修饰与函数签名：为了防止程序中的符号冲突，先后发明了 <strong>名称空间（namespace）</strong>，<strong>符号修饰（Name Decoration）</strong> 等机制，以 <strong>函数签名（Function Signature）</strong> 作为符号的唯一标识，避免多个符号冲突，链接器无法识别</p>
-</li>
-<li><p>exten “C”：C++中用来声明或定义一个 C 符号的语法，配合 <strong>__cplusplus</strong> 来定义变量，这样就可以在 C 或 C++ 中正确的定义符号，使得链接器能够找到目标符号进行链接</p>
-</li>
-<li><p>弱符号和强符号： 都是针对定义而言的，编译器默认函数和初始化了的全局变量为 <strong>强符号（Strong Symbol）</strong>，未初始化的全局变量为 <strong>弱符号（Weak Symbol）</strong>，链接器会在链接的时候，遵循3种选择规则，来选择强符号还是弱符号：1. 相同变量强弱都定义，选择强，2. 不允许强符号被多次定义，3. 都是弱，选择占用空间最大的</p>
-</li>
-<li><p>弱引用和强引用：当链接器在引用决议时未发现符号就报错时，就是强引用，相反，不报错的就是弱引用。之所以有弱引用的存在，是为了使得程序可以在未发现符号的时候，使用原来库的定义，即便去掉了某个模块，也不会报错，方便解耦</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>调式信息 <strong>DWARF（Debug With Arbitrary Record Format）</strong></p>
-<ul>
-<li>使用命令 <code>strip</code> 来去掉 ELF 文件中的调试信息， 大幅度减少文件大小</li>
-</ul>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjfrz58cl0028les6h0fz4spt" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjft1cq46001yu0s69o9iktsi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2028,7 +2088,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2037,7 +2097,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">22</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">23</span></li></ul>
         </div>
     </div>
 
