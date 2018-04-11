@@ -214,13 +214,7 @@
         
             
             <h3 id="Redis：独立功能的实现"><a href="#Redis：独立功能的实现" class="headerlink" title="Redis：独立功能的实现"></a>Redis：独立功能的实现</h3><h5 id="1-发布与订阅"><a href="#1-发布与订阅" class="headerlink" title="1. 发布与订阅"></a>1. 发布与订阅</h5><p>Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成</p>
-<p>struct redisServer {</p>
-<pre><code>// 保存所有频道的订阅关系
-dict *pubsub_channels;
-
-// 保存所有模式的订阅关系
-list *pubsub_patterns;
-</code></pre><p>}</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct redisServer &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 保存所有频道的订阅关系</span></span><br><span class="line">	dict *pubsub_channels;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 保存所有模式的订阅关系</span></span><br><span class="line">	list *pubsub_patterns;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Redis 将所有频道的订阅关系都保存在服务器状态的 pubsub_channels 字典里面, 这个字典的键是某个被订阅的频道, 而键的值则是一个链表, 链表里面记录了所有订阅这个频道的客户端</p>
 <ul>
 <li><p>服务器数据结构在 pubsub_channels 字典保存了所有频道的订阅关系: SUBSCRIBE 命令负责将客户端和被订阅的频道关联到这个字典里面, 而 UNSUBCRIBE 命令则负责解除客户端和被退订频道之间的关联</p>
@@ -289,7 +283,7 @@ list *pubsub_patterns;
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjfueiwxb00162is6byr4btd4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjfuem5ah001j3rs6i9sduc9u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -485,7 +479,7 @@ list *pubsub_patterns;
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfueiwxg001e2is6rx74su0p" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjfuem5ac001b3rs6zrx629mo" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -723,7 +717,7 @@ list *pubsub_patterns;
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfueiwxh001g2is6hlpqepe3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjfuem5ab00193rs6q316tov4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -860,7 +854,7 @@ list *pubsub_patterns;
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfueiwws00052is6acwxfuqh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjfuem59r00053rs6thftadz7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -990,7 +984,7 @@ list *pubsub_patterns;
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjfueiwwk00012is6pgxm715n" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjfuem59g00003rs6pp2qer2w" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1231,7 +1225,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfueiwxd001b2is64k5fleq4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjfuem5ae001e3rs6vzdus6pc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1364,7 +1358,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfueiwx6000u2is6oyf9x9jq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjfuem5a5000u3rs6yivernr8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1532,7 +1526,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfueiwx5000s2is6yg5ycs41" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjfuem5a4000s3rs69217m4ux" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1686,7 +1680,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfueiwx8000z2is643sb59n2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjfuem5a6000x3rs60eqhfd3b" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1836,7 +1830,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfueiwx7000x2is669xog8ja" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjfuem5a7000z3rs65tmingnv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding

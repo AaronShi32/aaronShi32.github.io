@@ -326,160 +326,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfueiwx0000h2is6ixoquidx" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-NodeJS - 理解 内存控制" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/08/29/NodeJS - 理解 内存控制/">NodeJS - 理解 内存控制</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/08/29/NodeJS - 理解 内存控制/">
-            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>V8 具有内存限制，所有的 JavaScript 对象都是通过堆来进行分配的，可以通过 <code>process.memoryUsage()</code> 来查看内存信息，其中 heapTotal 和 heapUsed 分别代表了已申请到的对内存和当前使用的量。如果当前代码已申请的堆空闲内存不够分配新的对象，将就申请堆内存，知道堆的大小超过 V8 的内存限制为止</p>
-<p>为何采取 V8 内存限制：一次小的垃圾回收需要 50ms 以上，一次非增量式的垃圾回收甚至需要 1s 以上，这是垃圾回收引起的 JS 线程暂停执行的时间，应用的性能和响应时间都会大幅度下降</p>
-<h4 id="V8-的垃圾回收机制"><a href="#V8-的垃圾回收机制" class="headerlink" title="V8 的垃圾回收机制"></a>V8 的垃圾回收机制</h4><p>采用 node –trace-gc xxx 命令行参数来查看内存垃圾回收日志，使用 –prof 可以得到 V8 执行时的性能分析数据，配合 tick-processor 工具查看统计信息</p>
-<h5 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h5><ul>
-<li><p>基于分代式垃圾回收（解决不同的对象生命周期不同）</p>
-<p>  <code>--max-old-space-size</code> 指定老生代内存空间的最大值 <strong>+</strong>  <code>--max-new-space-size</code> 指定新生代内存空间的最大值 <strong>=</strong> V8 堆的整体大小</p>
-</li>
-<li><p>新生代的回收算法：Scavenge（base on Cheney）</p>
-<p>  核心思想：空间一分为二，从 From 空间 <strong>复制</strong> 到 To 空间，缺点是只能使用堆内存的一般，好处是以空间换取时间（块），适合新生代频繁的内存回收</p>
-<p>  对象<strong>晋升</strong>两个条件：是否经历过 Scavenge 回收，To空间的内存占用是否超过了比例（25%）</p>
-</li>
-<li><p>老生代的回收算法：Mark-Sweep &amp; Mark-Compact</p>
-<p>  核心思想：标记 - 清楚 - 整理内存碎片</p>
-</li>
-<li><p>回收策略：延迟清理（lazy sweeping）和 增量式整理（incremental compaction）</p>
-<p>  为了降低全堆垃圾回收带来的线程停顿问题，采用增量标记来减少由于垃圾回收造成的停顿时间</p>
-</li>
-</ul>
-<h5 id="高效使用内存"><a href="#高效使用内存" class="headerlink" title="高效使用内存"></a>高效使用内存</h5><p>在正常的 JavaScript 执行中，无法立即回收的内存有必报和全局变量引用这两种情况，由于 V8 的内存限制，要十分小心此类变量是否无限制的增加，因为他会导致老生代的对象增多</p>
-<h4 id="内存指标"><a href="#内存指标" class="headerlink" title="内存指标"></a>内存指标</h4><ul>
-<li>使用 <code>process.memoryUsage()</code> 查看 Node 进程的内存占用情况</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// outofmemory.js</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMem</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> mem = process.memoryUsage();</span><br><span class="line">	<span class="keyword">var</span> format = <span class="function"><span class="keyword">function</span>(<span class="params">bytes</span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (bytes / <span class="number">1024</span> / <span class="number">1024</span>).toFixed(<span class="number">2</span>) + <span class="string">'MB'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">`Process: heapTotal <span class="subst">$&#123;format(mem.heapTotal)&#125;</span> heapUsed <span class="subst">$&#123;format(mem.heapUsed)&#125;</span> rss <span class="subst">$&#123;mem.rss&#125;</span>`</span>)；</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> useMem = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> size = <span class="number">20</span> * <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line">	<span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(size);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">		arr[i] = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> total = [];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>； j++)&#123;</span><br><span class="line">	showMem();</span><br><span class="line">	total.push(useMem());</span><br><span class="line">&#125;</span><br><span class="line">showMem();</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>使用 <code>os.totalmem()</code> 和 <code>os.freemem()</code> 查看 操作系统 的内存情况</p>
-</li>
-<li><p>堆外内存：那些不是通过 V8 分配的内存 - Buffer 对象</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjfueiwww000a2is6ip7ryk50" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjfuem5a0000k3rs6ko8a8m5w" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -637,7 +484,160 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfueiwwu00082is6ont5urio" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 Buffer/" data-id="cjfuem59s00073rs6gen61u1x" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-NodeJS - 理解 内存控制" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/08/29/NodeJS - 理解 内存控制/">NodeJS - 理解 内存控制</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/08/29/NodeJS - 理解 内存控制/">
+            <time datetime="2017-08-29T03:22:52.000Z" itemprop="datePublished">2017-08-29</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>V8 具有内存限制，所有的 JavaScript 对象都是通过堆来进行分配的，可以通过 <code>process.memoryUsage()</code> 来查看内存信息，其中 heapTotal 和 heapUsed 分别代表了已申请到的对内存和当前使用的量。如果当前代码已申请的堆空闲内存不够分配新的对象，将就申请堆内存，知道堆的大小超过 V8 的内存限制为止</p>
+<p>为何采取 V8 内存限制：一次小的垃圾回收需要 50ms 以上，一次非增量式的垃圾回收甚至需要 1s 以上，这是垃圾回收引起的 JS 线程暂停执行的时间，应用的性能和响应时间都会大幅度下降</p>
+<h4 id="V8-的垃圾回收机制"><a href="#V8-的垃圾回收机制" class="headerlink" title="V8 的垃圾回收机制"></a>V8 的垃圾回收机制</h4><p>采用 node –trace-gc xxx 命令行参数来查看内存垃圾回收日志，使用 –prof 可以得到 V8 执行时的性能分析数据，配合 tick-processor 工具查看统计信息</p>
+<h5 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h5><ul>
+<li><p>基于分代式垃圾回收（解决不同的对象生命周期不同）</p>
+<p>  <code>--max-old-space-size</code> 指定老生代内存空间的最大值 <strong>+</strong>  <code>--max-new-space-size</code> 指定新生代内存空间的最大值 <strong>=</strong> V8 堆的整体大小</p>
+</li>
+<li><p>新生代的回收算法：Scavenge（base on Cheney）</p>
+<p>  核心思想：空间一分为二，从 From 空间 <strong>复制</strong> 到 To 空间，缺点是只能使用堆内存的一般，好处是以空间换取时间（块），适合新生代频繁的内存回收</p>
+<p>  对象<strong>晋升</strong>两个条件：是否经历过 Scavenge 回收，To空间的内存占用是否超过了比例（25%）</p>
+</li>
+<li><p>老生代的回收算法：Mark-Sweep &amp; Mark-Compact</p>
+<p>  核心思想：标记 - 清楚 - 整理内存碎片</p>
+</li>
+<li><p>回收策略：延迟清理（lazy sweeping）和 增量式整理（incremental compaction）</p>
+<p>  为了降低全堆垃圾回收带来的线程停顿问题，采用增量标记来减少由于垃圾回收造成的停顿时间</p>
+</li>
+</ul>
+<h5 id="高效使用内存"><a href="#高效使用内存" class="headerlink" title="高效使用内存"></a>高效使用内存</h5><p>在正常的 JavaScript 执行中，无法立即回收的内存有必报和全局变量引用这两种情况，由于 V8 的内存限制，要十分小心此类变量是否无限制的增加，因为他会导致老生代的对象增多</p>
+<h4 id="内存指标"><a href="#内存指标" class="headerlink" title="内存指标"></a>内存指标</h4><ul>
+<li>使用 <code>process.memoryUsage()</code> 查看 Node 进程的内存占用情况</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// outofmemory.js</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMem</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> mem = process.memoryUsage();</span><br><span class="line">	<span class="keyword">var</span> format = <span class="function"><span class="keyword">function</span>(<span class="params">bytes</span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (bytes / <span class="number">1024</span> / <span class="number">1024</span>).toFixed(<span class="number">2</span>) + <span class="string">'MB'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">`Process: heapTotal <span class="subst">$&#123;format(mem.heapTotal)&#125;</span> heapUsed <span class="subst">$&#123;format(mem.heapUsed)&#125;</span> rss <span class="subst">$&#123;mem.rss&#125;</span>`</span>)；</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> useMem = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> size = <span class="number">20</span> * <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line">	<span class="keyword">var</span> arr = <span class="keyword">new</span> <span class="built_in">Array</span>(size);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">		arr[i] = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> total = [];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; <span class="number">15</span>； j++)&#123;</span><br><span class="line">	showMem();</span><br><span class="line">	total.push(useMem());</span><br><span class="line">&#125;</span><br><span class="line">showMem();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>使用 <code>os.totalmem()</code> 和 <code>os.freemem()</code> 查看 操作系统 的内存情况</p>
+</li>
+<li><p>堆外内存：那些不是通过 V8 分配的内存 - Buffer 对象</p>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/08/29/NodeJS - 理解 内存控制/" data-id="cjfuem59v000b3rs6dnek1ono" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -805,7 +805,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjfueiwxt00282is6tfiyxtli" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/07/05/读书笔记-程序员的自我修养（十一）/" data-id="cjfuem5as00253rs6iwe7jms5" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1009,7 +1009,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjfueiwxs00252is6k0fgtcz0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/26/读书笔记-程序员的自我修养（十）/" data-id="cjfuem5at00283rs632s4rxvt" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1189,7 +1189,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfueiwxn001t2is6e5qcib3c" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/20/读书笔记-程序员的自我修养（九）/" data-id="cjfuem5am001t3rs6t4w9k76j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1370,7 +1370,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfueiwxq00202is6c7ekzqzu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjfuem5aq00203rs6xixnzylg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1601,7 +1601,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfueiwxl001o2is6yxf1z9x9" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjfuem5ak001o3rs6gft9qj9j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1822,7 +1822,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfueiwxr00232is6ev5g3h6u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjfuem5ar00233rs6i6nk5hqu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1999,7 +1999,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfueiwxp001y2is66xljmstc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjfuem5ap001y3rs6pisjjeor" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
