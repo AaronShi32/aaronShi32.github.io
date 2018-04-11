@@ -5,18 +5,18 @@
     
     <title>读书笔记-Redis 独立功能的实现 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Redis：独立功能的实现1. 发布与订阅">
+    <meta name="description" content="Redis：独立功能的实现1. 发布与订阅Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成 struct redisServer { // 保存所有频道的订阅关系 dict *pubsub_channels;  // 保存所有模式的订阅关系 list *pubsub_patterns; } Redis 将所有频道的订阅关系都保存在服务器状">
 <meta name="keywords" content="读书">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读书笔记-Redis 独立功能的实现">
 <meta property="og:url" content="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="Redis：独立功能的实现1. 发布与订阅">
+<meta property="og:description" content="Redis：独立功能的实现1. 发布与订阅Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成 struct redisServer { // 保存所有频道的订阅关系 dict *pubsub_channels;  // 保存所有模式的订阅关系 list *pubsub_patterns; } Redis 将所有频道的订阅关系都保存在服务器状">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-10T02:16:19.414Z">
+<meta property="og:updated_time" content="2018-04-11T01:13:22.089Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-Redis 独立功能的实现">
-<meta name="twitter:description" content="Redis：独立功能的实现1. 发布与订阅">
+<meta name="twitter:description" content="Redis：独立功能的实现1. 发布与订阅Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成 struct redisServer { // 保存所有频道的订阅关系 dict *pubsub_channels;  // 保存所有模式的订阅关系 list *pubsub_patterns; } Redis 将所有频道的订阅关系都保存在服务器状">
     
 
     
@@ -217,7 +217,73 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="Redis：独立功能的实现"><a href="#Redis：独立功能的实现" class="headerlink" title="Redis：独立功能的实现"></a>Redis：独立功能的实现</h3><h5 id="1-发布与订阅"><a href="#1-发布与订阅" class="headerlink" title="1. 发布与订阅"></a>1. 发布与订阅</h5>
+            <h3 id="Redis：独立功能的实现"><a href="#Redis：独立功能的实现" class="headerlink" title="Redis：独立功能的实现"></a>Redis：独立功能的实现</h3><h5 id="1-发布与订阅"><a href="#1-发布与订阅" class="headerlink" title="1. 发布与订阅"></a>1. 发布与订阅</h5><p>Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成</p>
+<p>struct redisServer {</p>
+<pre><code>// 保存所有频道的订阅关系
+dict *pubsub_channels;
+
+// 保存所有模式的订阅关系
+list *pubsub_patterns;
+</code></pre><p>}</p>
+<p>Redis 将所有频道的订阅关系都保存在服务器状态的 pubsub_channels 字典里面, 这个字典的键是某个被订阅的频道, 而键的值则是一个链表, 链表里面记录了所有订阅这个频道的客户端</p>
+<ul>
+<li><p>服务器数据结构在 pubsub_channels 字典保存了所有频道的订阅关系: SUBSCRIBE 命令负责将客户端和被订阅的频道关联到这个字典里面, 而 UNSUBCRIBE 命令则负责解除客户端和被退订频道之间的关联</p>
+</li>
+<li><p>服务器数据结构在 pubsub_patterns 链表保存了所有模式的订阅关系: PSUBCRIBE 命令负责将客户端和被订阅的模式记录到这个链表中, 而 PUNSUBSCRIBE 命令则负责移除客户端和被退订模式之间的关联</p>
+</li>
+<li><p>PUBLISH 命令通过访问 pubsub_channels 字典来向频道的所有订阅者发送消息, 通过访问 pubsub_patterns 链表来向所有匹配频道的模式的订阅者发送消息</p>
+</li>
+<li><p>PUBSUB 命令的三个子命令都是读取通过 pubsub_channels 字典和 pubsub_patterns 链表中的信息来实现的</p>
+</li>
+</ul>
+<h5 id="2-事务"><a href="#2-事务" class="headerlink" title="2. 事务"></a>2. 事务</h5><p>Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务(transaction)功能</p>
+<p>WATCH 命令是一个乐观锁, 它可以在 EXEC 命令执行之前, 监事任意数量的数据库键, 并在 EXEC 命令执行时, 检查被监视的键是否至少有一个已经被修改过了, 如果是的话, 服务器将拒绝执行事务, 并向客户端返回代表事务执行失败的空回复</p>
+<ul>
+<li><p>事务在执行过程中不会被中断, 当事务队列中的所有命令都被执行完毕之后, 事务才会结束</p>
+</li>
+<li><p>带有 WATCH 命令的事务会将客户端和被监视的键在数据库的 watched_keys 字典中进行关联, 当键被修改时, 程序会将所有监视被修改键的客户端的 REDIS_DIRTY_CAS 标志打开</p>
+</li>
+<li><p>只有在客户端的 REDIS_DIRTY_CAS 标志未被打开时, 服务器才会执行客户端提交的事务, 否则将拒绝</p>
+</li>
+<li><p>Redis 的事务总是具有 ACID 中的原子性、一致性和隔离性, 当服务器运行在 AOF 持久化模式下, 并且 appendfsync 选项的值为 always 时, 事务也具有耐久性</p>
+</li>
+</ul>
+<h5 id="3-排序"><a href="#3-排序" class="headerlink" title="3. 排序"></a>3. 排序</h5><ul>
+<li><p>SORT 命令通过将被排序键包含的元素载入到数组里面, 然后对数组进行排序来完成对键进行排序工作</p>
+</li>
+<li><p>在默认情况下, SORT 命令假设被排序键包含的都是数字值, 并且以数字值的方式来进行排序</p>
+</li>
+<li><p>如果 SORT 命令使用了 ALPHA 选项, 那么 SORT 命令假设被排序键包含的都是字符串值, 并且以字符串的方式来进行排序</p>
+</li>
+<li><p>SORT 命令的排序操作由快速排序算法实现</p>
+</li>
+<li><p>当 SORT 命令使用了 BY 选项时, 命令使用其他键的值作为权重来进行排序操作</p>
+</li>
+<li><p>除了 GET 选项之外, 调整选项的摆放位置不会影响 SORT 命令的排序结果</p>
+</li>
+</ul>
+<h5 id="4-慢查询日志"><a href="#4-慢查询日志" class="headerlink" title="4. 慢查询日志"></a>4. 慢查询日志</h5><p>Reids 的慢日志查询功能用于记录执行时间超过给定时长的命令请求, 用户可以通过这个功能产生的日志来监视和优化查询速度</p>
+<ul>
+<li><p>Redis 服务器将所有的慢查询日志保存在服务器状态的 slowlog 链表中, 每个链表节点都包含一个 slowlogEntry 结构, 每个 slowlogEntry 结构代表一条慢查询日志</p>
+</li>
+<li><p>打印和删除慢查询日志可以通过遍历 slowlog 链表来完成</p>
+</li>
+<li><p>slowlog 链表的长度就是服务器所保存慢查询在日志的数量</p>
+</li>
+<li><p>新的慢查询日志会被添加到 slowlog 链表的表头, 如果日志的数量超过 slowlog-max-len 选项的值, 那么多出来的日志会被删除</p>
+</li>
+</ul>
+<h5 id="5-监视器"><a href="#5-监视器" class="headerlink" title="5. 监视器"></a>5. 监视器</h5><ul>
+<li><p>客户端可以通过执行 MONITOR 命令转换成监视器, 接收并打印服务器处理的每个命令请求信息</p>
+</li>
+<li><p>当一个客户端变为监视器时, 该客户端的 REDIS_MONITOR 标识会被打开</p>
+</li>
+<li><p>服务器将所有监视器都记录在 monitors 链表中</p>
+</li>
+<li><p>每次处理命令请求时, 服务器都会遍历 monitors 链表, 将相关信息发送给监视器</p>
+</li>
+</ul>
+
         
         </div>
         <footer class="article-footer">
@@ -227,7 +293,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjft1cq41001lu0s6ck63vfe4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjfueiwxb00162is6byr4btd4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
