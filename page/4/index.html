@@ -140,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                39
+                41
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -175,6 +175,297 @@
 
             
             <section id="main">
+    <article id="post-Tensorflow学习-环境搭建" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/08/Tensorflow学习-环境搭建/">Tensorflow学习-环境搭建</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/08/Tensorflow学习-环境搭建/">
+            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>耳闻 Tensorflow 已经很久了，一直没有时间亲自动手体验，忙里抽闲把环境都配置好了，以此来记录学习的开始</p>
+<h4 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h4><ul>
+<li><p>VMware Player 12 （免费）</p>
+</li>
+<li><p>Ubuntu 16.04 LTS</p>
+</li>
+<li><p>Anaconda 4.3.0</p>
+</li>
+<li><p>Tensorflow Library</p>
+</li>
+<li><p>Sublime Text + Plugin</p>
+</li>
+<li><p>翻墙</p>
+</li>
+</ul>
+<p>基于 Anaconda 搭建 Tensorflow 的环境非常方便，避免GFW的干扰，提供一个环境网站：<a href="https://mirrors.tuna.tsinghua.edu.cn/" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/</a></p>
+<p>创建虚拟机的步骤就不赘述了，用过VMware的很简单，记得安装VMware Tools ，这个很关键</p>
+<p>下载好 Anaconda 之后，有 2 和 3 两个版本，分别对应 python 2.7 和 python 3.5，<strong>chmod 之后就可以一路安装了</strong>，记得添加到PATH中，这样默认的python环境就升级了</p>
+<p>打开终端，输入以下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> conda create -n tensorflow python=2.7</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source activate tensorflow</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> pip install --ignore-installed --upgrade $TF_BINARY_URL</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source deactivate</span><br></pre></td></tr></table></figure>
+<p>下载安装 Sublime Text，安装 Package Control 之后依次添加以下插件：</p>
+<ul>
+<li>Anaconda</li>
+</ul>
+<p>其中 Anaconda 配置参考：<a href="http://www.cnblogs.com/nx520zj/p/5787393.html" target="_blank" rel="noopener">http://www.cnblogs.com/nx520zj/p/5787393.html</a></p>
+<p>去掉代码检测提示框：<a href="https://segmentfault.com/q/1010000002415020" target="_blank" rel="noopener">https://segmentfault.com/q/1010000002415020</a></p>
+<p>这样，Tensorflow 的环境就搭建成功了，总体来说还是非常方便的，保证一个通畅的网络，翻墙很关键！</p>
+<p>试运行一个线性拟合 Demo 点此下载：<a href="/2017/02/08/Tensorflow学习-环境搭建/line.py" title="line.py">line.py</a></p>
+<p>得到如下输出：</p>
+<img src="/2017/02/08/Tensorflow学习-环境搭建/line-result.png" title="运行结果">
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjgoyfvwn000ppws6g02jaurj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/08/Tensorflow学习-神经网络/">
+            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
+<p>首先来回忆几个概念</p>
+<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
+<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
+<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
+<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
+<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
+<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
+<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
+<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
+<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
+</ul>
+<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjgoyfvwm000mpws6f7s9vl9s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-2017书单" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -251,7 +542,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjgbyia6y0000s0s6y6eo1yfc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjgoyfvw30000pws6e9zl57n4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -405,7 +696,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjgbyia770007s0s62zlzjg9z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjgoyfvwd0007pws6o3qqdicr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -557,7 +848,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjgbyia7h000qs0s6osjdyuhw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjgoyfvwo000qpws6d1rld75s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -688,7 +979,7 @@
 <li><a href="##中介模式">中介模式</a></li>
 <li><a href="##享元模式">享元模式</a></li>
 <li><a href="##解释器模式">解释器模式</a></li>
-<li><a href="##访问者模式">*访问者模式</a></li>
+<li><a href="##访问者模式">访问者模式</a></li>
 </ul>
 <h4 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h4><ul>
 <li><p>也叫最少知识原则，即：类的设计要降低耦合，如果两个类不必彼此直接通信，那么这两个类就不应当发生直接的相互作用。如果其中一个类需要调用另一个类的某一个方法的话，可以通过第三者转发这个调用</p>
@@ -828,7 +1119,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjgbyia7u001js0s6z5ya4u8v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjgoyfvx7001opws64ejqfffh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -982,7 +1273,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/JS文档生成工具-Jsdoc/" data-id="cjgbyia760004s0s6ut8kaum3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/JS文档生成工具-Jsdoc/" data-id="cjgoyfvwb0004pws6qymw80me" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1632,7 +1923,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjgbyia7n0016s0s6j9q3xv7v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjgoyfvwv0014pws6u23p37sj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1799,7 +2090,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/16/Node命令行工具-Yargs和Commander/" data-id="cjgbyia7c000fs0s6u8091z51" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/16/Node命令行工具-Yargs和Commander/" data-id="cjgoyfvwh000cpws6ss3gjv8i" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1943,376 +2234,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/14/JS压缩混淆工具-UglifyJS/" data-id="cjgbyia740003s0s6v2fdhipj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-Google工作整理术" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/10/26/读书笔记-Google工作整理术/">读书笔记-Google工作整理术</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/10/26/读书笔记-Google工作整理术/">
-            <time datetime="2016-10-26T09:53:00.000Z" itemprop="datePublished">2016-10-26</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="认知大脑"><a href="#认知大脑" class="headerlink" title="认知大脑"></a>认知大脑</h3><ul>
-<li><p>为了实现大脑压力最小化，要把生活组织的有条不紊</p>
-</li>
-<li><p>让信息尽可能快地离开大脑</p>
-</li>
-<li><p>多重任务通常让你降低效率</p>
-</li>
-<li><p>利用故事去记忆</p>
-</li>
-</ul>
-<h5 id="共勉句"><a href="#共勉句" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>我们做决定经常是建立在害怕失去什么的基础上，而不是考虑希望得到什么</p>
-</li>
-<li><p>紊乱无需让你搞到重重压力，进而举措失当，承受等大的压力，让你更加失误连连</p>
-</li>
-<li><p>音乐可以减缓压力</p>
-</li>
-<li><p>识别要比回忆轻松地多</p>
-</li>
-<li><p>要回忆一个事实，先努力想想第一次注意到那个事实时你正在干什么，这是很有帮助的</p>
-</li>
-<li><p>面对太多选择的时候，我们经常倾向于选择最熟悉的东西</p>
-</li>
-<li><p>做决定的关键在于你的目标是什么，并确定他们的优先次序，展望各不相同的最终结果，比较各种决定的效果。</p>
-</li>
-<li><p>多样性会让你和你的同事在实现目标的过程中更加出类拔萃</p>
-</li>
-</ul>
-<h3 id="错误的有序"><a href="#错误的有序" class="headerlink" title="错误的有序"></a>错误的有序</h3><ul>
-<li><p>仅仅因为一直都按照某种特定方式做某事，并不意味着就该永远这样做（朝九晚五、暑假）</p>
-</li>
-<li><p>知识不是力量，共享知识才是力量</p>
-</li>
-</ul>
-<h5 id="共勉句-1"><a href="#共勉句-1" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>分享自己的所知，鼓励别人也这么做，你就会从他们那里学有所获，他们也可以从你这里学到东西，然后你们就会胜任更好的工作</p>
-</li>
-<li><p>解决问题的办法不是更加辛苦的工作，而是利用现有的工具和技术，巧妙的工作</p>
-</li>
-</ul>
-<h3 id="突破制约"><a href="#突破制约" class="headerlink" title="突破制约"></a>突破制约</h3><ul>
-<li><p>进行组织安排时，要绕开的是实际制约而不是假性制约</p>
-</li>
-<li><p>对自己要坦诚，但是千万不要自我评判，坦诚的检视下你所处的环境，多听听可信赖的人的意见</p>
-</li>
-<li><p>要懂得什么时候忽略制约，不要第一步都迈不出去</p>
-</li>
-</ul>
-<h5 id="共勉句-2"><a href="#共勉句-2" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>学会识别、接受并绕开你的实际制约，从而不在你无法改变的事情上浪费时间和精力</p>
-</li>
-<li><p>实际制约通常涉及你绝对无法控制的某些因素</p>
-</li>
-<li><p>有时候，超出我们控制范围的制约刚好就潜伏在你能控制的哪些制约的表面之下</p>
-</li>
-<li><p>源自情绪的制约最难识别和控制，无论面对什么制约，控制好自己的<strong>举止，行动，愿望和情绪</strong></p>
-</li>
-<li><p>在不可预料的意外发生之前，对于那些面临压力时还会变本加厉的制约，要及早辨别并准备好绕开它的有效策略，这是十分重要的</p>
-</li>
-</ul>
-<h3 id="目标决策"><a href="#目标决策" class="headerlink" title="目标决策"></a>目标决策</h3><ul>
-<li><p>在发动汽车之前，一定要确切的搞清楚自己要到哪里去，还要知道选择什么途径去</p>
-</li>
-<li><p>在实现目标的方式上灵活变通</p>
-</li>
-</ul>
-<h5 id="共勉句-3"><a href="#共勉句-3" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>在一件事之前，要搞清楚 <strong>你的问题是什么？</strong>，也就间接的让自己清楚目标是什么</p>
-</li>
-<li><p>所做的每一件事都要从自己的目标出发，切勿盲目，偏离初衷</p>
-</li>
-<li><p>一旦确定了某个项目的目标，先学会四处看看，确定一下可能面临的问题是否有人已经解决了，别人所用的解决办法中哪些要素可以采纳或借鉴</p>
-</li>
-<li><p>给别人委派任务涉及信任问题，请求别人做事情，就一定要信任别人，更不要剥夺别人学习新的东西、担负更多责任的机会</p>
-</li>
-<li><p>针对你的决策将会产生的不同结果，逐个试试看，形象的展望一个决定可能产生的不同结果，可以帮你明确什么才是你真正想要的</p>
-</li>
-<li><p>任何决定都需要经过反复推敲做出假设，写下来，每天看一遍</p>
-</li>
-</ul>
-<h3 id="Google"><a href="#Google" class="headerlink" title="Google"></a><a href="g.cn">Google</a></h3><h3 id="搜索的时代"><a href="#搜索的时代" class="headerlink" title="搜索的时代"></a>搜索的时代</h3><ul>
-<li>不要给信息处处归档，用的时候去搜索就行了</li>
-</ul>
-<h5 id="共勉句-4"><a href="#共勉句-4" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li>搜索功能是新式组织管理的基础，我们不必在文件归档方面耗时间和精力，也用不着为了找到重要信息而劳神费力</li>
-</ul>
-<h3 id="基本搜索引擎技巧"><a href="#基本搜索引擎技巧" class="headerlink" title="基本搜索引擎技巧"></a>基本搜索引擎技巧</h3><ul>
-<li><p>PageRank：别人说他好，才是真的好（引用的越多，越有价值）</p>
-</li>
-<li><p>技巧</p>
-<ul>
-<li><p>尽量增强搜索条件的描述性（关键词多一些）</p>
-</li>
-<li><p>在搜索条件短语中使用引号（引号表示确认在搜索的网页中包含）</p>
-</li>
-<li><p>使用形容词搜索（”apple ~cheap”）</p>
-</li>
-<li><p>排除不想要的结果（”opera -browser”）</p>
-</li>
-<li><p>通过数值范围获取特定信息（…表示数值范围，”digital camera” $100…$300）</p>
-</li>
-<li><p>搜索特定网站（”paris hotels” site:nytimes.com）</p>
-</li>
-<li><p>搜索特定类型的文件（”paris hotels” filetype:xls）</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="信息过滤器"><a href="#信息过滤器" class="headerlink" title="信息过滤器"></a>信息过滤器</h3><ul>
-<li><p>目标是信息存储的向导，大脑中只保存真正需要记忆的内容</p>
-</li>
-<li><p>大块的内容要化整为零</p>
-</li>
-<li><p>每周拿出些时间回顾关键信息，再次梳理归类</p>
-</li>
-</ul>
-<h5 id="共勉句-5"><a href="#共勉句-5" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>幸运的是，我们接收的绝大部分信息都没有必要记住，因为大部分信息不值得我们记忆</p>
-</li>
-<li><p>信息的有效性取决于你的目标是什么，不断的分门别类，建立信息等级（忽略，今后它用，记忆），离目标越近的信息就是越需要的</p>
-</li>
-<li><p>重复和回归通常可以帮你确定目标</p>
-</li>
-<li><p>只要有可能，就把大块信息分解成小块，就不会感到困难了，分解信息会当你找出其中的规律和主题</p>
-</li>
-</ul>
-<h3 id="纸质文档-与-电子文档"><a href="#纸质文档-与-电子文档" class="headerlink" title="纸质文档 与 电子文档"></a>纸质文档 与 电子文档</h3><ul>
-<li><p>没有一个完美无缺的组织方法</p>
-</li>
-<li><p>通常消化吸收之后的信息，写下来会比较好</p>
-</li>
-<li><p>做笔记的过程就是锻炼信息筛选的过程，好的笔记不是全，而是精</p>
-</li>
-</ul>
-<h5 id="共勉句-6"><a href="#共勉句-6" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>每当文件柜即将塞满的时候，我会直接筛选一遍文档，不再需要的财务票据及其它敏感信息，我会当场销毁，其它不用的文件继续回收利用</p>
-</li>
-<li><p>重要文档，必须纸质保存</p>
-</li>
-<li><p>信息多的时候，先分类，后处理</p>
-</li>
-<li><p>要使用信誉好的在线存储或备份业务</p>
-</li>
-<li><p>针对需要处理的信息，你要确定什么时候最可能用到，如何去使用，需要保存的期限有多长，以及你打算与谁共享，从而决定存储方式。</p>
-</li>
-<li><p>何时使用纸质工具</p>
-<ul>
-<li><p>解决某个问题或者提出一种想法，请随时记录下来</p>
-</li>
-<li><p>目标是记住或者真正吸收的信息，打印出来比盯着屏幕要好</p>
-</li>
-<li><p>随身携带一个小笔记本</p>
-</li>
-</ul>
-</li>
-<li><p>何时使用数字工具</p>
-<ul>
-<li><p>需要与别人共享的信息</p>
-</li>
-<li><p>需要快速查看的信息</p>
-</li>
-<li><p>存储比较久的信息</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="电子邮箱-Gmail"><a href="#电子邮箱-Gmail" class="headerlink" title="电子邮箱 Gmail"></a>电子邮箱 <a href="gmail.com">Gmail</a></h3><ul>
-<li>在数字信息中加上相应的关键词，以便日后容易找到</li>
-</ul>
-<h5 id="共勉句-7"><a href="#共勉句-7" class="headerlink" title="共勉句"></a>共勉句</h5><ul>
-<li><p>Gmail 是一种近乎理想的脚手架，简单易用，免费，容量大</p>
-</li>
-<li><p>标签比文件夹更有效，一封邮件可以拥有多个标签</p>
-</li>
-<li><p>aaronshicf9032+shopping@gmail.cn 简直爽的不要不要的，自动过滤</p>
-</li>
-<li><p>把密码提示线索保存在Gmail邮箱之类的便于访问的安全场所</p>
-</li>
-</ul>
-<h3 id="日历-Google-Calendar"><a href="#日历-Google-Calendar" class="headerlink" title="日历 Google Calendar"></a>日历 <a href="">Google Calendar</a></h3><ul>
-<li><p>跟特定人士共享特定日程，其实就是为他们过滤你的日程信息</p>
-</li>
-<li><p>尽量使用已经上手的工具</p>
-</li>
-</ul>
-<h3 id="协同文档-Google-doc"><a href="#协同文档-Google-doc" class="headerlink" title="协同文档 Google doc"></a>协同文档 <a href="">Google doc</a></h3><ul>
-<li><p>轻量级，适用于协作：存放重要本地文档、组织一个待办事项总清单、掌握资金使用情况、<strong>共享临时信息</strong></p>
-</li>
-<li><p><strong>每周拿出些时间回顾关键信息</strong></p>
-</li>
-</ul>
-<h3 id="也许是精华"><a href="#也许是精华" class="headerlink" title="也许是精华"></a><a href="">也许是精华</a></h3><ul>
-<li><p>如何减轻大脑的压力：及时加注解，有助于以后了解背景信息</p>
-</li>
-<li><p>思维转换：从一件事情过度到另一件事，转换气味的时候，大脑必须要吧短期记忆中的当前内容转移到长期记忆中，以便为新信息腾出空间，这样一来，有些信息就会丢失</p>
-</li>
-<li><p>思维转换次数越多，各种思维背景之间的关联度就月底，大脑的工作难度就越大</p>
-</li>
-<li><p>晚上要睡好，在你和你的大脑都能休息好的时候，转换思维要容易的多</p>
-</li>
-<li><p>如何减少思维转换的次数</p>
-<ul>
-<li><p>当需要转换的时候，随手加上背景注解，方便下次直接还原当时的想法</p>
-</li>
-<li><p>把类似的任务或会议安排在一起</p>
-</li>
-<li><p>分辨哪些分神的因素导致频繁进行并不必要的思维转换，然后减少这些因素</p>
-</li>
-<li><p>心无旁骛的工作状态：定期查收邮件，关闭手机干扰，隔间里工作</p>
-</li>
-<li><p>召开会议之前先的明确会议主题和目标</p>
-</li>
-</ul>
-</li>
-<li><p>把工作和生活融为一体，而不是力图在二者之间求平衡</p>
-</li>
-<li><p>在效率下降的时候自我放松一下，同时需要工作的时候随时工作</p>
-</li>
-</ul>
-<h3 id="如何处理意外事件"><a href="#如何处理意外事件" class="headerlink" title="如何处理意外事件"></a>如何处理意外事件</h3><ul>
-<li><p>无论如何都要”把握当前”，在危机出现之前，如果已经做到未雨绸缪，胸有成竹，那现在就会更加从容不迫，有备无患</p>
-</li>
-<li><p>在你面对重大挑战的时候，典型反应就是寻求更多信息</p>
-</li>
-<li><p>在出现危机时，依然具备处理好当前事情的能力，即掌控当前局面的能力，而这个能力需要实践经验的积累</p>
-</li>
-<li><p>你无法预知未来，但你可以确认正在发生的坏事表现出来的征兆，从而未雨绸缪，以便坏事发生时，知道如何应对</p>
-</li>
-<li><p>多跟哪些不同于自己的朋友沟通交流，这在艰难时期更加重要</p>
-</li>
-<li><p>过分的考虑未来情况，经常会失去对当前的把握</p>
-</li>
-</ul>
-<h3 id="找工作：真的可以如此高效？"><a href="#找工作：真的可以如此高效？" class="headerlink" title="找工作：真的可以如此高效？"></a>找工作：真的可以如此高效？</h3><ul>
-<li><p>面试的时候，希望对方记住你，那么请<strong>利用故事去记忆</strong></p>
-</li>
-<li><p>仅仅因为一直都是按照某种特定方式做某事，并不意味着就该永远这样做</p>
-</li>
-<li><p>进行组织安排时，要绕开的是实际制约而不是假性制约，面试的时候要理清楚什么是自身的实际制约，才能专注于一个目标</p>
-</li>
-<li><p>每周拿出写关键事件回顾关键信息</p>
-</li>
-<li><p>学会面试记录：尽量使用已经上手的工具 + 在数字信息上加上相应的关键词</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/10/26/读书笔记-Google工作整理术/" data-id="cjgbyia7m0014s0s6easnvq8r" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/14/JS压缩混淆工具-UglifyJS/" data-id="cjgoyfvwa0003pws69tmc3unt" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2389,7 +2311,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
+        <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
     </nav>
 </section>
             
@@ -2401,7 +2323,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2410,7 +2332,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">24</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">26</span></li></ul>
         </div>
     </div>
 

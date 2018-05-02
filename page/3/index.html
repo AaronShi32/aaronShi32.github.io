@@ -140,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                39
+                41
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -175,6 +175,458 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-程序员的自我修养（七）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/06/06/读书笔记-程序员的自我修养（七）/">读书笔记-程序员的自我修养（七）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/06/06/读书笔记-程序员的自我修养（七）/">
+            <time datetime="2017-06-06T03:03:25.000Z" itemprop="datePublished">2017-06-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="动态链接（Dynamic-Linking）：一个单一个可执行文件模块被拆分成若干模块，在程序运行时进行链接的一种方式"><a href="#动态链接（Dynamic-Linking）：一个单一个可执行文件模块被拆分成若干模块，在程序运行时进行链接的一种方式" class="headerlink" title="动态链接（Dynamic Linking）：一个单一个可执行文件模块被拆分成若干模块，在程序运行时进行链接的一种方式"></a>动态链接（Dynamic Linking）：一个单一个可执行文件模块被拆分成若干模块，在程序运行时进行链接的一种方式</h2><ul>
+<li><p><strong>欲扬先抑</strong>：静态链接饱受 <strong>内存磁盘空间浪费</strong>（同一个目标文件存在多份供使用），<strong>更新发布需要重新链接</strong> 等问题，而动态链接解决了上面的问题，提供了 <strong>可扩展性</strong>（动态选择加载），但饱受 <strong>兼容性</strong> （如不兼容，程序将崩溃无法运行），<strong>性能损耗</strong>（装载时重新链接）困扰</p>
+</li>
+<li><p><strong>基本思想</strong>：把程序按照模块 <strong>拆分</strong> 成各个相对 <strong>独立</strong> 部分，在程序 <strong>运行时</strong> 才将它们链接在一起形成一个 <strong>完整</strong> 的程序，而不是像静态链接一样把所有的程序模块都链接成一个单独的可执行文件</p>
+</li>
+<li><p><strong>普及</strong>： Linux 下，ELF 动态链接文件叫 <strong>动态共享对象（DSO，Dynamic Shared Objects）</strong>，以 <strong>.so</strong> 结尾；Windows 下，动态链接文件叫 <strong>动态链接库（Dynamical Linking Library）</strong>，以 <strong>.dll</strong> 结尾</p>
+</li>
+<li><p><strong>普及</strong>：<strong>动态链接器</strong> 才完成以上操作，策略：<strong>延迟绑定（Lazy Binding）</strong></p>
+</li>
+<li><p><strong>普及</strong>：<strong>PIC（Position-independent Code）地址无关代码</strong> 技术，<strong>GOT（Global Offset Table）全局偏移量表</strong></p>
+</li>
+<li><p>动态链接的地址空间分配 <strong>奥秘</strong></p>
+<ul>
+<li><p>共享对象的 <strong>最终装载地址</strong> 在编译时是 <strong>不确定</strong> 的，而是在 <strong>装载</strong> 时，装载器根据当前地址空间的空闲情况，动态分配一块 <strong>足够大小</strong> 的虚拟地址空间给相应的共享对象</p>
+</li>
+<li><p><strong>普及</strong>：静态链接时提到的重定位叫做 <strong>链接时重定位（Link Time Relocation）</strong>，而动态链接提到的重定位叫做 <strong>装载时重定位（Load Time Relocation）</strong>，也成 <strong>基址重置（Rebasing）</strong></p>
+</li>
+<li><p>共享对象的虚拟地址空间分配技术离不开：<strong>地址无关代码（PIC机制）</strong>，<strong>共享模块的全局变量（线程私有存储 Thread Local Storage）</strong>，<strong>数据段地址无关性</strong>，也正是这些无关性技术，才保证了共享对象被多个程序引用时，能够发挥各自的作用，确保程序不出现崩溃</p>
+</li>
+</ul>
+</li>
+<li><p><strong>延迟绑定</strong>（Lazy Binding）的 <strong>艺术</strong></p>
+<ul>
+<li><p><strong>性能的事实</strong>：动态链接是以 <strong>牺牲性能</strong> 为代价的，具体表现在：<strong>一方面</strong> 对于全局和静态数据的访问、模块间的调用都要进行复杂的 <strong>GOT定位</strong>，然后 <strong>间接寻址</strong>，<strong>另一方面</strong>动态链接的工作是在 <strong>运行时</strong> 完成的，不是事先链接好的</p>
+</li>
+<li><p><strong>优化的手段</strong>：延迟绑定，理解为当函数第一次被用到时才进行绑定（符号查找、重定位等），使用 <strong>PLT （Procedure Linkage Table）</strong> 来实现，通常以 <strong>.plt</strong> 作为段名，保存在 ELF 文件中</p>
+</li>
+<li><p><strong>实现原理</strong>：<strong>通过 PLT 中的待跳转指令，将各个函数的待跳转偏移量链接到地址栏，等运行时使用的时候，直接读取偏移量进行跳转，这里不是直接读取GOT链接到真正的目标函数地址，而是读取偏移量，进行jump，再到目标函数</strong></p>
+</li>
+<li><p><code>原话：而是将上面代码中第二条指令&quot;push n&quot;的地址填入到 bar@GOT 中，这个步骤不需要查找任何符号</code></p>
+</li>
+</ul>
+</li>
+<li><p>动态链接 <strong>相关结构</strong></p>
+<ul>
+<li><p><strong>.interp</strong> 段：保存可执行文件需要的 <strong>动态链接器</strong> 的路径，内容就是个字符串</p>
+</li>
+<li><p><strong>.dymanic</strong> 段：保存了动态链接器所需要的 <strong>基本信息</strong>：依赖于哪些共享对象、动态链接符号表的位置、动态链接重定位表的位置、共享对象初始化代码的地址等，位于经典的头文件 <strong>elf.h （Elf32_Dyn）</strong> 中</p>
+</li>
+<li><p><strong>动态符号表（Dynamic Symbol Table）[.dynsym 段]</strong>：只保留动态链接这些模块之间的符号导入导出关系</p>
+</li>
+<li><p><strong>动态链接重定位表</strong>：<strong>.rel.dyn</strong> 是对数据引用的重定位修正，它所修正的位置位于 <strong>.got 及 数据段</strong>，<strong>.rel.plt</strong> 是对函数引用的修正，它所修正的位置位于 <strong>.rel.plt</strong> </p>
+</li>
+</ul>
+</li>
+<li><p>动态链接时进程 <strong>堆栈初始化信息</strong></p>
+<ul>
+<li><p>堆栈里保存了关于进程 <strong>执行环境：程序执行入口</strong> 和 <strong>命令行参数</strong> 等信息，还保存了动态链接器所需要的一些 <strong>辅助信息数组（Auxiliary Vector）</strong></p>
+</li>
+<li><p>int main(int argc, char<em> argv[])  ，<strong>argc</strong> 表示参数的个数，<em>*argv数组</em></em> 是参数</p>
+</li>
+</ul>
+</li>
+<li><p>动态链接器的 <strong>步骤</strong> 和 <strong>实现</strong></p>
+<ul>
+<li><p>步骤：</p>
+<ul>
+<li><p><strong>启动动态链接器本身</strong></p>
+<p>  动态链接器本身也是一个共享对象，因此它的编写除了不能依赖于其他任何共享对象，而且本身所需要的全局和静态变量的重定位工作也由它本身来完成，因此有一段精致的启动代码称之为 <strong>自举（Bootstrap）</strong></p>
+</li>
+<li><p><strong>装载所有需要的共享对象</strong></p>
+<p>  动态链接器会根据 .dynamic 段中所依赖的共享对象，使用 <strong>广度优先的图遍历</strong> 算法，来按顺序状态共享对象；<strong>全局符号表（Global Symbol Table）</strong> 的介入，为了解决相同符号名的链接冲突，如已存在，则后加入的符号被忽略</p>
+</li>
+<li><p><strong>重定位和初始化</strong></p>
+<p>  动态链接器根据进程的全局符号表，对需要重定位的位置进行修正，如果某个共享对象有 <strong>.init 段</strong>，那么动态链接器会执行，实现共享对象 <strong>特有的</strong> 初始化过程（常见的，C++全局/静态对象的构造就在此初始化）</p>
+</li>
+</ul>
+</li>
+<li><p>实现：</p>
+<ul>
+<li><p><strong>普及</strong>：<strong>内核在装载完 ELF 可执行文件以后，就返回到用户空间，将控制权交给程序的入口。对于静态链接，入口地址是 e_entry 制定的地址，对于动态链接，入口地址是将动态链接器映射至进程地址空间，然后把控制权交给动态链接器</strong></p>
+</li>
+<li><p><strong>普及</strong>：Linux 动态链接器：/lib/ld-linux.so.2 -&gt; <strong>/lib/ld-x.y.z.so</strong></p>
+</li>
+<li><p>动态链接器在实现中的 <strong>几个问题</strong></p>
+<ol>
+<li><p>动态链接器本身是动态链接还是静态链接？ 答：<strong>静态链接</strong>，不依赖于任何共享对象</p>
+</li>
+<li><p>动态链接器本身必须是 PIC 吗？答：<strong>不一定</strong>，如果是 PIC 会简单些</p>
+</li>
+<li><p>动态链接器可以被当作可执行文件运行，装载地址是多少？答：0x00000000 无效的，<strong>内核</strong> 会装载它时 <strong>分配</strong> 一个 <strong>有效</strong> 的</p>
+</li>
+</ol>
+</li>
+<li><p><strong>灵活技术</strong>：显示运行时链接（Explicit Run-time Linking）</p>
+<ul>
+<li><p>顾名思义：<strong>让程序自己在运行时控制加载制定的模块，并且可以在不需要该模块时将其卸载</strong>，操作对象是 DLL</p>
+</li>
+<li><p>动态链接库提供了 4 个 <strong>API</strong> 来实现，它们分别是：<strong>dlopen()，dlsym()，dlerror()，dlclose()</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>总结一波</strong>：</p>
+<ul>
+<li><p><strong>动态链接可以更加有效地利用内存和磁盘资源，可以更加方便的维护升级程序，可以让程序的重用变得更加有效和可行</strong></p>
+</li>
+<li><p><strong>装载时重定位和地址无关代码是解决绝对地址引用的两个方法，装载时重定位的缺点是无法共享代码段，但是它的运行速度较快；而地址无关代码的缺点是运行速度较慢，但它可以实现代码段在各个进程之间的共享，还介绍了 ELF 的延迟绑定 PLT 技术</strong></p>
+</li>
+<li><p><strong>.interp、.dynamic、动态符号表、重定位表等接口，它们是实现 ELF 动态链接的关键结构。动态链接器实现自举，装载共享对象，实现重定位和初始化的过程，实现动态链接，最后关键技术：显示运行时链接</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/06/06/读书笔记-程序员的自我修养（七）/" data-id="cjgoyfvxh001vpws6g5pc94fw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-读书笔记-程序员的自我修养（六）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/24/读书笔记-程序员的自我修养（六）/">读书笔记-程序员的自我修养（六）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/24/读书笔记-程序员的自我修养（六）/">
+            <time datetime="2017-05-24T02:24:44.000Z" itemprop="datePublished">2017-05-24</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="可执行文件的装载与进程"><a href="#可执行文件的装载与进程" class="headerlink" title="可执行文件的装载与进程"></a>可执行文件的装载与进程</h3><p>前言：源文件经过编译，链接过程，生成了目标可执行文件，可执行文件只有装载到内存以后才能被CPU执行</p>
+<ul>
+<li><p><strong>程序</strong> 和 <strong>进程</strong>：前者理解为一些预先编译好的指令和数据集合的一个 <strong>文件</strong>，是一个 <strong>静态</strong> 的概念，后者理解为程序运行时的一个 <strong>过程</strong>，是一个 <strong>动态</strong> 的概念</p>
+</li>
+<li><p>每个进程都被操作系统分配以 <strong>虚拟的地址空间（Virtual Address Space）</strong> 来供运行时分配使用，如果被操作系统捕捉到进程非法访问了额外控件，将当做 <strong>非法操作强制结束进程</strong>，常见的 Windows：”进程因非法操作需要关闭” 和 Linux：Segmentation fault</p>
+</li>
+<li><p><strong>限制</strong>： 对于32位系统而言，允许分配给进程最大为：4GB的地址空间使用，而64位系统，则17179869184GB，即使 4GB，操作系统也会分配占用之后，最终留给进程最大3GB的地址空间使用，再通俗一点：<strong>整个进程在执行的时候，所有代码、数据包括通过 C 语言 malloc() 等方法申请的虚拟空间之和不得超过 3GB</strong></p>
+</li>
+<li><p><strong>PAE</strong>（Physical Address Extension）和 <strong>AWE</strong>（Address Windowing Extension）：Intel 扩展了地址线，由 对应的32根（32位）扩展到了 <strong>36根</strong> 地址线，为此 <strong>多出来了256MB的物理空间</strong>，使用 <strong>窗口映射</strong> 技术，<strong>变向</strong>的增大了内存空间，进而也打破了 3GB 的限制，作为一种补救地址空间不够大的非常规手段</p>
+</li>
+<li><p>装载的方式</p>
+<ul>
+<li><p><strong>原理</strong>：程序执行时所需要的指令和数据必须 <strong>在内存中</strong> 才能够正常运行</p>
+</li>
+<li><p><strong>装载的方法</strong>：都是利用了 <strong>程序局部性</strong> 的原理，即某一时刻程序只用到了局部的一些执行和数据，并非全局</p>
+<ul>
+<li><p><strong>以时间换取空间（淘汰）：覆盖装入（Overlay）</strong></p>
+</li>
+<li><p><strong>页映射（Paging）</strong>，通常32位的Intel都是用4096字节的页作为页长，假设内存为16K，那么会被分为4个页，假设程序需要32K的内存，即需要8个页的空间，那么如何在4个页中不影响程序执行的情况下，自如装载8个页呢？ <strong>内存页的分配算法</strong></p>
+<ul>
+<li><p>先进先出算法（<strong>FIFO</strong>）</p>
+</li>
+<li><p>最少使用算法（<strong>LUR</strong>）</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>从 <strong>操作系统角度</strong> 看可执行文件的装载，干了三件事</p>
+<ul>
+<li><p><strong>创建</strong> 一个独立的虚拟地址空间（这也是进程最关键的特征，实质上是创建映射函数所需要的相应的数据结构）</p>
+</li>
+<li><p><strong>读取</strong> 可执行文件头，并建立虚拟空间与可执行文件的映射关系</p>
+</li>
+<li><p>将CPU的指令寄存器设置成可执行文件的入口地址，<strong>启动</strong>运行</p>
+</li>
+<li><p>操作系统通过不断的 <strong>页错误</strong> 来不停地将程序通过虚拟地址管理器装载到物理内存，进程才得以正常运行</p>
+</li>
+</ul>
+</li>
+<li><p>进程虚拟空间 <strong>分布</strong></p>
+<ul>
+<li><p><strong>区分概念</strong> <strong>段</strong> 和 <strong>页</strong> 的关系：ELF段在映射时长度应该都是系统页长度的 <strong>整数倍</strong>，如果不是，那么多余部分也会占用一个页，进而造成 <strong>浪费</strong>，实际上，操作系统装载可执行文件时，只会根据段的 <strong>权限</strong> 来区分，<strong>对于相同权限的段，把它们合并到一起当做一个段来映射</strong></p>
+</li>
+<li><p><strong>普及概念</strong> Linux 中将进程虚拟空间中的一个段叫做 <strong>虚拟内存区域（VMA，Virtual Memory Area）</strong>，Windows 叫做 <strong>虚拟段（Virtual Section）</strong></p>
+</li>
+<li><p><strong>两次合并</strong>：<strong>第一次是链接器把各个目标文件中的相同段（Section，链接视图）合并，统一存放于可执行文件中，第二次是操作系统按照权限把可执行文件中的各个段（Segement，执行视图）合并，映射到虚拟内存区域中</strong></p>
+</li>
+<li><p><strong>核心</strong>：<strong>操作系统</strong> 通过给进程空间划分出一个个 <strong>VMA</strong> 来 <strong>管理</strong> 进程的虚拟空间，基本原则是将相同 <strong>权限</strong> 属性的、有相同 <strong>映像文件</strong> 的映射成一个VMA，一个进程基本上可以分为如下几 <strong>种</strong> VMA区域：</p>
+<ul>
+<li><p>代码VMA，权限只读、可执行；有映像文件</p>
+</li>
+<li><p>数据VMA，权限可读写，可执行；有映像文件</p>
+</li>
+<li><p>堆VMA，权限可读写、可执行；无映像文件，匿名，可向上扩展</p>
+</li>
+<li><p>栈VMA，权限可读写、不可执行；无映像文件，匿名，可向下扩展</p>
+</li>
+</ul>
+</li>
+<li><p><strong>一些限制</strong></p>
+<ul>
+<li><p>堆的 <strong>最大</strong> 申请数量：受操作系统版本、程序本身大小、用到的动态/共享库数量、大小、程序栈数量、大小等因素影响（<strong>随机地址空间分布技术</strong>）</p>
+</li>
+<li><p>段地址 <strong>对齐</strong>：受页和段的长度 <strong>整数倍映射</strong> 问题，Unix采取了 <strong>段合并</strong> 映射的方法：各个段接壤部分共享一个物理页面</p>
+</li>
+<li><p>进程栈 <strong>初始化</strong>：进程初始化启动之前，一些系统环境变量和进程的运行 <strong>参数</strong> 会提前保存到 <strong>Stack VMA</strong> 中，程序的库部分会把堆栈里面的初始化信息中的参数信息传递给 <strong>main()</strong> 的 <strong>argc</strong> 和 <strong>argv</strong> 两个参数</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>大致了解</strong>：Linux 内核装载 ELF <strong>过程简介</strong></p>
+<ol>
+<li>bash 进程会调用 fork() 系统调用创建一个新的进程，然后新的进程调用 execve() 系统调用加载执行指定的 ELF 文件</li>
+<li>检查 ELF 可执行文件格式的有效性，比如魔数、程序头表中段的数量</li>
+<li>寻找动态链接的 .interp 段，设置动态链接器路径</li>
+<li>根据 ELF 可执行文件的程序头表的描述，对 ELF 文件进行映射，比如代码、数据、只读数据</li>
+<li>初始化 ELF 进程环境，动态链接准备</li>
+<li>将系统调用的返回地址修改成 ELF 可执行文件的入口点 </li>
+</ol>
+</li>
+<li><p><strong>大致了解</strong>：Windows PE 的装载 <strong>过程简介</strong></p>
+<ol>
+<li>先读取文件的第一个页，包含了 DOS 头、PE文件头 和 段表</li>
+<li>检查进程地址空间中，目标地址是否可用</li>
+<li>使用段表中提供的信息，将 PE 文件中所有的段一一映射到地址空间中相应的位置</li>
+<li>如果装载地址不是目标地址，则进行 Rebasing</li>
+<li>装载所有 PE 文件所需要的 DLL 文件</li>
+<li>对 PE 文件中的所有导入符号进行解析</li>
+<li>根据 PE 头中制定的参数，建立初始化栈和堆</li>
+<li>建立主线程并启动进程</li>
+</ol>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/05/24/读书笔记-程序员的自我修养（六）/" data-id="cjgoyfvxo002apws6mkjvlu3z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-程序员的自我修养（五）" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -276,7 +728,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjgbyia810020s0s604tdaz9r" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/18/读书笔记-程序员的自我修养（五）/" data-id="cjgoyfvxj0020pws6aldat736" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -443,7 +895,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjgbyia86002ds0s6iu93mgdd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjgoyfvxs002ipws65sof177z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -635,7 +1087,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjgbyia7y001ts0s6ccb0fyht" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjgoyfvxi001ypws6j9sne483" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -814,7 +1266,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjgbyia80001ys0s69d4je8ck" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjgoyfvxl0023pws68c0u58c3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -994,7 +1446,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjgbyia7w001os0s6qyn68ixp" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjgoyfvxg001tpws6730m3ump" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1171,7 +1623,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjgbyia7b000cs0s6s7rm90lr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjgoyfvwj000fpws6w19v39ws" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1303,7 +1755,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjgbyia7k000zs0s6qsrj96r3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjgoyfvwt000zpws6ix31bc8q" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1478,298 +1930,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjgbyia7e000ks0s63pjhcprk" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/08/Tensorflow学习-神经网络/">
-            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
-<p>首先来回忆几个概念</p>
-<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
-<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
-<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
-<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
-<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
-<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
-<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
-<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
-<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
-</ul>
-<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjgbyia7g000ps0s6n7ju7kvx" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Tensorflow学习-环境搭建" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/08/Tensorflow学习-环境搭建/">Tensorflow学习-环境搭建</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/08/Tensorflow学习-环境搭建/">
-            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>耳闻 Tensorflow 已经很久了，一直没有时间亲自动手体验，忙里抽闲把环境都配置好了，以此来记录学习的开始</p>
-<h4 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h4><ul>
-<li><p>VMware Player 12 （免费）</p>
-</li>
-<li><p>Ubuntu 16.04 LTS</p>
-</li>
-<li><p>Anaconda 4.3.0</p>
-</li>
-<li><p>Tensorflow Library</p>
-</li>
-<li><p>Sublime Text + Plugin</p>
-</li>
-<li><p>翻墙</p>
-</li>
-</ul>
-<p>基于 Anaconda 搭建 Tensorflow 的环境非常方便，避免GFW的干扰，提供一个环境网站：<a href="https://mirrors.tuna.tsinghua.edu.cn/" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/</a></p>
-<p>创建虚拟机的步骤就不赘述了，用过VMware的很简单，记得安装VMware Tools ，这个很关键</p>
-<p>下载好 Anaconda 之后，有 2 和 3 两个版本，分别对应 python 2.7 和 python 3.5，<strong>chmod 之后就可以一路安装了</strong>，记得添加到PATH中，这样默认的python环境就升级了</p>
-<p>打开终端，输入以下命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> conda create -n tensorflow python=2.7</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source activate tensorflow</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> pip install --ignore-installed --upgrade $TF_BINARY_URL</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source deactivate</span><br></pre></td></tr></table></figure>
-<p>下载安装 Sublime Text，安装 Package Control 之后依次添加以下插件：</p>
-<ul>
-<li>Anaconda</li>
-</ul>
-<p>其中 Anaconda 配置参考：<a href="http://www.cnblogs.com/nx520zj/p/5787393.html" target="_blank" rel="noopener">http://www.cnblogs.com/nx520zj/p/5787393.html</a></p>
-<p>去掉代码检测提示框：<a href="https://segmentfault.com/q/1010000002415020" target="_blank" rel="noopener">https://segmentfault.com/q/1010000002415020</a></p>
-<p>这样，Tensorflow 的环境就搭建成功了，总体来说还是非常方便的，保证一个通畅的网络，翻墙很关键！</p>
-<p>试运行一个线性拟合 Demo 点此下载：<a href="/2017/02/08/Tensorflow学习-环境搭建/line.py" title="line.py">line.py</a></p>
-<p>得到如下输出：</p>
-<img src="/2017/02/08/Tensorflow学习-环境搭建/line-result.png" title="运行结果">
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjgbyia7f000ms0s6z1jdkx3z" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjgoyfvwl000kpws63h6hqrax" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1846,7 +2007,7 @@
 
 
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
+        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
 </section>
             
@@ -1858,7 +2019,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1867,7 +2028,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">24</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">26</span></li></ul>
         </div>
     </div>
 
