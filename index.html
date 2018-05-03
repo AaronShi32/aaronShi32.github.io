@@ -213,7 +213,17 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="第三部分-Java-服务端技术"><a href="#第三部分-Java-服务端技术" class="headerlink" title="第三部分: Java 服务端技术"></a>第三部分: Java 服务端技术</h3><h5 id="1-Servlet-工作原理解析"><a href="#1-Servlet-工作原理解析" class="headerlink" title="1. Servlet 工作原理解析"></a>1. Servlet 工作原理解析</h5>
+            <h3 id="第三部分-Java-服务端技术"><a href="#第三部分-Java-服务端技术" class="headerlink" title="第三部分: Java 服务端技术"></a>第三部分: Java 服务端技术</h3><h5 id="1-Servlet-工作原理解析"><a href="#1-Servlet-工作原理解析" class="headerlink" title="1. Servlet 工作原理解析"></a>1. Servlet 工作原理解析</h5><p>Servlet 是 Java Web 的核心技术, Servlet 容器是一个独立发展的标准化产品: Jetty, Tomcat, JBoss 等</p>
+<p>以 Tomcat 为例, Context 容器负责管理 Servlet 容器, 一个 Context 对应一个 Web 工程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Context ctx = <span class="keyword">new</span> StandardContext();</span><br><span class="line">...</span><br><span class="line">ctx.addLifecycleListener(<span class="keyword">new</span> DefaultWebXmlListener())</span><br><span class="line">...</span><br><span class="line">ContextConfig ctxCfg = <span class="keyword">new</span> ContextConfig();</span><br><span class="line">ctxCfg.setDefaultWebXml(<span class="string">"org/apache/catalin/startup/NO_DEFAULT_XML"</span>);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>Tomcat 的启动逻辑是基于观察者模式设计的, 所有的容器都会继承 Lifecycle 接口, 所有容器的修改和状态变更会有由它去通知已经注册的观察者(Listener)</p>
+<p><strong>Tomcat 的启动创建了 Context 容器, 在 Context 容器中, Web 应用得以初始化, 而这个初始化的过程中, web.xml 决定了 Servlet 对象的创建和初始化</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>yunos-mdm<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath*:conf/spring/mvc-config.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span> // 如果大于 0, 那么在 Context 容器启动时就会被实例化</span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Servlet 的体系结构围绕着: ServletConfig, ServletRequest, ServletResponse, ServletContext(上下文) 四个类</p>
+<p>Servlet 最终的工作原理是靠映射完成的, 这个类就是 org.apache.tomcat.util.http.mapper</p>
+<p>Listener 是基于观察者设计模式的, Filter 是基于责任链设计模式的</p>
+<img src="/2018/04/28/读书笔记-深入分析%20Java%20Web%20技术内幕（三）/Listener.png" title="Servlet Listener设计">
+<h5 id="2-深入理解-Session-与-Cookie"><a href="#2-深入理解-Session-与-Cookie" class="headerlink" title="2. 深入理解 Session 与 Cookie"></a>2. 深入理解 Session 与 Cookie</h5>
         
         </div>
         <footer class="article-footer">
@@ -223,7 +233,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgoyfvx3001jpws66ubb1jex" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgq5ebg8001kgls6k7c4bdz8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -439,7 +449,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgoyfvx5001lpws6tyybo44d" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgq5ebge001wgls64g1at54q" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -680,7 +690,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgoyfvx8001qpws6gby87go1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgq5ebgb001rgls6rqztkfng" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -864,7 +874,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgoyfvx0001epws6hrimwr2w" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgq5ebg5001fgls66bute6pb" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1060,7 +1070,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgoyfvwy0019pws6p2ks4ct1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgq5ebg3001cgls6mpqyguv6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1298,7 +1308,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgoyfvx1001gpws69oewdom6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgq5ebg3001agls6ah9ecvzz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1435,7 +1445,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgoyfvwc0005pws6076k6gzi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgq5ebfh0005gls64hbz9v03" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1565,7 +1575,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgoyfvw70001pws6equ4v1lv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgq5ebff0003gls6bp0s9qjr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1806,7 +1816,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgoyfvwz001bpws6l1nif3em" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgq5ebg7001hgls6xaqalo5t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1939,7 +1949,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgoyfvwr000upws6hhxgcue4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgq5ebfw000tgls6n3xg1wyq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
