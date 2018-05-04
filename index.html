@@ -223,7 +223,17 @@
 <p>Servlet 最终的工作原理是靠映射完成的, 这个类就是 org.apache.tomcat.util.http.mapper</p>
 <p>Listener 是基于观察者设计模式的, Filter 是基于责任链设计模式的</p>
 <img src="/2018/04/28/读书笔记-深入分析%20Java%20Web%20技术内幕（三）/Listener.png" title="Servlet Listener设计">
-<h5 id="2-深入理解-Session-与-Cookie"><a href="#2-深入理解-Session-与-Cookie" class="headerlink" title="2. 深入理解 Session 与 Cookie"></a>2. 深入理解 Session 与 Cookie</h5>
+<h5 id="2-深入理解-Session-与-Cookie"><a href="#2-深入理解-Session-与-Cookie" class="headerlink" title="2. 深入理解 Session 与 Cookie"></a>2. 深入理解 Session 与 Cookie</h5><p>当前 Cookie 有两个版本(0,1), 不同的浏览器支持 Cookie 的数量和大小都不同, Cookie 被加到 header 中发生在构建响应 Response 中, 基于这些限制, Session 则创建在服务端, 以一个 id 作为标识, 客户端使用这个标识可通过 URL Path Paramter, Cookie 中的一个字段来实现</p>
+<p>服务器管理 Session 的容器: org.apache.cataline.Manager, 它来负责接管过期回收, 服务器关闭序列化到磁盘(SESSIONS.ser)等问题</p>
+<p>Session 的安全性优于 Cookie, 适合存储用户隐私和重要的数据, 引出分布式 Session 框架的核心解决要点</p>
+<ul>
+<li><p>订阅服务器(如 Zookeeper) 负责 Cookie 项的统一配置推送</p>
+</li>
+<li><p>分布式缓存系统(如 Tair, Memcache) 负责 Session 的快速存储和读取, 而实现就是配置一个 SessionFilter 在创建 Session 之前进行拦截读存等操作</p>
+</li>
+</ul>
+<p>处理 Cookie 被盗取的情况: 当用户登录成功后根据用户的私密信息生成一个签名, 以表示当前这个唯一的合法登录状态, 即 Session 签名; 处理 Cookie 压缩的情况: 可配置一个 Filter 在页面输出是对 Cookie 进行全部的压缩或者部分压缩, 使用 gzip 和 defalte 算法, 节省带宽; 处理表单重复提交的问题: crsf 的 hidden token 验证</p>
+<h5 id="3-Tomcat-的系统架构与设计模式"><a href="#3-Tomcat-的系统架构与设计模式" class="headerlink" title="3. Tomcat 的系统架构与设计模式"></a>3. Tomcat 的系统架构与设计模式</h5>
         
         </div>
         <footer class="article-footer">
@@ -233,7 +243,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgq5ebg8001kgls6k7c4bdz8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgrolwn6001guvs6o9i0epja" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -449,7 +459,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgq5ebge001wgls64g1at54q" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgrolwnc001quvs6c6h2va9g" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -690,7 +700,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgq5ebgb001rgls6rqztkfng" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgrolwnb001ouvs6fwoz19x1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -874,7 +884,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgq5ebg5001fgls66bute6pb" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgrolwn8001juvs6oq7c95ho" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1070,7 +1080,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgq5ebg3001cgls6mpqyguv6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgrolwn2001buvs6yy00p2lq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1308,7 +1318,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgq5ebg3001agls6ah9ecvzz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgrolwn00019uvs67k8n89hz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1445,7 +1455,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgq5ebfh0005gls64hbz9v03" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgrolwmf0004uvs6q27u5nu7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1575,7 +1585,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgq5ebff0003gls6bp0s9qjr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgrolwma0001uvs67ulh4ki8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1816,7 +1826,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgq5ebg7001hgls6xaqalo5t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgrolwn3001euvs6gaaz50r1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1949,7 +1959,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgq5ebfw000tgls6n3xg1wyq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgrolwms000suvs6v7pekk57" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding

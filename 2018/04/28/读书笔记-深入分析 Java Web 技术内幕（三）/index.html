@@ -14,7 +14,7 @@
 <meta property="og:description" content="第三部分: Java 服务端技术1. Servlet 工作原理解析Servlet 是 Java Web 的核心技术, Servlet 容器是一个独立发展的标准化产品: Jetty, Tomcat, JBoss 等 以 Tomcat 为例, Context 容器负责管理 Servlet 容器, 一个 Context 对应一个 Web 工程 1234567Context ctx = new Stand">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析%20Java%20Web%20技术内幕（三）/Listener.png">
-<meta property="og:updated_time" content="2018-05-03T06:26:02.577Z">
+<meta property="og:updated_time" content="2018-05-04T08:12:04.863Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读书笔记-深入分析 Java Web 技术内幕（三）">
 <meta name="twitter:description" content="第三部分: Java 服务端技术1. Servlet 工作原理解析Servlet 是 Java Web 的核心技术, Servlet 容器是一个独立发展的标准化产品: Jetty, Tomcat, JBoss 等 以 Tomcat 为例, Context 容器负责管理 Servlet 容器, 一个 Context 对应一个 Web 工程 1234567Context ctx = new Stand">
@@ -229,7 +229,17 @@
 <p>Servlet 最终的工作原理是靠映射完成的, 这个类就是 org.apache.tomcat.util.http.mapper</p>
 <p>Listener 是基于观察者设计模式的, Filter 是基于责任链设计模式的</p>
 <img src="/2018/04/28/读书笔记-深入分析%20Java%20Web%20技术内幕（三）/Listener.png" title="Servlet Listener设计">
-<h5 id="2-深入理解-Session-与-Cookie"><a href="#2-深入理解-Session-与-Cookie" class="headerlink" title="2. 深入理解 Session 与 Cookie"></a>2. 深入理解 Session 与 Cookie</h5>
+<h5 id="2-深入理解-Session-与-Cookie"><a href="#2-深入理解-Session-与-Cookie" class="headerlink" title="2. 深入理解 Session 与 Cookie"></a>2. 深入理解 Session 与 Cookie</h5><p>当前 Cookie 有两个版本(0,1), 不同的浏览器支持 Cookie 的数量和大小都不同, Cookie 被加到 header 中发生在构建响应 Response 中, 基于这些限制, Session 则创建在服务端, 以一个 id 作为标识, 客户端使用这个标识可通过 URL Path Paramter, Cookie 中的一个字段来实现</p>
+<p>服务器管理 Session 的容器: org.apache.cataline.Manager, 它来负责接管过期回收, 服务器关闭序列化到磁盘(SESSIONS.ser)等问题</p>
+<p>Session 的安全性优于 Cookie, 适合存储用户隐私和重要的数据, 引出分布式 Session 框架的核心解决要点</p>
+<ul>
+<li><p>订阅服务器(如 Zookeeper) 负责 Cookie 项的统一配置推送</p>
+</li>
+<li><p>分布式缓存系统(如 Tair, Memcache) 负责 Session 的快速存储和读取, 而实现就是配置一个 SessionFilter 在创建 Session 之前进行拦截读存等操作</p>
+</li>
+</ul>
+<p>处理 Cookie 被盗取的情况: 当用户登录成功后根据用户的私密信息生成一个签名, 以表示当前这个唯一的合法登录状态, 即 Session 签名; 处理 Cookie 压缩的情况: 可配置一个 Filter 在页面输出是对 Cookie 进行全部的压缩或者部分压缩, 使用 gzip 和 defalte 算法, 节省带宽; 处理表单重复提交的问题: crsf 的 hidden token 验证</p>
+<h5 id="3-Tomcat-的系统架构与设计模式"><a href="#3-Tomcat-的系统架构与设计模式" class="headerlink" title="3. Tomcat 的系统架构与设计模式"></a>3. Tomcat 的系统架构与设计模式</h5>
         
         </div>
         <footer class="article-footer">
@@ -239,7 +249,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgq5ebg8001kgls6k7c4bdz8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgrolwn6001guvs6o9i0epja" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
