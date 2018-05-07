@@ -214,7 +214,7 @@
         
             
             <h3 id="第三部分-Java-服务端技术"><a href="#第三部分-Java-服务端技术" class="headerlink" title="第三部分: Java 服务端技术"></a>第三部分: Java 服务端技术</h3><h5 id="1-Servlet-工作原理解析"><a href="#1-Servlet-工作原理解析" class="headerlink" title="1. Servlet 工作原理解析"></a>1. Servlet 工作原理解析</h5><p>Servlet 是 Java Web 的核心技术, Servlet 容器是一个独立发展的标准化产品: Jetty, Tomcat, JBoss 等</p>
-<p>以 Tomcat 为例, Context 容器负责管理 Servlet 容器, 一个 Context 对应一个 Web 工程</p>
+<p>以 Tomcat 为例, Context 容器负责管理 Servlet 容器(隶属于组件 Container), 一个 Context 对应一个 Web 工程</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Context ctx = <span class="keyword">new</span> StandardContext();</span><br><span class="line">...</span><br><span class="line">ctx.addLifecycleListener(<span class="keyword">new</span> DefaultWebXmlListener())</span><br><span class="line">...</span><br><span class="line">ContextConfig ctxCfg = <span class="keyword">new</span> ContextConfig();</span><br><span class="line">ctxCfg.setDefaultWebXml(<span class="string">"org/apache/catalin/startup/NO_DEFAULT_XML"</span>);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 <p>Tomcat 的启动逻辑是基于观察者模式设计的, 所有的容器都会继承 Lifecycle 接口, 所有容器的修改和状态变更会有由它去通知已经注册的观察者(Listener)</p>
 <p><strong>Tomcat 的启动创建了 Context 容器, 在 Context 容器中, Web 应用得以初始化, 而这个初始化的过程中, web.xml 决定了 Servlet 对象的创建和初始化</strong></p>
@@ -233,7 +233,23 @@
 </li>
 </ul>
 <p>处理 Cookie 被盗取的情况: 当用户登录成功后根据用户的私密信息生成一个签名, 以表示当前这个唯一的合法登录状态, 即 Session 签名; 处理 Cookie 压缩的情况: 可配置一个 Filter 在页面输出是对 Cookie 进行全部的压缩或者部分压缩, 使用 gzip 和 defalte 算法, 节省带宽; 处理表单重复提交的问题: crsf 的 hidden token 验证</p>
-<h5 id="3-Tomcat-的系统架构与设计模式"><a href="#3-Tomcat-的系统架构与设计模式" class="headerlink" title="3. Tomcat 的系统架构与设计模式"></a>3. Tomcat 的系统架构与设计模式</h5>
+<h5 id="3-Tomcat-的系统架构与设计模式"><a href="#3-Tomcat-的系统架构与设计模式" class="headerlink" title="3. Tomcat 的系统架构与设计模式"></a>3. Tomcat 的系统架构与设计模式</h5><p><strong>Tomcat 核心架构: Server - 若干个 Service - N 个 Connector 和 1 个 Container, 整个 Tomcat 生命周期由 Server 控制</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// conf/server.xml</span><br><span class="line">Service 是 Catalina</span><br><span class="line">// 其中 Context 是在 context.xml 中</span><br><span class="line">Container 是 Engine - Host - Context - Wrapper</span><br></pre></td></tr></table></figure>
+<p>实现上来讲 StandServer、StandService 配合 LifeCycle 接口实现全程事件监听和触发控制</p>
+<p>Connector 组件是 Tomcat 中的两个核心组件之一, 它的主要任务是负责接收浏览器发过来的 TCP 的连接请求, 创建一个 Request 和 Response 对象分别用于和请求端交换数据, 然后会产生一个线程来处理这个请求, 而处理这个请求的线程就是 Container 组件要做的事情了</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Connector</span> <span class="attr">port</span>=<span class="string">"8080"</span> <span class="attr">protocol</span>=<span class="string">"HTTP/1.1"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">connectionTimeout</span>=<span class="string">"15000"</span> <span class="attr">redirectPort</span>=<span class="string">"8443"</span> <span class="attr">maxParameterCount</span>=<span class="string">"1000"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">maxThreads</span>=<span class="string">"250"</span> <span class="attr">maxPostSize</span>=<span class="string">"2097152"</span> <span class="attr">acceptCount</span>=<span class="string">"200"</span> <span class="attr">useBodyEncodingForURI</span>=<span class="string">"true"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Tomcat 使用的设计模式有</p>
+<ul>
+<li><p>外观模式(门面模式): Request 和 Response 对象封装、StandardWrapper 到 ServletConfig 封装、ApplicationContext 到 ServletContext 封装, 一句话, Facade 类控制暴露的数据</p>
+</li>
+<li><p>观察者模式: LifeCycle 接口接管 Tomcat 生命周期</p>
+</li>
+<li><p>命令模式: Connector 是通过命令模式调用 Container 的</p>
+</li>
+<li><p>责任链模式: Container 是通过责任链模式一步步传递给 Servlet 的</p>
+</li>
+</ul>
+<h5 id="4-Jetty-的工作原理解析"><a href="#4-Jetty-的工作原理解析" class="headerlink" title="4. Jetty 的工作原理解析"></a>4. Jetty 的工作原理解析</h5>
         
         </div>
         <footer class="article-footer">
@@ -243,7 +259,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgrolwn6001guvs6o9i0epja" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjgvn3pdo001lyis6pe6459f5" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -459,7 +475,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgrolwnc001quvs6c6h2va9g" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjgvn3pdq001qyis60inq54yk" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -700,7 +716,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgrolwnb001ouvs6fwoz19x1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjgvn3pdp001oyis6nba122do" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -884,7 +900,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgrolwn8001juvs6oq7c95ho" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjgvn3pdn001jyis62vinl1ck" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1080,7 +1096,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgrolwn2001buvs6yy00p2lq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjgvn3pdi001byis6al3ivycx" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1318,7 +1334,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgrolwn00019uvs67k8n89hz" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjgvn3pdh0019yis6aq4uhv1b" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1455,7 +1471,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgrolwmf0004uvs6q27u5nu7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjgvn3pcy0005yis6zfwyoxdr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1585,7 +1601,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgrolwma0001uvs67ulh4ki8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjgvn3pct0001yis64iz73lo2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1826,7 +1842,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgrolwn3001euvs6gaaz50r1" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjgvn3pdj001eyis6g0vyqnmc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1959,7 +1975,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgrolwms000suvs6v7pekk57" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjgvn3pdb000uyis6dcwcee2i" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
