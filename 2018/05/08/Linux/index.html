@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>读书笔记-程序员的自我修养（二） | 着陆的橘子</title>
+    <title>Linux 常用命令 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="编译和链接 编译和链接： 通常将编译和链接合并到一起的过程称为 构建（Build），可以分解成以下 4 个步骤  预编译（Propressing）   源文件 和 头文件 被预编译器预编译成一个 .i 或者 .ii（cpp）的文件   期间主要处理那些源代码文件中的以 # 开始的预编译命令，比如  #include，#define  等   经过预编译后的 .i 文件 不包含任何宏定义，并且引用的">
-<meta name="keywords" content="读书">
+    <meta name="description" content="系统信息类1cat /proc/meminfo | grep MemTotal //查看系统内存信息 系统日志类系统日志一般都存在/var/log下 123cat /etc/syslog.conf //查看系统日志配置位置dmesg //查看kernel信息">
+<meta name="keywords" content="系统">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读书笔记-程序员的自我修养（二）">
-<meta property="og:url" content="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/index.html">
+<meta property="og:title" content="Linux 常用命令">
+<meta property="og:url" content="https://aaronshi32.github.io/2018/05/08/Linux/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="编译和链接 编译和链接： 通常将编译和链接合并到一起的过程称为 构建（Build），可以分解成以下 4 个步骤  预编译（Propressing）   源文件 和 头文件 被预编译器预编译成一个 .i 或者 .ii（cpp）的文件   期间主要处理那些源代码文件中的以 # 开始的预编译命令，比如  #include，#define  等   经过预编译后的 .i 文件 不包含任何宏定义，并且引用的">
+<meta property="og:description" content="系统信息类1cat /proc/meminfo | grep MemTotal //查看系统内存信息 系统日志类系统日志一般都存在/var/log下 123cat /etc/syslog.conf //查看系统日志配置位置dmesg //查看kernel信息">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-05-08T02:25:36.000Z">
+<meta property="og:updated_time" content="2018-05-09T01:39:37.464Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读书笔记-程序员的自我修养（二）">
-<meta name="twitter:description" content="编译和链接 编译和链接： 通常将编译和链接合并到一起的过程称为 构建（Build），可以分解成以下 4 个步骤  预编译（Propressing）   源文件 和 头文件 被预编译器预编译成一个 .i 或者 .ii（cpp）的文件   期间主要处理那些源代码文件中的以 # 开始的预编译命令，比如  #include，#define  等   经过预编译后的 .i 文件 不包含任何宏定义，并且引用的">
+<meta name="twitter:title" content="Linux 常用命令">
+<meta name="twitter:description" content="系统信息类1cat /proc/meminfo | grep MemTotal //查看系统内存信息 系统日志类系统日志一般都存在/var/log下 123cat /etc/syslog.conf //查看系统日志配置位置dmesg //查看kernel信息">
     
 
     
@@ -179,7 +179,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-读书笔记-程序员的自我修养（二）" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-Linux" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -187,7 +187,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            读书笔记-程序员的自我修养（二）
+            Linux 常用命令
         </h1>
     
 
@@ -196,8 +196,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/05/08/读书笔记-程序员的自我修养（二）/">
-            <time datetime="2017-05-08T02:24:26.000Z" itemprop="datePublished">2017-05-08</time>
+        <a href="/2018/05/08/Linux/">
+            <time datetime="2018-05-08T08:49:05.000Z" itemprop="datePublished">2018-05-08</time>
         </a>
     </div>
 
@@ -206,7 +206,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
+        <a class="tag-link" href="/tags/系统/">系统</a>
     </div>
 
                     </div>
@@ -217,61 +217,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="编译和链接"><a href="#编译和链接" class="headerlink" title="编译和链接"></a>编译和链接</h3><ul>
-<li><p>编译和链接： 通常将编译和链接合并到一起的过程称为 <strong>构建（Build）</strong>，可以分解成以下 4 个步骤</p>
-<ul>
-<li><p><strong>预编译（Propressing）</strong></p>
-<p>  源文件 和 头文件 被预编译器预编译成一个 <strong>.i</strong> 或者 <strong>.ii</strong>（cpp）的文件</p>
-<p>  期间主要处理那些源代码文件中的以 <strong>#</strong> 开始的预编译命令，比如 <strong> #include，#define </strong> 等</p>
-<p>  经过预编译后的 .i 文件 <strong>不包含任何宏定义</strong>，<strong>并且引用的文件已经全部被插入到  .i 文件中</strong>，<strong>删除了所有注释</strong>，<strong>处理了所有条件预编译指令（#if，#ifdef，#elif，#else，#endif）</strong>，<strong>保留了所有#progma编译器命令</strong></p>
-<p>  为此，当需要判断 <strong>宏定义</strong>，<strong>包含的头文件</strong>是否正确时，可以查看预编译后的文件来确定问题（gcc -E hello.c -o hello.i）</p>
-</li>
-<li><p><strong>编译（Compilation）</strong></p>
-<p>  编译过程就是把预编译完的文件（.i / .ii）进行一些列 <strong>词法分析，语法分析，语义分析及优化</strong> 后生成相应的 <strong>汇编代码文件</strong>（.s）</p>
-<p>  如今GCC已经把预编译和编译两个步骤合二为一了，使用叫做 <strong>cc1</strong> 的程序来完成（gcc -S hello.c -o hello.s）</p>
-<p>  实际 <strong>gcc</strong> 这个命令只是这些后台程序的 <strong>包装</strong>，它会根据不同的参数要求去调用预编译编译程序 <strong>cc1</strong>，汇编器 <strong>as</strong>，链接器 <strong>Id</strong></p>
-</li>
-<li><p><strong>汇编（Assembly）</strong></p>
-<p>  汇编过程只是根据汇编指令和机器指令的对照表一一翻译就可以了（gcc -c hello.s -o hello.o），生成 <strong>目标文件（Object File）</strong></p>
-</li>
-<li><p><strong>链接（Linking）</strong></p>
-<p>  目标文件 到 可执行文件，需要链接许多内容（静态链接和动态链接），后文会详细介绍</p>
-<p>  ld <strong>-static crt1.o crti.o crtbeginT.o</strong> hello.o <strong>–start-group -lgcc -lgcc_eh -lc -end-group crtend.o crtn.o</strong></p>
-</li>
-</ul>
-</li>
-<li><p>编译的过程： <strong>编译器</strong> 从源代码（Source Code）到最终目标代码（Final Target Code）过程，做了以下 6 个步骤</p>
-<ul>
-<li><p><strong>词法分析</strong></p>
-<p>  通过扫描器，运用一种类似于 <strong>有限状态机（Final State Machine）</strong> 的算法，将源代码的字符序列分割成一系列的 <strong>记号（Token）</strong></p>
-<p>  词法分析产生的记号一般分为以下几类：<strong>关键字、标识符、字面量（包含数字、字符串等）和 特殊符号（如加号、等号）</strong>，并将它们放到对应的 <strong>表</strong> 中</p>
-<p>  <strong>lex</strong> 程序可以实现词法分析，支持自定义词法规则</p>
-</li>
-<li><p><strong>语法分析</strong></p>
-<p>  通过 <strong>语法分析器（Grammar Parser）</strong>，采用 <strong>上下文无关语法（Context-free Grammar）</strong> 的分析手段，将由扫描器产生的记号生成 <strong>语法树（Syntax Tree）</strong></p>
-<p>  语法树就是以 <strong>表达式（Expression）</strong> 为节点的树，如果出现了表达式不合法，编译器就会报告语法分析阶段的错误</p>
-<p>  <strong>yacc</strong> 程序可以实现语法分析，构建一颗语法树，支持自定义语法规则</p>
-</li>
-<li><p><strong>语义分析</strong></p>
-<p>  <strong>语义分析器（Semantic Analyzer）</strong> 只对表达式完成语法层面的分析，不关心是否真正有意义，通常可以分为以下两种</p>
-<p>  <strong>静态语义（Static Semantic）</strong> 通常包括声明和类型的匹配，类型的转换，最简单的例子：赋值类型转换</p>
-<p>  <strong>动态语义（Dynamic Semantic）</strong> 一般指在运行期出现的语义相关问题，比如将0作为除数</p>
-<p>  经过语义分析之后，整个语法树的表达式都被标识了 <strong>类型</strong>，如果有些类型需要做隐式转换，语义分析程序会在语法树中 <strong>插入</strong> 相应的转换节点</p>
-</li>
-<li><p><strong>中间语言生成</strong></p>
-<p>  现代的编译器都包含 <strong>源码级优化器（Source Code Optimizer）</strong>，在源代码级别有一个优化过程（比如能在编译期间确定表达式值）</p>
-<p>  直接在语法树上做优化比较困难，所以将整个语法树转换成 <strong>中间代码（Intermediate Code）</strong>，比较常见的有：<strong>三地址码（Three-address Code）</strong> 和 <strong>P-代码（P-Code）</strong></p>
-<p>  <strong>跨平台原理</strong>：中间代码使得编译器可以被分为前端和后端。编译器前端负责产生机器无关的中间代码，编译器后端将中间代码转换成目标机器代码。这样对于一些可以跨平台的编译器而言，他们可以针对不同的平台使用同一个前端和针对不同机器平台的数个后端</p>
-</li>
-<li><p><strong>目标代码生成与优化</strong></p>
-<p>  源代码级优化器产出的结果：中间代码，标志着下面的过程都属于编译器后端，包括 <strong>代码生成器（Code Generator）</strong> 和 <strong>目标代码优化器（Target Code Optimizer）</strong></p>
-<p>  <strong>代码生成器（Code Generator）</strong> 主要是将中间代码转换成目标机器代码，依赖于目标机器的环境</p>
-<p>  <strong>目标代码优化器（Target Code Optimizer）</strong> 主要针对目标代码，在合适的寻址方式，使用位移来代替乘法运算，删除多余的指令等方面，进行优化，涉及到的技术比如： <strong>基址比例变址寻址（Base Index Scale Addressing）</strong></p>
-<p>  <strong>问题：此时，目标机器代码（汇编）已经生成，但是目标代码中的变量地址还没有确定，这个地址可以是本程序内定义的，也可以是其他程序模块中的，那么运行时该如何寻址？在介绍链接器之前，先说明下链接器的作用对象：目标文件都包括什么</strong></p>
-</li>
-</ul>
-</li>
-</ul>
+            <h5 id="系统信息类"><a href="#系统信息类" class="headerlink" title="系统信息类"></a>系统信息类</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/meminfo | grep MemTotal //查看系统内存信息</span><br></pre></td></tr></table></figure>
+<h5 id="系统日志类"><a href="#系统日志类" class="headerlink" title="系统日志类"></a>系统日志类</h5><p>系统日志一般都存在/var/log下</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/syslog.conf //查看系统日志配置位置</span><br><span class="line"></span><br><span class="line">dmesg //查看kernel信息</span><br></pre></td></tr></table></figure>
 
         
         </div>
@@ -282,7 +230,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjh5lx6r7002572s6plnq2rtn" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjh5lx6q8000772s699odl69v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -357,19 +305,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2017/05/09/读书笔记-程序员的自我修养（三）/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    读书笔记-程序员的自我修养（三）
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/05/06/读书笔记-程序员的自我修养（一）/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">读书笔记-程序员的自我修养（一）</div>
+            <div class="article-nav-title">读书笔记-深入分析 Java Web 技术内幕（三）</div>
         </a>
     
 </nav>

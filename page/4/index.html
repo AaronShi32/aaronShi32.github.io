@@ -140,11 +140,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                41
+                42
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                8
+                9
                 <span>标签</span>
             </div>
         </div>
@@ -175,7 +175,7 @@
 
             
             <section id="main">
-    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Tensorflow学习-机器学习" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -183,7 +183,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
+            <a class="article-title" href="/2017/02/13/Tensorflow学习-机器学习/">机器学习</a>
         </h1>
     
 
@@ -192,8 +192,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/02/08/Tensorflow学习-神经网络/">
-            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        <a href="/2017/02/13/Tensorflow学习-机器学习/">
+            <time datetime="2017-02-13T10:27:59.000Z" itemprop="datePublished">2017-02-13</time>
         </a>
     </div>
 
@@ -213,19 +213,57 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
-<p>首先来回忆几个概念</p>
-<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
-<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
-<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
-<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
-<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
-<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
-<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
-<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
-<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
+            <h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><table>
+<thead>
+<tr>
+<th>机器学习</th>
+<th style="text-align:left">有监督学习(Supervised)</th>
+<th style="text-align:left">无监督学习(UnSupervised)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>理解</td>
+<td style="text-align:left">有一组称之为”正确”的数据提供给算法，用于监督每次的训练成果</td>
+<td style="text-align:left">从数据集中发掘出规律，从而将数据进行某种程度划分</td>
+</tr>
+<tr>
+<td>问题</td>
+<td style="text-align:left"><li>回归预测（Regression Predict）</li><li>特征分类（Feature Classification）</li></td>
+<td style="text-align:left"><li>聚类（Cluster）</li></td>
+</tr>
+</tbody>
+</table>
+<h4 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h4><ul>
+<li><p>模型表示</p>
+<ul>
+<li><p>关键词：训练集（Training Set）| 学习算法（Learning Algorithm）| 假说（Hypothesis）</p>
+</li>
+<li><p>通过<strong>学习算法</strong>找到某种<strong>假说</strong>使得<strong>训练集</strong>的数据呈现该假说规律，即：H maps from TraningSet</p>
+</li>
+<li><p>如何检测<strong>假说</strong>的效果，使用成本函数（cost function or loss function），有时候也叫损失函数，通常来说，假说越准确，越接近真实，其值就越小。成本函数的出现通常伴随着目标，即 <code>When cost function defined，the goal has appearanced</code></p>
+<p>  线性回归通常使用的成本函数和目标为：</p>
+  <img src="/2017/02/13/Tensorflow学习-机器学习/cfg.png" title="线性回归的成本函数和目标">
+</li>
+<li><p>学习算法：</p>
+<ol>
+<li><p>梯度下降法（Gradient Descent）</p>
+<ul>
+<li>梯度下降法的缺点包括：1）靠近极小值时速度减慢，2）直线搜索可能会产生一些问题，3）可能会“之字型”地下降。</li>
 </ul>
-<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
+</li>
+</ol>
+</li>
+<li><p>如何调节机器学习的结果：</p>
+<ol>
+<li><p>特征缩放（Feature Scaling）</p>
+<p> 解释：在运用一些机器学习算法的时候不可避免地要对数据进行特征缩放（feature scaling），比如：在随机梯度下降（stochastic gradient descent）算法中，特征缩放有时能提高算法的收敛速度</p>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
 
         
         </div>
@@ -236,7 +274,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjgvn3pd8000pyis6fq7rbgzu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjh5lx6qi000m72s6c13itcm7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -369,7 +407,7 @@
 <p>创建虚拟机的步骤就不赘述了，用过VMware的很简单，记得安装VMware Tools ，这个很关键</p>
 <p>下载好 Anaconda 之后，有 2 和 3 两个版本，分别对应 python 2.7 和 python 3.5，<strong>chmod 之后就可以一路安装了</strong>，记得添加到PATH中，这样默认的python环境就升级了</p>
 <p>打开终端，输入以下命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> conda create -n tensorflow python=2.7</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source activate tensorflow</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span> pip install --ignore-installed --upgrade $TF_BINARY_URL</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> source deactivate</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> conda create -n tensorflow python=2.7</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> activate tensorflow</span></span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span><span class="bash"> <span class="built_in">export</span> TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl</span></span><br><span class="line"></span><br><span class="line"><span class="meta">(tensorflow)$</span><span class="bash"> pip install --ignore-installed --upgrade <span class="variable">$TF_BINARY_URL</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> deactivate</span></span><br></pre></td></tr></table></figure>
 <p>下载安装 Sublime Text，安装 Package Control 之后依次添加以下插件：</p>
 <ul>
 <li>Anaconda</li>
@@ -390,7 +428,144 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjgvn3pd7000myis6zkoivmr6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjh5lx6qj000p72s6oxqfx4yp" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/08/Tensorflow学习-神经网络/">
+            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
+<p>首先来回忆几个概念</p>
+<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
+<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
+<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
+<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
+<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
+<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
+<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
+<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
+<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
+</ul>
+<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjh5lx6qk000q72s6d8dt9mx3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -542,7 +717,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjgvn3pcp0000yis6v4yqh263" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjh5lx6px000072s6wcm00ssl" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -696,7 +871,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjgvn3pcz0007yis6v5jk8t6e" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjh5lx6q9000872s6g9buph9m" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -848,7 +1023,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjgvn3pd9000qyis6lk96tlxw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjh5lx6qk000s72s6wjmnwqpi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1119,7 +1294,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjgvn3pdl001gyis6dcibj11h" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjh5lx6qw001g72s6pp2z4juj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1273,7 +1448,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/JS文档生成工具-Jsdoc/" data-id="cjgvn3pcx0004yis6s8mff7fn" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/JS文档生成工具-Jsdoc/" data-id="cjh5lx6q5000472s6a8oih18a" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1923,7 +2098,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjgvn3pdf0014yis6e3rwvit0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjh5lx6qr001672s6e8znnbr0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2090,151 +2265,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/16/Node命令行工具-Yargs和Commander/" data-id="cjgvn3pd3000cyis6m4e25s8j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-JS压缩混淆工具-UglifyJS" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/14/JS压缩混淆工具-UglifyJS/">JS压缩混淆工具-UglifyJS</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/14/JS压缩混淆工具-UglifyJS/">
-            <time datetime="2016-11-14T08:08:52.000Z" itemprop="datePublished">2016-11-14</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>, <a class="tag-link" href="/tags/工具/">工具</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>最近写了一些JS的项目，顺便研究了下UglifyJS工具，它是一款JS代码处理工具，提供了压缩，混淆和代码规范化等功能，同时还支持命令行和NodeJS两种使用方式，在代码基本”格式化”功能的基础上，可自定义扩展一些功能选项，满足具体项目中的使用。在业界内，JQuery使用UglifyJS进行代码压缩混淆，可见其结果具备准确性和稳定性。</p>
-<p>使用方式：<code>uglifyjs [input files] [options]</code></p>
-<h4 id="SourceMap"><a href="#SourceMap" class="headerlink" title="SourceMap"></a>SourceMap</h4><p>UglifyJS支持使用/生成SourceMap, 那什么是SourceMap，简单来说就是一个解码表，JS代码从原生到压缩混淆之后，从原来的几百行甚至几千行中，压缩到几十行。不仅代码行数骤减，同时经过混淆，代码的变量声明都进行了替换，因此当我们看混淆之后的代码，很难读懂代码的本意，这也是压缩混淆的初衷，减少JS代码的大小，方便网络传输，理论上对代码进行了保护。利弊相对，压缩混淆之后的代码对调试来说尤为困难，因此SourceMap就出现了。</p>
-<p>简单来讲，压缩混淆之后的代码通过SourceMap，即可还原成原始的JS代码，这就是为什么说它是一个解码表的原因，因为反向还原了JS代码，结合到UglifyJS而言，其支持以下几个选项：</p>
-<ul>
-<li>source-map                  指定生成一个SourceMap的文件名</li>
-<li>source-map-root             指定SourceMap的根目录位置</li>
-<li>source-map-url              指定SourceMap的网络路径</li>
-<li>source-map-inline           在压缩混淆的JS代码后，追加SourceMap内容</li>
-<li>in-source-map               指定一个SourceMap</li>
-</ul>
-<h4 id="功能：压缩"><a href="#功能：压缩" class="headerlink" title="功能：压缩"></a>功能：压缩</h4><p>使用UglifyJS进行代码压缩，-c 选项即启用压缩，例如：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line"><span class="keyword">var</span> net = <span class="built_in">require</span>(<span class="string">'net'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> IP = <span class="string">"127.0.0.1"</span>;</span><br><span class="line"><span class="keyword">const</span> PORT = <span class="number">8887</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> client = <span class="keyword">new</span> net.Socket();</span><br><span class="line">client.connect(PORT, IP, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'CONNECTED TO: '</span> + IP + <span class="string">':'</span> + PORT);</span><br><span class="line">    client.write(<span class="string">'I am Chuck Norris!'</span>);</span><br><span class="line"></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>压缩后变成</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;<span class="keyword">var</span> net=<span class="built_in">require</span>(<span class="string">"net"</span>);<span class="keyword">const</span> IP=<span class="string">"127.0.0.1"</span>,PORT=<span class="number">8887</span>;<span class="keyword">var</span> client=<span class="keyword">new</span> net.Socket;client.connect(PORT,IP,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="string">"CONNECTED TO: "</span>+IP+<span class="string">":"</span>+PORT),client.write(<span class="string">"I am Chuck Norris!"</span>)&#125;);</span><br></pre></td></tr></table></figure>
-<p>可以看出，压缩之后去掉了空行以及连续声明时候的关键字const，如果让你调试这样的出错代码，没有SourceMap，则无从下手</p>
-<h4 id="功能：混淆"><a href="#功能：混淆" class="headerlink" title="功能：混淆"></a>功能：混淆</h4><p>使用UglifyJS进行代码混淆，-m 选项即启用混淆，例如，还是上面的代码，经过混淆后变成</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;<span class="keyword">var</span> c=<span class="built_in">require</span>(<span class="string">"net"</span>);<span class="keyword">const</span> e=<span class="string">"127.0.0.1"</span>;<span class="keyword">const</span> n=<span class="number">8887</span>;<span class="keyword">var</span> o=<span class="keyword">new</span> c.Socket;o.connect(n,e,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="string">"CONNECTED TO: "</span>+e+<span class="string">":"</span>+n);o.write(<span class="string">"I am Chuck Norris!"</span>)&#125;);</span><br></pre></td></tr></table></figure>
-<p>可以看出，混淆把变量都替换成了单字符，相比于压缩，进一步的减小了代码量</p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>UglifyJS是一款出色的JS代码压缩，混淆工具，其具有丰富的功能，例如代码美化，支持NodeJS自定义编程等，更多细节请参考 <a href="https://github.com/mishoo/UglifyJS2" target="_blank" rel="noopener">UglifyJS</a></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/11/14/JS压缩混淆工具-UglifyJS/" data-id="cjgvn3pcw0003yis6ejbuahyi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/16/Node命令行工具-Yargs和Commander/" data-id="cjh5lx6qg000h72s6zllkyolq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2323,7 +2354,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2332,7 +2363,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">26</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">26</span></li></ul>
         </div>
     </div>
 
