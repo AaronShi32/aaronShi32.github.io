@@ -140,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                44
+                45
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -175,6 +175,186 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-程序员的自我修养（一）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/06/读书笔记-程序员的自我修养（一）/">读书笔记-程序员的自我修养（一）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/06/读书笔记-程序员的自我修养（一）/">
+            <time datetime="2017-05-06T02:50:04.000Z" itemprop="datePublished">2017-05-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="计算机基础知识回顾"><a href="#计算机基础知识回顾" class="headerlink" title="计算机基础知识回顾"></a>计算机基础知识回顾</h3><ul>
+<li><p>SMP（Symmetrical Multi-Processing）对称多处理器：每个CPU在系统中所处的地位和所发挥的功能都是一样的。通常情况下的程序不可能分解成多个不相干的子问题，除非商用的计算环境（充分发挥每个CPU的能力），所以多核处理器（Mutli-core Processor）和 SMP 通常是一个概念。</p>
+</li>
+<li><p>层次结构，计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。开发工具与应用程序属于同一个层次，因为它们都使用运行库提供的 <strong>应用程序编程接口（Application Programming Interface）</strong>。运行库使用操作系统提供的 <strong>系统调用接口（System call Interface）</strong>，通常以软件中断方式实现提供。操作系统内核层使用硬件层提供的 <strong>硬件规格（Hardware Specification）</strong></p>
+</li>
+<li><p>操作系统的一个功能是提供抽象的接口，另一个主要功能是管理硬件资源（CPU，存储器（内存和磁盘）和 I/O 设备）</p>
+<ul>
+<li><p>不要让CPU打盹：早期的CPU是 <strong>单一</strong> 服务式，简直浪费，后来出现了分时系统（Time-Sharing System），以 <strong>协作</strong> 的方式主动让闲CPU，供其他程序使用，再到现在，操作系统接管了所有硬件资源，本身运行在一个受硬件保护的级别，所有程序都以进程的方式运转，并且允许 <strong>抢占式</strong> 的CPU分配方式</p>
+</li>
+<li><p>设备驱动（Device Driver），操作系统 <strong>将硬件逐渐抽象成一些列的概念</strong>。比如：UNIX 中硬件设备的访问形式跟访问普通的文件形式一样，Windows 中，图像硬件被抽象成 GDI，声音和多媒体设备被抽象成 DirectX 对象等，向上提供统一的接口供程序使用，设备驱动完成向下对硬件的适配</p>
+</li>
+<li><p>I/O 设备：内存和磁盘的读取和写入是通过 I/O 端口寄存器来实现的，提供读取和写入的地址，来完成磁盘数据操作</p>
+<p>即操作系统以进程概念，使得每个进程从逻辑上来看都是独占计算机资源，实质上操作系统以抢占式的 CPU 策略，I/O 抽象模型的方式来管理这些资源</p>
+</li>
+</ul>
+</li>
+<li><p>操作系统是如何管理内存的</p>
+<ul>
+<li><p>解决的问题：如何将计算机 <strong>有限</strong> 的物理内存分配给 <strong>多个</strong> 程序使用</p>
+</li>
+<li><p>直接分配物理内存的弊端：地址空间不隔离（程序直接访问物理内存），内存使用效率低（缺乏有效的内存管理机制，使得频繁换入换出数据，内存的使用分配以程序为单位（粒度太大）），程序运行的地址不固定（程序每次装入内存执行时，数据和指令跳转涉及到重定位问题）</p>
+</li>
+<li><p>解决方法： 增加中间层来 <strong>隔离</strong>，把程序给出的地址看作是一种 <strong>虚拟地址（Virtual Address）</strong>，通过某些映射方法，保证任意一个程序所能够访问的物理内存区域跟另外一个程序相互不重叠，以达到地址空间隔离的效果</p>
+</li>
+<li><p>分段（Segmentation）：段映射，以程序所使用的的内存为单位，从虚拟地址映射到物理地址，映射结果唯一，解决了隔离和程序地址不固定的问题</p>
+</li>
+<li><p>分页（Paging）：页分割，把常用的数据和代码页装载到内存中，把不常用的代码和数据保存在磁盘里，当用到的时候再取出来。若用到的页不在内存中，操作系统会受到页错误（Page Fault），然后将需要的页装载到内存中。硬件级别：<strong>MMU（Memory Management Unit）</strong>用来支持虚拟地址到物理地址的转换，已集成到CPU内部</p>
+</li>
+</ul>
+</li>
+<li><p>程序执行流最小单元：线程（Thread），又称为轻量级进程（Lightweight Process，LWP）</p>
+<ul>
+<li><p>基础概念</p>
+<p>  <strong>线程私有</strong>（局部变量，函数的参数，TLS数据），<strong>线程之间共享</strong>（全局变量，堆数据，函数里的静态变量，程序代码，打开的文件，这些就是进程所有的东西）</p>
+<p>  <strong>调度</strong>（线程数&gt;处理器时（或者单处理器应对多线程时），会模拟出来一种并发的状态，即切换不同的线程行为，称之为线程调度 </p>
+<p>  <strong>至少三种状态</strong>：运行，就绪，等待，以时间片的改变作为区分 </p>
+<p>  <strong>调度算法</strong>：优先级调度（Priority Schedule），轮转法（Round Robin），也区分出 <strong>IO密集型线程（IO Bound Thread）</strong> 和 <strong>CPU密集型线程（CPU Bound Thread）</strong>，IO 总比 CPU 能获得更高的优先级 </p>
+<p>  为了防止 <strong>饿死（Starvation）</strong> 现象： 用户指定优先级/根据进入等待状态的频繁程序提升或降低优先级/长时间得不到执行而被提升优先级，也出现了 <strong>可抢占式线程（Preemption）</strong></p>
+</li>
+<li><p>线程安全</p>
+<p>  <strong>竞争与原子操作</strong>：多个线程同时访问一个共享数据，为此引出 <strong>原子性（Atomic）</strong>，但原子性操作只适用于简单的操作，更复杂的数据结构访问，通常用 <strong>锁</strong> 的手段</p>
+<p>  <strong>同步与锁</strong>：<strong>同步（Synchronization）</strong> 是一种机制：保证线程访问数据的原子性。<strong>锁（Lock）</strong> 是一种手段，每个线程在访问数据或资源之前，首先试图 <strong>获取（Accquire）</strong> 锁，并在访问结束之后 <strong>释放（Release）</strong> 锁</p>
+<p>  <strong>锁的演进</strong>：<strong>二元信号量（Binary Semaphore）</strong>，只允许一个线程独占，其状态有两个：占用 和 非占用，可以由一个线程获取，另一个线程释放；<strong>多元信号量（N Semaphore）</strong>，允许 N 个线程并发访问共享资源；<strong>互斥量（Mutex）</strong>，类似于二元信号量，但谁获得谁负责释放；<strong>临界区（Critical Section）</strong>：不同于之前的信号量，互斥量（作用域为进程内的所有线程），临界区的作用范围仅限于本线程，其他线程无法获取临界区的锁，因此也就无法访问；<strong>条件变量（Condition Variable）</strong>，使用条件变量可以让许多线程一起等待某个事件的发生，当事件发生时，所有线程可以一起恢复执行</p>
+<p>  <strong>读写锁（Read-Write Lock）</strong>：三种状态分别是，<strong>自由（Free），共享（Shared）和独占（Exclusive）</strong>，当处于自由状态时，试图以任何一种方式获取锁都能成功，并将锁至于对应的状态。如果锁处于共享状态，其他线程以共享的方式获取锁仍会成功（读），此时这个锁分配给了多个线程。如果其他线程试图以独占的方式获取已经处于共享状态的锁，那么他将必须等在锁被所有的线程释放后，才能将锁的状态置成独占（写）</p>
+<p>  <strong>可重入（Reentrant）</strong>：即幂等性的函数，可以称为可重入函数</p>
+<p>  <strong>过度优化</strong>：使用 volatile 关键字，解决 1. 阻止编译器为了提高速度将一个变量缓存到寄存器内而不写回，2. 阻止编译器调整操作 volatile 变量的质量顺序，<strong>但还是无法阻止CPU动态调度换序</strong></p>
+</li>
+<li><p>线程内部三种模型</p>
+<p>  多线程库的实现方式：对用户来说如果有三个线程在同时执行（<strong>用户态线程（User Thread）</strong>），对内核来说很可能只有一个线程（<strong>内核线程（Kernel Thread）</strong>），下面提及的模型都是 <strong>UT：KT</strong></p>
+<p>  <strong>一对一模型</strong>：真正意义上的并发调度，缺点是受内核线程数量限制，内核线程上下文切换调度开销较大，使得用户线程执行效率低下</p>
+<p>  <strong>多对一模型</strong>：高效的上下文切换和几乎无限制的线程数量，缺点是一个用户线程阻塞了，那么所有线程都将无法执行</p>
+<p>  <strong>多对多模型</strong>：多个用户线程映射到多个内核线程，切换方便且避免了一个阻塞全局的情况</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjiohwzzb0025z7s681qlh9ij" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-SonarQube安装使用调试" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -276,7 +456,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjimf8y43000kyps6i28g83gm" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjiohwzyl000hz7s6xtbz32p8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -408,7 +588,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjimf8y4d0016yps6bzymdjl7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjiohwzyz0018z7s68m3tr5nw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -583,7 +763,144 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjimf8y44000myps6hxqxddro" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjiohwzyo000mz7s6axrzfxkr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/08/Tensorflow学习-神经网络/">
+            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
+<p>首先来回忆几个概念</p>
+<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
+<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
+<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
+<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
+<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
+<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
+<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
+<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
+<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
+</ul>
+<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjiohwzys000rz7s6g89pa4f0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -737,144 +1054,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjimf8y45000pyps6vo7hi3b4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Tensorflow学习-神经网络" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/08/Tensorflow学习-神经网络/">Tensorflow学习-神经网络</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/08/Tensorflow学习-神经网络/">
-            <time datetime="2017-02-08T03:34:59.000Z" itemprop="datePublished">2017-02-08</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/人工智能/">人工智能</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>学校里人工智能的课程，都会以神经网络作为入门，因此，也以神经网络（NNs）作为回顾和新的学习开始</p>
-<p>首先来回忆几个概念</p>
-<h5 id="神经元"><a href="#神经元" class="headerlink" title="神经元"></a>神经元</h5><p>神经元是神经网络中的一个基本单元，作用是：<strong>求得输入向量与权向量的内积后，经一个非线性传递函数得到一个标量结果</strong></p>
-<p>这个非线性传递函数也称之为：激励函数（ReLu）</p>
-<p>因此对于一个基本单位神经元，他的目的就是汇合其所有的输入（外界刺激），与该神经元上的所有权值相乘（神经敏感度），通过激励（激励函数）产生相应的反应（标量结果）</p>
-<h5 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h5><p>神经网络由多个神经元组成，通过层的概念划分，可以分为输入层，隐含层和输出层。</p>
-<p>神经元之间的信息传递强度，是通过权向量来定义的，结合一定的训练学习算法，权向量会不断的进行调整，即学习算法（learning algorithm）会不断的调整神经元的敏感度，让神经元在训练过程中产生不同的刺激反应</p>
-<p>同时，神经网络结合学习算法，依赖于大量的数据来训练，每一次的训练都需要有一个评估方法，称之为成本函数（cost function），用来定量评估根据特定输入值， 计算出来的输出结果，离正确值有多远，结果有多靠谱，换句话说就是神经网络的反应与预期是否一致</p>
-<p>为此，一个神经网络的基本可变关键因素就是：网络拓扑设计（输入层，隐含层和输出层的关系），学习算法（以何种方式来调整神经元敏感度），激励函数（神经元对外界刺激做出如何的反应），成本函数（衡量评估神经网络距离预期的差距），当然，随着深入的研究，神经网络还有许多高级可变因素，比如，dropout等</p>
-<h5 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h5><ul>
-<li>最常用的两个激活函数：Sigmoid系（Logistic-Sigmoid、Tanh-Sigmoid）</li>
-</ul>
-<h5 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h5><p>来源：<a href="https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">维基百科-人工神经网络</a> <a href="http://ufldl.stanford.edu/wiki/index.php/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">斯坦福大学UFLDL-神经网络</a></p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjimf8y46000qyps6ie8erjzv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjiohwzyq000pz7s6ny0ork2v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1026,7 +1206,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjimf8y3n0001yps6oh5zteib" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjiohwzy00000z7s657l67b9f" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1180,7 +1360,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjimf8y3t0007yps6vkeenwm3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjiohwzyb0008z7s69otdgdz7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1332,7 +1512,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjimf8y49000wyps64geifzkj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/30/前端资源打包工具-WebPack/" data-id="cjiohwzyt000uz7s6t7plji3l" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1982,278 +2162,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjimf8y4f001byps6xgzx8l86" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-大话设计模式" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/11/17/读书笔记-大话设计模式/">读书笔记-大话设计模式</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/11/17/读书笔记-大话设计模式/">
-            <time datetime="2016-11-17T09:53:00.000Z" itemprop="datePublished">2016-11-17</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <ul>
-<li><a href="##迪米特法则">迪米特法则</a></li>
-<li><a href="##合成/聚合复用原则">合成/聚合复用原则</a></li>
-<li><a href="##原型模式">原型模式</a></li>
-<li><a href="##模板模式">模板模式</a></li>
-<li><a href="##外观模式">外观模式</a></li>
-<li><a href="##建造者模式">建造者模式</a></li>
-<li><a href="##适配器模式">适配器模式</a></li>
-<li><a href="##备忘录模式">备忘录模式</a></li>
-<li><a href="##组合模式">组合模式</a></li>
-<li><a href="##迭代器模式">迭代器模式</a></li>
-<li><a href="##桥接模式">桥接模式</a></li>
-<li><a href="##命令模式">命令模式</a></li>
-<li><a href="##职责链模式">职责链模式</a></li>
-<li><a href="##中介模式">中介模式</a></li>
-<li><a href="##享元模式">享元模式</a></li>
-<li><a href="##解释器模式">解释器模式</a></li>
-<li><a href="##访问者模式">访问者模式</a></li>
-</ul>
-<h4 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h4><ul>
-<li><p>也叫最少知识原则，即：类的设计要降低耦合，如果两个类不必彼此直接通信，那么这两个类就不应当发生直接的相互作用。如果其中一个类需要调用另一个类的某一个方法的话，可以通过第三者转发这个调用</p>
-</li>
-<li><p>在类的结构设计上，每一个类都应当尽量降低成员的访问权限，设计时应当考虑两个类是直接发生调用关系，还是通过第三方来搭建关系</p>
-</li>
-</ul>
-<h4 id="合成-聚合复用原则"><a href="#合成-聚合复用原则" class="headerlink" title="合成/聚合复用原则"></a>合成/聚合复用原则</h4><ul>
-<li><p>尽量使用合成/聚合，尽量不要使用类继承，因为父类的改变，会影响到所有子类</p>
-</li>
-<li><p>聚合表示一种弱的拥有关系，体现的是A对象可以包含B对象，但B对象不是A对象的一部分。合成是一种强的拥有关系，体现的是严格的部分和整体的关系。</p>
-</li>
-<li><p>大雁拥有翅膀（合成），许多大雁聚合成雁群（聚合）</p>
-</li>
-</ul>
-<hr>
-
-<h4 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h4><ul>
-<li><p>深复制：把引用对象的变量指向复制过的新对象，而不是原有的被引用的对象</p>
-</li>
-<li><p>浅复制：被复制对象的鄋变量都含有与原来的对象相同的值，而所有对其他对象的引用都仍然指向原来的对象</p>
-</li>
-<li><p><strong>如何实现深复制：</strong> 用 私有构造函数 创建引用对象，然后再clone方法里调用私有构造函数，完成克隆，其他的值引用则在clone里面直接赋值就好了</p>
-</li>
-</ul>
-<h4 id="模板模式"><a href="#模板模式" class="headerlink" title="模板模式"></a>模板模式</h4><ul>
-<li><p>定义一个操作中的算法的骨架，而将一些步骤延迟到子类中，模板方法是的子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤</p>
-</li>
-<li><p>一切逻辑都在父类中写好，需要延迟交给子类的部分，通过让子类@Override方法来实现，或者抽象类实现逻辑，具体类实现细节</p>
-</li>
-</ul>
-<h4 id="外观模式"><a href="#外观模式" class="headerlink" title="外观模式"></a>外观模式</h4><ul>
-<li><p>为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这个接口使得这一子系统更加容易使用，比如，基金是各种股票的外观模式，购买者只需要和基金打交道就好了</p>
-</li>
-<li><p>分层的处理：Facade类，承上启下的作用，对外暴露的接口简单，统一</p>
-</li>
-</ul>
-<h4 id="建造者模式"><a href="#建造者模式" class="headerlink" title="建造者模式"></a>建造者模式</h4><ul>
-<li><p>Builder 和 Director： Builder是抽象类，用于让开发者实现一些细节步骤，Director里面包含了Buider的实例，用于封装一些操作逻辑，这样开发者每次只需要根据自己的需求实现Builder，然后交给Director就可以了，不用care操作逻辑是否有遗漏</p>
-</li>
-<li><p>适用于当创建复杂对象的算法应该独立于该对象的组成部分以及他们的装配方式时适用的模式，即将一个复杂对象的构建与它的表示分离，使得同样的构建过程（Director）可以创建不同的表示(Builder)</p>
-</li>
-</ul>
-<h4 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a>状态模式</h4><ul>
-<li><p>当一个对象的内在状态改变时允许改变其行为，这个对象看起来像是改变了其类</p>
-</li>
-<li><p>状态模式主要解决的是当控制一个对象状态转换的条件表达式过于复杂时，把状态的判断逻辑转移到表示不同状态的一系列类当中（<strong>实际！</strong>）</p>
-</li>
-</ul>
-<h4 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h4><ul>
-<li><p>将一个类的接口转换成客户希望的另外一个接口，Adapter模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
-</li>
-<li><p>使用一个已经存在的类，但如果它的接口，也就是它的方法和你的要求不相同时，就应该考虑用适配器模式，即：使用一个Adapter类实现抽象接口，里面持有待适配的对象，在Override接口方法的时候，将待适配对象的方法实现到接口中</p>
-</li>
-</ul>
-<h4 id="备忘录模式"><a href="#备忘录模式" class="headerlink" title="备忘录模式"></a>备忘录模式</h4><ul>
-<li><p>在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。</p>
-</li>
-<li><p>Originator(发起人，负责创建一个备忘录，即在SaveStatus时创建个Mememto) 和 Memento(备忘录，负责创建状态副本，保存在自己的类中) 和 Caretaker（管理者，负责管理内部的状态副本get和set）</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Originator</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Mememto <span class="title">SaveState</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> Memento(vit,atk,def)	</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RecoveryState</span>(<span class="params">Mememto state</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.vit = state.vit;</span><br><span class="line">	<span class="keyword">this</span>.atk = state.atk;</span><br><span class="line">	<span class="keyword">this</span>.def = state.def;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Memento</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> vit;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> atk;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> def;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Memento</span>(<span class="params"><span class="keyword">int</span> vit, <span class="keyword">int</span> atk, <span class="keyword">int</span> def</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.vit = vit;</span><br><span class="line">	<span class="keyword">this</span>.atk = atk;</span><br><span class="line">	<span class="keyword">this</span>.def = def;</span><br><span class="line">  &#125;</span><br><span class="line">  /...</span><br><span class="line">	<span class="keyword">get</span>/<span class="keyword">set</span></span><br><span class="line">  .../</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Caretaker</span> &#123;</span><br><span class="line">  <span class="keyword">private</span> Memento memento;</span><br><span class="line">  /...</span><br><span class="line">	<span class="keyword">get</span>/<span class="keyword">set</span></span><br><span class="line">  .../</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//----------To Do----------</span></span><br><span class="line"></span><br><span class="line">Caretaker.memento = Originator.SaveState();</span><br><span class="line">Originator.RecoveryState(Caretaker.memento);</span><br></pre></td></tr></table></figure>
-<h4 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h4><ul>
-<li><p>将对象组合成属性结构以表示”部分-整体”的层次结构。组合模式使得用户对单个对象和组合对象的使用具有<strong>一致性</strong></p>
-</li>
-<li><p>“部分-整体” 的关系实质上为 “树叶-根”的关系，所有的组件实现统一的接口，这个接口包含扩展组件的能力，即</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">abstarct <span class="keyword">class</span> <span class="title">Component</span>&#123;</span><br><span class="line">			</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">string</span> name;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Component</span>(<span class="params"><span class="keyword">string</span> name</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Add</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 扩展能力</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Remove</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 扩展能力</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Display</span>(<span class="params">Compoent c</span>)</span>; <span class="comment">// 各司其职</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="迭代器模式"><a href="#迭代器模式" class="headerlink" title="迭代器模式"></a>迭代器模式</h4><ul>
-<li><p>提供一种方法顺序访问一个聚合对象中各个元素，而又不暴露该对象的内部表示，即当你需要访问一个聚集对象，而且不管这些对象是什么，就应该考虑用迭代器模式</p>
-</li>
-<li><p>迭代器抽象类（Iterator） 和 迭代器具体类 (ConcreteIterator) </p>
-</li>
-<li><p>聚集抽象类（Aggregate）和 聚集具体类（ConcreteAggregate）</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">abstaract <span class="keyword">class</span> <span class="title">Iterator</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">object</span> <span class="title">First</span>(<span class="params"></span>)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">object</span> <span class="title">Next</span>(<span class="params"></span>)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">IsDone</span>(<span class="params"></span>)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">object</span> <span class="title">CurrentItem</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">abstaract <span class="keyword">class</span> <span class="title">Aggregate</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Iterator <span class="title">createIterator</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line">		</span><br><span class="line">class ConcreteAggregate：Aggregate &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> IList&lt;<span class="keyword">object</span>&gt; items = <span class="keyword">new</span> List&lt;<span class="keyword">object</span>&gt;();</span><br><span class="line">  <span class="keyword">public</span> orerride Iterator createIterator&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> ConcreteIterator(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">		</span><br><span class="line"><span class="keyword">class</span> <span class="title">ConcreteIterator</span> : <span class="title">Iterator</span> &#123;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">private</span> ConcreteAggregate aggregate;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ConcreteIterator</span>(<span class="params">ConcreteAggregate aggregate</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.aggregate = aggregate;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Override methods in Iterator</span></span><br><span class="line"><span class="comment">   * /</span></span><br><span class="line"><span class="comment">&#125;</span></span><br></pre></td></tr></table></figure>
-<h4 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a>桥接模式</h4><ul>
-<li><p>将抽象部分与它的实现部分分离，使它们都可以独立的变化</p>
-</li>
-<li><p>Abstraction 和 Implementor </p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Implementor</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">ConcreteImplementorA</span> : <span class="title">Implenmentor</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">class ConcreteImplementorB : Implenmentor</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">class Abstraction </span>&#123;</span><br><span class="line">  <span class="keyword">protected</span> Implementor implementor;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetImplementor</span>(<span class="params">Implementor implementor</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.implementor = implementor;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">RefinedAbstraction</span>: <span class="title">Abstraction</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	implementor.Operation();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span>&#123;</span><br><span class="line">  Abstraction ab = <span class="keyword">new</span> RefinedAbstraction();</span><br><span class="line">  ab.SetImpelementor(<span class="keyword">new</span> ConcreteImplementorA());</span><br><span class="line">  ad.Operation();</span><br><span class="line">  ab.SetImpelementor(<span class="keyword">new</span> ConcreteImplementorB());</span><br><span class="line">  ad.Operation();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h4><ul>
-<li><p>分离两个类的职责，统一规划到中间的消息队列管理：客户 - 服务员 - 烤肉者</p>
-</li>
-<li><p>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化，对请求排队或记录请求日志，以及支持可撤销的操作，它将请求一个操作的对象与知道怎么执行一个操作的对象分隔开: Command 和 Receiver 绑定，而 Command 的调度执行，由 Invoker 负责</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Command</span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">protected</span> Receiver receiver;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Command</span>(<span class="params">Receiver receiver</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.receiver = receiver;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">abstract</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">ConcreteCommand</span> : <span class="title">Command</span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ConcreteCommand</span>(<span class="params">Receiver receiver</span>): <span class="title">base</span>(<span class="params">receiver</span>)</span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	receiver.Action();			</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Invoker</span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> Command command;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetCommand</span>(<span class="params">Command command</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.command = command;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ExecuteCommand</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	command.Execute();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Receiver</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Action</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  Receiver r = <span class="keyword">new</span> Receiver();</span><br><span class="line">  Command c = <span class="keyword">new</span> ConcreteCommand(r);</span><br><span class="line">  Invoker i = <span class="keyword">new</span> Invoker();</span><br><span class="line">  i.SetCommand(c);</span><br><span class="line">  i.ExecuteCommand();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="职责链模式"><a href="#职责链模式" class="headerlink" title="职责链模式"></a>职责链模式</h4><ul>
-<li><p>使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系，将这个对象连成一个链，并沿着这条链传递该请求，知道有一个对象处理它为止（Chain）</p>
-</li>
-<li><p>接收者和发送者都没有对方的明确信息，且链中的对象自己也并不知道链的结构。结果是职责链可简化对象的相互连接，仅需要保持一个向后引用</p>
-</li>
-<li><p>随时增加或修改处理一个请求的结构，增强了给对象指派职责的灵活性，<strong>最坏情况</strong>：到末端都得不到处理，需要事先考虑全面</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Handler</span>&#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">protected</span> Handler successor;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetSuccessor</span>(<span class="params">Handler successor</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.successor = successor;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> request</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">ConcreteHandler1</span> : <span class="title">Handler</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> request</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(request &gt;= <span class="number">0</span> &amp;&amp; request &lt; <span class="number">10</span>)&#123;</span><br><span class="line">	  <span class="comment">// do handle request</span></span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span>(successor != <span class="literal">null</span>)&#123;</span><br><span class="line">	  successor.HandleRequest(request);</span><br><span class="line">	&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="中介模式"><a href="#中介模式" class="headerlink" title="中介模式"></a>中介模式</h4><ul>
-<li><p>对象之间大量的连接使得一个对象不可能在没有其他对象的支持下工作，系统表现为一个不可分割的整理，所谓低耦合的解决方案：中介模式其中之一</p>
-</li>
-<li><p>用一个中介对象来封装一系列的对象交互。中介者使得各对象不需要显示地相互引用，从而使其耦合松散，并且可以独立的改变他们之间的交互。</p>
-</li>
-<li><p>缺点：把交互的复杂性变成了中介者的复杂性，需要着重考虑，对象之间多对多的交互，首先应当考虑系统设计上的合理性</p>
-</li>
-</ul>
-<h4 id="享元模式"><a href="#享元模式" class="headerlink" title="享元模式"></a>享元模式</h4><ul>
-<li><p>如果一个应用程序使用了大量的对象，而大量的这些对象造成了很大的存储开销时就应该考虑使用享元模式，还有就是对象的大多数的外部状态，如果删除不影响的话，那么可以用相对较少的共享对象取代很多组对象，此时也应该考虑使用享元模式，比如：线程池</p>
-</li>
-<li><p>享元模式共享的是对象，对象数量是有限制的，因此会在工厂内部保存对象的引用，而工厂模式是生成对象，对象数量是无限制的</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Flyweight</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">int</span> ee</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">class ConcreteFlyweight : Flyweight</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">int</span> ee</span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">FlyweightFactory</span>&#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">private</span> Hashtable flyweights = <span class="keyword">new</span> Hashtable();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">FlyweightFactory</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">//内部保留有限的对象数</span></span><br><span class="line">	flyweights.Add(<span class="string">"X"</span>, <span class="keyword">new</span> ConcreteFlyweight());</span><br><span class="line">	flyweights.Add(<span class="string">"Y"</span>, <span class="keyword">new</span> ConcreteFlyweight());</span><br><span class="line">	flyweights.Add(<span class="string">"Z"</span>, <span class="keyword">new</span> ConcreteFlyweight());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Flyweight <span class="title">GetFlyweight</span>(<span class="params"><span class="keyword">string</span> key</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> ((Flyweight)flyweights[key]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="解释器模式"><a href="#解释器模式" class="headerlink" title="解释器模式"></a>解释器模式</h4><ul>
-<li><p>同样的一个抽象操作，需要不同的实施方法，则考虑解释器模式</p>
-</li>
-<li><p>缺点在于需要维护多个解释器实现</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">AbstractExpression</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">TerminalExpression: AbstractExpression </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NonterminalExpression: AbstractExpression &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Interpret</span>(<span class="params">Context ctx</span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 全局信息</span></span><br><span class="line"><span class="keyword">class</span> <span class="title">Context</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">string</span> input;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">string</span> output;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span>&#123;</span><br><span class="line">  Context ctx = <span class="keyword">new</span> Context();</span><br><span class="line">  AbstractExpression terminal = <span class="keyword">new</span> TerminalExpression();</span><br><span class="line">  terminal.interpret(ctx);</span><br><span class="line">  AbstractExpression terminal = <span class="keyword">new</span> NonterminalExpression();</span><br><span class="line">  nonterminal.interpret(ctx);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="访问者模式"><a href="#访问者模式" class="headerlink" title="访问者模式"></a>访问者模式</h4><ul>
-<li><p>表示一个作用于某对象结构中的各元素的操作，它使你可以在不改变各元素的类前提下定义作用于这些元素的新操作。</p>
-</li>
-<li><p>访问者模式的目的是要把处理从数据结构分离出来，有稳定的数据结构，又有易于变化的算法，使用访问者模式就是比较合理的，因为增加算法的操作变得尤为容易</p>
-</li>
-</ul>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Visitor</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">useAlgorithmA</span>(<span class="params">concreteElementA A</span>)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">useAlgorithmB</span>(<span class="params">concreteElementB B</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">ConcreteVisitor1: Visitor </span>&#123;</span><br><span class="line">  <span class="comment">// implements</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ConcreteVisitor2: Visitor &#123;</span><br><span class="line">  <span class="comment">// implements</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Element</span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">ConcreteElementr1 : Element &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</span><br><span class="line">	visitor.useAlgorithmA(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ConcreteElementr2 : Element &#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</span><br><span class="line">	visitor.useAlgorithmB(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Contorller</span> &#123;</span><br><span class="line">  <span class="comment">//整合 visitor 和 element, 使得对外操作统一</span></span><br><span class="line">  <span class="keyword">private</span> IList&lt;Element&gt; elements = <span class="keyword">new</span> List&lt;Element&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Attach</span>(<span class="params">Element element</span>)</span>&#123;</span><br><span class="line">	elements.Add(element);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Detach</span>(<span class="params">Element element</span>)</span>&#123;</span><br><span class="line">	elements.Remove(element);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Accept</span>(<span class="params">Visitor visitor</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">foreach</span>(Element e <span class="keyword">in</span> elements)&#123;</span><br><span class="line">	  e.Accept(visitor);</span><br><span class="line">	&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-大话设计模式/" data-id="cjimf8y4o001qyps68qn1kvjs" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2016/11/17/读书笔记-Effective JavaScript/" data-id="cjiohwzz1001dz7s6zu70roc3" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2342,7 +2251,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2351,7 +2260,7 @@ Function.prototype(.call/.bind/.apply) --&gt; User(.prototype) --&gt; User.proto
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">27</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li></ul>
         </div>
     </div>
 
