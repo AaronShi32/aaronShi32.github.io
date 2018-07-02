@@ -316,7 +316,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjiohwzyy0016z7s6phkam2ak" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjj3pj0yn00149ps6u9zu6q50" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -430,7 +430,8 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="详解-HTTP"><a href="#详解-HTTP" class="headerlink" title="详解 HTTP"></a>详解 HTTP</h3><h5 id="关键字-TCP-IP-四层模型"><a href="#关键字-TCP-IP-四层模型" class="headerlink" title="关键字: TCP/IP 四层模型"></a>关键字: TCP/IP 四层模型</h5><p>TCP/IP 协议族是指通常与网络相关联的协议集合, 分为四层: 应用层(HTTP, DNS, FTP, SSH, SMTP), 传输层(TCP, UDP), 网络层(IP, ARP), 数据层(操作系统、网卡、驱动、光纤等)</p>
+            <h3 id="详解-HTTP"><a href="#详解-HTTP" class="headerlink" title="详解 HTTP"></a>详解 HTTP</h3><img src="/2018/06/19/网络基础知识/TCP.png" title="协议参数优化">
+<h5 id="关键字-TCP-IP-四层模型"><a href="#关键字-TCP-IP-四层模型" class="headerlink" title="关键字: TCP/IP 四层模型"></a>关键字: TCP/IP 四层模型</h5><p>TCP/IP 协议族是指通常与网络相关联的协议集合, 分为四层: 应用层(HTTP, DNS, FTP, SSH, SMTP), 传输层(TCP, UDP), 网络层(IP, ARP), 数据层(操作系统、网卡、驱动、光纤等)</p>
 <p>HTTP 数据 -&gt; TCP 首部 (HTTP 数据) -&gt; IP 首部 (TCP 首部 (HTTP 数据)) -&gt; 以太网首部 (IP 首部 (TCP 首部 (HTTP 数据)))</p>
 <p>我们把这种数据信息包装的做法称之为 封装(encapsulate)</p>
 <p>ARP 是一种解析地址的协议, 根据 IP 查出 MAC 地址</p>
@@ -507,6 +508,15 @@
 <p>端口号由其使用的传输层协议决定, ssh 22, https 443, ftp 21, dns 53, snmp 161</p>
 <p>UDP 适用于 包总量较少的通信(DNS, SNMP等), 视频、音频等多媒体通信(即时通信), 限定于 LAN 等特定网络中的应用通信, 广播通信</p>
 <p>TCP 确认应答和窗口控制</p>
+<ul>
+<li><p>TCP 通过肯定的确认应答(ACK) 实现可靠的数据传输</p>
+</li>
+<li><p>TCP 通过窗口提高传输速度, 窗口大小是指无需等待确认应答而可以继续发送数据的最大值</p>
+</li>
+</ul>
+<p>因此, 在窗口比较大, 又出现报文段丢失的情况下, 同一个需要的确认应答将会被重复不断的返回, 而发送端主机如果连续3次收到同一个确认应答, 就会将其所对应的数据进行重发, 这种机制比之前提到的超时管理更加高效</p>
+<p>拥塞控制及慢启动</p>
+<p>简单的说，就是TCP传输过程中，为了避免一下子将网络冲爆，引入的机制。而慢启动，顾名思义，一开始慢慢传，发现没有问题，再增加传输速度。而一旦发现传输有超时，协议会认为网络拥堵，又降低传输速度。<br>起始的传输速度，就是由初始拥塞窗口，initial congestion window，简称initcwnd参数控制的</p>
 <h5 id="关键字-路由协议"><a href="#关键字-路由协议" class="headerlink" title="关键字: 路由协议"></a>关键字: 路由协议</h5><p>路由算法: 距离向量算法, 链路状态算法</p>
 <p>主要路由协议: RIP(base on UDP), RIP2(base on UDP), OSPFbase on IP), EGP(base on IP), BGP(base on TCP)</p>
 
@@ -519,7 +529,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjiohwzz0001bz7s6cv0fza10" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjj3pj0ys001b9ps60273ta7l" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -617,7 +627,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjiohwzzj002mz7s6vb67u0k0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjj3pj0ze002q9ps687ydlrru" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -744,7 +754,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjiohwzya0007z7s613sxo02n" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjj3pj0y600079ps693v6nf2t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -932,7 +942,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjiohwzzc0027z7s6qzx1jvcf" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjj3pj0z1001v9ps6a3l6m345" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1148,7 +1158,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjiohwzz8001xz7s6cxpxpdsn" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjj3pj0z2001y9ps613fbndnw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1389,7 +1399,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjiohwzz6001sz7s6dqvya4q0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjj3pj0yz001q9ps6pd12lgbc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1573,7 +1583,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjiohwzz4001nz7s6ysltj026" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjj3pj0yy001o9ps6s3hlurtd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1769,7 +1779,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjiohwzz2001gz7s6mmvv6xng" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjj3pj0yv001j9ps6d37bi79h" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2007,7 +2017,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjiohwzz3001lz7s6gzp4oh7n" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjj3pj0yu001g9ps6mpvhd7jv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
