@@ -13,10 +13,12 @@
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="Q：Transient 作用 A：1）一旦变量被transient修饰，变量将不再是对象持久化的一部分，该变量内容在序列化后无法获得访问 2）transient关键字只能修饰变量，而不能修饰方法和类。注意，本地变量是不能被transient关键字修饰的。变量如果是用户自定义类变量，则该类需要实现Serializable接口 3）一个静态变量不管是否被transient修饰，均不能被序列化 4）若实">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-05-23T10:50:54.157Z">
+<meta property="og:image" content="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/线程状态.png">
+<meta property="og:updated_time" content="2018-07-03T05:20:57.332Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基础知识-Java 语法">
 <meta name="twitter:description" content="Q：Transient 作用 A：1）一旦变量被transient修饰，变量将不再是对象持久化的一部分，该变量内容在序列化后无法获得访问 2）transient关键字只能修饰变量，而不能修饰方法和类。注意，本地变量是不能被transient关键字修饰的。变量如果是用户自定义类变量，则该类需要实现Serializable接口 3）一个静态变量不管是否被transient修饰，均不能被序列化 4）若实">
+<meta name="twitter:image" content="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/线程状态.png">
     
 
     
@@ -241,6 +243,7 @@
 <p>1） 并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时；并发：通过cpu调度算法，让用户看上去同时执行，实际上从cpu操作层面不是真正的同时</p>
 <p>2）线程安全：代码在多线程中使用，线程的调度顺序不影响结果</p>
 <p>3）线程状态：NEW，RUNNABLE，WAITING，BLOCKED，TERMINATED，TIMED_WAITING</p>
+<img src="/2017/12/11/基础知识-Java语法/线程状态.png" title="状态流转图">
 <p>4）sleep 和 wait 区别：前者不会释放锁，后者会</p>
 <p>5）三种线程实现方式：Thread，Runnable，Callable（Future），后者可以返回线程执行结果</p>
 <p>6）容器类：BlockingQueue、ConcurrentHashMap</p>
@@ -258,7 +261,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjj3pj0ym00119ps67rxrgye6" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjj58whue0012mhs66yjbs7ai" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
