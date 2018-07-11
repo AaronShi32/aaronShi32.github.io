@@ -140,7 +140,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                45
+                47
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -175,6 +175,295 @@
 
             
             <section id="main">
+    <article id="post-Java分布式服务框架" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/07/06/Java分布式服务框架/">Java分布式服务框架</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/07/06/Java分布式服务框架/">
+            <time datetime="2018-07-06T07:13:28.000Z" itemprop="datePublished">2018-07-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h5 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h5><p>业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为)</p>
+<p>分布式服务框架包括: <strong>RPC组件</strong>, 配置化服务<strong>发布</strong>, 基于服务<strong>注册中心</strong>的订阅和发布, <strong>服务治理</strong></p>
+<h5 id="RPC-组件-通信框架-编码-协议栈"><a href="#RPC-组件-通信框架-编码-协议栈" class="headerlink" title="RPC 组件: 通信框架, 编码, 协议栈"></a>RPC 组件: 通信框架, 编码, 协议栈</h5><p>涉及到的技术: Socket 通信, 多线程, 协议栈 -&gt; Netty</p>
+<p>关键字: 长连接, NIO(多路复用)</p>
+<p>epoll 没有最大连接句柄 1024/2048 的限制, 意味着只需要一个线程负责 Selector 的轮询, 就可以接入成千上万的客户端</p>
+<p>可靠性设计靠心跳来实现: TCP 层面的心跳检测(Keep-Alive), 协议层的心跳检测, 应用层的心跳检测</p>
+<p>Netty 的心跳检测实际上利用了链路空闲检测机制实现的, 默认为读写空闲(链路持续时间 t 没有接受或者发送消息)</p>
+<p>Netty 的 EventLoopGroup 线程组会默认创建 CPU Core * 2 个线程, 使用的时候一定要评估线程数指定, 最好不要使用默认, 或者创建一个数组, 按照 Hash 复用 EventLoopGroup</p>
+<h5 id="服务组件-路由"><a href="#服务组件-路由" class="headerlink" title="服务组件: 路由"></a>服务组件: 路由</h5><p>基于服务注册中心(例如: Zookeeper)的订阅发布机制, 消费者可通过主动查询和被动通知的方式获取服务提供者的地址, 消费者本地也缓存服务地址列表, 当注册中心挂掉时, 仍可向服务发起通信</p>
+<p>消费者访问服务的负载均衡: 随机, 轮循, 服务调用延时(消费者缓存服务调用延时, 计算权重, 让延时高的服务接收更少的消息), 一致性哈希</p>
+<p>本地路由优先策略: injvm(本地 JVM 中), innative(相同物理机或者VM)</p>
+<p>一致性哈希: 希望在增删节点(集群)的时候，让尽可能多的数据不失效, 精华:每个实际节点的N个虚拟节点尽量随机分布在整数环上,增加cache节点时,就能尽量保证移动到新cache节点的key来自于不同的cache节点, 从而保证负载均衡, 即 hash(key) -&gt; 虚拟节点 -&gt; 真实节点</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjjgl2qqz0008ihs633udzi72" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Java并发编程实践" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/07/04/Java并发编程实践/">Java并发编程实践</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/07/04/Java并发编程实践/">
+            <time datetime="2018-07-04T05:36:08.000Z" itemprop="datePublished">2018-07-04</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h3><p>线程安全定义: 不管运行时线程采取何种调度方式, 代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的</p>
+<p>同步机制: 关键字 synchronized, volatile 变量, 显示锁, 原子变量</p>
+<p>两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可见性)</p>
+<p>synchronized 是可重入的, 否则下面这段代码将会死锁</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SyncMain</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        LongWidget w = <span class="keyword">new</span> LongWidget();</span><br><span class="line">        w.work();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">work</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"super is working..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LongWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">work</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"sub is working..."</span>);</span><br><span class="line">        <span class="keyword">super</span>.work();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>volatile 的实现原理: 不会将该变量上的操作重排序, 也不会放入缓存寄存器中</p>
+<p>同步机制可确保原子性和可见性, volatile 只能保证可见性(++count 无法保证原子性)</p>
+<p>线程封闭: 将访问的共享可变数据限制在单线程之内, 就不需要同步, ThreadLocal</p>
+<p><strong>想要做到线程安全: 同步保证原子性操作, 轻量 Volatile 保证可见性, 不变的对象一定是线程安全的(final)</strong></p>
+<h3 id="构建线程安全类"><a href="#构建线程安全类" class="headerlink" title="构建线程安全类"></a>构建线程安全类</h3><p>同步容器: Vector 和 HashTable, 方法级加锁(synchronized), 并发效率低</p>
+<p>并发容器: ConcurrentHashMap, ConcurrentLinkedQueue, CopyOnWriteArrayList 等, 灵活加锁, 并发效率高</p>
+<p>阻塞队列实现生产者-消费者: BlockingQueue 的实现有 LinkedBlockingQueue 和 ArrayBlockingQueue 都是 FIFO 队列, PriorityBlockingQueue 是优先级队列, 其中 put 和 take 方法是阻塞, offer 和 poll 是非阻塞, 对于无边界的队列而言永远不会阻塞</p>
+<p>同步工具类: 信号量(Semaphore), 栅栏(Barrier, 调用 await 的线程会中断, 直到等于 partion 时再开始执行), 闭锁(Latch, 调用 await 的线程会中断, 直到 countDown 为 0 被唤醒)</p>
+<p>区别性: 闭锁是一次性的, 不能反复使用, 栅栏可以多次使用; 闭锁用于等待事件，而栅栏用于等待其他线程</p>
+<p>工作密取: 消费者各自拥有一个双端队列 Deque, 如果一个消费者完成了自己双端队列中的全部工作，那么他就可以从其他消费者的双端队列末尾秘密的获取工作。具有更好的可伸缩性, 使用场景为网络爬虫</p>
+<p>CopyOnWrite 容器适用于读多写少的并发场景, set 方法加锁, get 方法不加锁, set 方法是 copy 一份新的内容, 修改, 再讲原引用指向新的, 这篇文章一目了然: <a href="https://www.cnblogs.com/dolphin0520/p/3938914.html" target="_blank" rel="noopener">https://www.cnblogs.com/dolphin0520/p/3938914.html</a></p>
+<h3 id="结构化并发程序"><a href="#结构化并发程序" class="headerlink" title="结构化并发程序"></a>结构化并发程序</h3><p>无限制创建线程的不足: 线程生命周期开销非常高, 资源消耗大, 稳定性低</p>
+<p>Executor 线程池框架, 抽象了执行任务的主要对象不是 Thread, 而是 Executor, 其实现了对生命周期的支持(ExecutorService), 以及统计信息收集, 应用程序管理机制和性能监控等机制, Executor 基于生产者 - 消费者模式</p>
+<p>Executors 是线程池的工厂类, 本质上是初始化 ThreadPoolExecutor, 实际开发的时候应该避免使用工厂类</p>
+<p>ExecutorService 封装了线程生命周期接口</p>
+<h3 id="线程中断-取消-关闭"><a href="#线程中断-取消-关闭" class="headerlink" title="线程中断, 取消, 关闭"></a>线程中断, 取消, 关闭</h3><p>调用 interrput 并不意味着立即停止目标线程正在进行的工作, 而只是传递了请求中断的消息, 通常, 中断是实现取消的最合理方式</p>
+<p>通过 Future 和 Executor 框架可以构建可取消的任务</p>
+<p>ExecutorService 提供了正常关闭 shutdown() 和 立刻关闭 shutdownNow()两种方法, 正常关闭速度慢但线程安全, 它会等到队列中所有任务都执行完成后才关闭</p>
+<p>还可以通过 JVM 钩子关闭线程, 但是极度不推荐, 线程可分为两种: 普通线程和守护线程 </p>
+<p>使用 newTaskFor 钩子函数来改进用来封装非标准取消的方法。这是 ThreadPoolExecutor 的新特性, 当提交一个 callable 给 ExecutorService 时，submit 返回一个 Future，可以用 Future 来取消任务。</p>
+<p>newTaskFor 钩子是一个工厂方法，创建一个 Future 来代表任务，这个 Future 属于由 FutureTask 实现的 RunnableFuture 接口，这个接口可以自定义 cancel 方法，实现自定义的取消方式</p>
+<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>计算密集型: 线程池大小为: Ncpu + 1, I/O 密集型: 线程池大小为: 2 * Ncpu</p>
+<p>对于 Executor, newCachedThreadPool 工厂方法是一种很好的默认选择, 它能提供比固定大小的线程池更好的排队性能。当需要限制当前任务的数量以满足资源管理需求时, 那么可以选择固定大小的线程池, 就像在接受网络客户请求的服务器应用程序中, 如果不进行限制, 那么肯容易发生过载问题</p>
+<p>只有当任务相互独立时, 为线程池或者工作队列设置界限才是合理的, 如果任务之间存在依赖性, 那么有界的线程池或队列就可能导致线程 “饥饿” 死锁问题</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjjgl2qr0000aihs6g4pujofi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-基础知识-MySQL" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -316,7 +605,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjj58whug0016mhs6a7mv6plc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjjgl2qrh001aihs6ycv6yax7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -529,7 +818,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjj58whuj0019mhs6l7wxuol8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjjgl2qrj001fihs68y6mu78b" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -609,6 +898,36 @@
     <div class="article-inner">
         
         
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/05/23/面试基础问题/">面试基础问题</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/05/23/面试基础问题/">
+            <time datetime="2018-05-23T10:47:41.000Z" itemprop="datePublished">2018-05-23</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/总结/">总结</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
         
         <div class="article-entry" itemprop="articleBody">
         
@@ -627,7 +946,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjj58whv8002smhs6bgoa045k" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjjgl2qs3002nihs6qufwa4kg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -754,7 +1073,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjj58whu00007mhs6xah2ocn0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjjgl2qqw0007ihs6on07ycqh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -942,7 +1261,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjj58whuy0028mhs685lwkp6g" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjjgl2qrs0024ihs694g3g3z8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1158,7 +1477,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjj58whut001vmhs6wjfu4xyk" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjjgl2qrr0021ihs6lzmemqld" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1399,7 +1718,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjj58whus001tmhs6bk2abjzu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjjgl2qrq001wihs64t81nmgc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1583,441 +1902,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjj58whuq001omhs6z2alo8y8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-Redis 多机数据库的实现" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/05/读书笔记-Redis 多机数据库的实现/">读书笔记-Redis 多机数据库的实现</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/05/读书笔记-Redis 多机数据库的实现/">
-            <time datetime="2018-04-05T09:56:15.000Z" itemprop="datePublished">2018-04-05</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="Redis：多机数据库的实现"><a href="#Redis：多机数据库的实现" class="headerlink" title="Redis：多机数据库的实现"></a>Redis：多机数据库的实现</h3><h5 id="1-复制"><a href="#1-复制" class="headerlink" title="1. 复制"></a>1. 复制</h5><h5 id="1-1-旧版本复制功能的实现-2-8版本以前"><a href="#1-1-旧版本复制功能的实现-2-8版本以前" class="headerlink" title="1.1 旧版本复制功能的实现(2.8版本以前)"></a>1.1 旧版本复制功能的实现(2.8版本以前)</h5><p>复制功能分为 同步(sync) 和 命令传播(command propagate) 两个操作</p>
-<img src="/2018/04/05/读书笔记-Redis%20多机数据库的实现/redis-copy.png" title="复制操作流程图"> 
-<p>SYNC 命令是一个非常耗费资源的操作, 生成 RDB 占据了大量的 CPU, 内存和磁盘 I/O 资源, 传输 RDB 占据了大量的网络资源, 接收并载入 RDB 会导致阻塞, 而旧版本的复制无法高效的完成: <strong>断线重复制的情况</strong>, 即从服务器断线后的一致性保证, 哪怕只有几秒的短线, 只能通过 SYNC 来保证</p>
-<h5 id="1-2-新版本复制功能的实现-2-8版本以后"><a href="#1-2-新版本复制功能的实现-2-8版本以后" class="headerlink" title="1.2 新版本复制功能的实现(2.8版本以后)"></a>1.2 新版本复制功能的实现(2.8版本以后)</h5><p>PSYNC 命令, 具备完整重同步(适用于初次复制的情况) 和 部分重同步(适用于断线重复制)</p>
-<p>部分重同步功能由以下三个部分构成:</p>
-<ol>
-<li><p>主服务器的复制偏移量(replication offset) 和 从服务器的复制偏移量</p>
-</li>
-<li><p>主服务器的复制积压缓冲区(replication backlog)</p>
-</li>
-<li><p>服务器的运行 ID(run ID)</p>
-</li>
-</ol>
-<p>通过对比主从服务器的复制偏移量, 程序可以很容易的指导主从服务器是否处于一致状态</p>
-<p>复制积压缓冲区是一个固定长度的FIFO队列, 保存着主服务器的写命令, 如果它里面操作的复制偏移量小于主从不一致的偏移量, 则完整重同步, 反之大于, 则部分重同步, 这个复制积压缓冲区的大小可以配置, 约等于: </p>
-<blockquote>
-<p>service_reready_seconds <em> write_size_per_second  服务平均恢复时长 </em> 每秒写命令产生的数据大小</p>
-</blockquote>
-<p>服务器的运行ID是检测 从服务器前后是否连接的是相同的主服务器, 若是的话则部分重同步, 若不是只能完整重同步</p>
-<ul>
-<li><p>在复制操作刚开始的时候, 从服务器会成为主服务器的客户端, 并通过向主服务器发送命令请求来执行复制操作, 而在复制操作的后期, 主从服务器会相互成为对方的客户端, 涵盖了: 设置主服务器的地址和端口/建立套接字连接/发送PING命令/身份验证/发送端口信息/同步/命令传播 等操作</p>
-</li>
-<li><p>主服务器通过向从服务器传播命令来更新从服务器的状态, 保持主从服务器一致, 而从服务器则通过向主服务器发送命令来进行心跳检测, 以及命令丢失检测(偏移量校验)</p>
-</li>
-</ul>
-<h5 id="2-Sentinel"><a href="#2-Sentinel" class="headerlink" title="2. Sentinel"></a>2. Sentinel</h5><p>Sentinel 是 Redis 高可用性的解决方案: 由一个或多个 Sentinel 实例组成的 Sentinel 系统, 监视着 Redis 的主从服务器, <strong>当发现主服务器下线了, 会从从服务器中选择一个当主服务器, 并继续监控下线的主服务器, 一旦恢复上线, 会设置为新的主服务器的从服务器</strong></p>
-<p>启动一个 Sentinel 命令如下:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-sentinel /path/to/your/sentinel.conf</span><br><span class="line">or</span><br><span class="line">redis-server /path/to/your/sentinel.conf --sentinel</span><br></pre></td></tr></table></figure>
-<p>配置项:</p>
-<p>down-after-milliseconds 选项指定了 Sentinel 判断实例进入主观下线所需要的时间长度, 多个 Sentinel 监视同一个主服务器的标准是不同的</p>
-<p>主观下线靠 PING 返回无效命令的累计时长, 客观下线靠询问其他 Sentinel 状态</p>
-<p>选择 Sentinel 领头羊的算法为: <a href="https://www.cnblogs.com/mindwind/p/5231986.html" target="_blank" rel="noopener">Raft</a></p>
-<ul>
-<li><p>Sentinel 只是一个运行在特殊模式下的 Redis 服务器, 它使用了和普通模式不同的命令表, 所以 Sentinel 模式能够使用的命令和普通 Redis 服务器能够使用的命令不同</p>
-</li>
-<li><p>Sentinel 会读入用户指定的配置文件, 为每个要被监视的主服务器创建相应的实例结构, 并创建连向主服务器的命令连接和订阅连接, 其中命令连接用于向主服务器发送命令请求, 而订阅连接则用于接收指定频道的消息</p>
-</li>
-<li><p>Sentinel 通过向主服务器发送 INFO 命令来获得主服务器属下所有从服务器的地址信息, 并为这些从服务器创建相应的实例结构, 以及连向这些从服务器的命令连接和订阅连接</p>
-</li>
-<li><p>在一般情况下, Sentinel 以每十秒一次的频率向被监视的主服务器和从服务器发送 INFO 命令, 当主服务器处于下线状态, 或者 Sentinel 正在对主服务器进行故障转移操作时, Sentinel 向从服务器发送 INFO 命令的频率会改为每秒一次</p>
-</li>
-<li><p>对于监视同一个主服务器和从服务器的多个 Sentinel 来说, 它们会以每两秒一次的频率, 通过向被监视服务器的 <em>sentinel</em>:hello 频道发送消息来向其他 Sentinel 宣告自己的存在</p>
-</li>
-<li><p>每个 Sentinel 也会从 <em>sentinel</em>:hello 频道中接收其他 Sentinel 发来的信息, 并根据这些信息为其他 Sentinel 创建相应的实例结构, 以及命令连接</p>
-</li>
-<li><p>Sentinel 只会与主服务器和从服务器创建命令连接和订阅连接, Sentinel 之间只创建命令连接</p>
-</li>
-<li><p>Sentinel 以每秒一次的频率向实例(包括主服务器、从服务器、其他 Sentinel)发送 PING 命令, 并根据实例对 PING 命令的恢复来判断实例是否在线, 当一个实例在指定的时长中连续向 Sentinel 发送无效的回复时, Sentinel 会将这个实例判断为主观下线</p>
-</li>
-<li><p>当 Sentinel 将一个主服务器判断为主观下线时, 它会向同样监视这个主服务器的其他 Sentinel进行询问, 看他们是否同意这个主服务器已经进入主观下线状态</p>
-</li>
-<li><p>当 Sentinel 收集到足够多的主观下线投票时, 它会将主服务器判断为客观下线, 并发起一次针对主服务器的故障转移操作</p>
-</li>
-</ul>
-<h5 id="3-集群"><a href="#3-集群" class="headerlink" title="3. 集群"></a>3. 集群</h5><ul>
-<li><p>节点通过握手来将其他节点添加到自己所处的集群当中</p>
-</li>
-<li><p>集群中的 16384 个槽截图分别指派给集群中的各个节点, 每个节点都会记录哪些槽指派给了自己, 而哪些槽又被指派给了其他节点</p>
-</li>
-<li><p>节点在接到一个命令请求时, 会先检查这个命令请求要处理的键所在的槽是否由自己负责, 如果不是的话, 节点将向客户端返回一个 MOVED 错误, MOVED 错误携带的信息可以指引客户端转向至正在负责相关槽的节点</p>
-</li>
-<li><p>对 Redis 集群的重新分片工作是由 redis-trib 负责执行的, 重新分片的关键是将属于某个槽的所有键值对从一个节点转移至另一个节点</p>
-</li>
-<li><p>如果节点 A 正在迁移槽 i 至节点 B, 那么当节点 A 没能在自己的数据库中找到命令指定的数据库键时, 节点 A 回向客户端返回一个 ASK 错误, 指引客户端到节点 B 继续查找指定的数据库键</p>
-</li>
-<li><p>MOVED 错误表示槽的负责权已经从一个节点转移到了另一个节点, 而 ASK 错误只是两个节点在迁移槽的过程中使用的一种临时措施</p>
-</li>
-<li><p>集群里的从节点用于复制主节点, 并在主节点下线时, 代替主节点继续处理命令请求</p>
-</li>
-<li><p>集群中的节点通过发送和接收消息来进行通信, 常见的消息包括: MEET, PING, PONG, PUBLISH, FAIL 五种</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjj58whuo001jmhs6axuv4ck9" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-读书笔记-Redis 单机数据库的实现" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">读书笔记-Redis 单机数据库的实现</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">
-            <time datetime="2018-04-02T05:55:51.000Z" itemprop="datePublished">2018-04-02</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="Redis：单机数据库的实现"><a href="#Redis：单机数据库的实现" class="headerlink" title="Redis：单机数据库的实现"></a>Redis：单机数据库的实现</h3><h5 id="1-数据库"><a href="#1-数据库" class="headerlink" title="1. 数据库"></a>1. 数据库</h5><p>通过 SELECT num 命令可以切换客户端使用的数据库, 即让客户端 db 指针指向服务端的某个 db 元素</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个数组, 保存着服务器中的所有数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器的数据库数量: 默认16个</span></span><br><span class="line">	<span class="keyword">int</span> dbnum;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// AOF 缓冲区: 记录写操作</span></span><br><span class="line">	sds aof_buf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// AOF 重写缓冲区: 记录在 AOF 重写机制期间的所有写操作, 用于完成数据一致性</span></span><br><span class="line">	sds aof_rewrite_buf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 一个链表, 保存了所有客户端状态</span></span><br><span class="line">	<span class="built_in">list</span> *clients;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisClient</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 记录客户端当前正在使用的数据库</span></span><br><span class="line">	redisDb *db;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 输入缓冲区: 用于保存客户端发送的命令请求</span></span><br><span class="line">	sds querybuf;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 命令的实现函数</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">redisCommand</span> *<span class="title">cmd</span>;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Redis 是一个键值对(key-value pair)数据库服务器, 服务器中的每个数据库都由一个 redisDb 结构表示</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisDb</span> &#123;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 数据库键空间, 保存着数据库中的所有键值对</span></span><br><span class="line">	dict *dict;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 过期字典, 保存着键的过期时间, EXPIRE 实际上是操作该键值</span></span><br><span class="line">	dict *expires;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>主要由 dict 和 expires 两个字典构成, 其中 dict 字典负责保存键值对, 而 expires 字典则负责保存键的过期时间</p>
-<p>dict 内容是 &lt; StringObject - 对象 &gt; 的键值对, 当使用 Redis 命令对数据库进行读写时, 服务器不仅会对键空间执行指定的读写操作, 还会执行一些额外的维护操作, 其中包括:</p>
-<ol>
-<li><p>在读取一个键之后, 服务器会根据键是否存在来更新服务器的键空间命中(hit)次数或不命中(miss)次数, 这两个值可以在 INFO stats 命令的 keyspace_hits 属性和 keyspace_misses 属性中查看</p>
-</li>
-<li><p>在读取一个键之后, 服务器会更新键的 LRU 时间, 用于计算键的闲置时间, 使用 OBJECT idletime <key> 命令可以查看 key 的闲置时间</key></p>
-</li>
-<li><p>如果服务器在读取一个键时发现该键已经过期, 那么服务器会先删除这个过期键, 然后才执行余下的其他操作</p>
-</li>
-<li><p>如果有客户端使用 WATCH 命令监视了某个键, 那么服务器在对被监视的键进行修改之后, 会将这个键标记为 dirty, 从而让事务程序注意到这个键已经被修改过</p>
-</li>
-<li><p>服务器每次修改一个件之后, 都会对脏键计数器的值增 1, 这个计数器会触发服务器的持久化以及复制操作</p>
-</li>
-<li><p>如果服务器开启了数据库通知功能, 那么在对键进行修改之后, 服务器将按配置发送相应的数据库通知</p>
-</li>
-</ol>
-<p>当键过期时, Redis 提供了三种删除策略</p>
-<ol>
-<li><p>(主动)定时删除: 在设置键的过期时间的同时, 创建一个定时器(timer), 让定时器在键的过期时间来临时, 立即执行对键的删除操作, 省内存, 费CPU</p>
-</li>
-<li><p>(Redis使用)(被动)惰性删除: 放任键过期不管, 当获取的时候, 过期就删除, 未过期就返回, 省CPU, 费内存(expireIfNeeded)</p>
-</li>
-<li><p>(Redis使用)(主动)定期删除: 每隔一段时间, 程序就对数据库进行一次检查, 删除里面的过期键(算法), 折中(serverCron - activeExpireCycle)</p>
-</li>
-</ol>
-<p><strong> AOF 和 RDB 是如何删除过期键的 </strong></p>
-<ol>
-<li><p>执行 SAVE 命令或者 BGSAVE 命令所产生的新 RDB 文件不会包含已经过期的键</p>
-</li>
-<li><p>执行 BGREWRITEAOF 命令所产生的重写 AOF 文件不会包含已经过期的键</p>
-</li>
-<li><p>当一个过期键被删除之后, 服务器会追加一条 DEL 命令到现有 AOF 文件的末尾, 显式的删除过期键</p>
-</li>
-<li><p>当主服务器删除一个过期键之后, 它会向所有从服务器发送一条 DEL 命令, 显式的删除过期键</p>
-</li>
-<li><p>从服务器即使发现过期键也不会自作主张的删除它, 而是等待主节点发来 DEL 命令, 从而保证主从服务器数据一致性</p>
-</li>
-</ol>
-<h5 id="2-RDB-持久化"><a href="#2-RDB-持久化" class="headerlink" title="2. RDB 持久化"></a>2. RDB 持久化</h5><p>RDB 持久化操作, 即执行 SAVE/BGSAVE 命令, 是由配置文件中的 save 选项生效的, 由周期性操作函数 serverCron 每个 100ms 检查是否满足持久化条件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// default</span><br><span class="line">save 900 1     900秒内对数据库至少1次修改</span><br><span class="line">save 300 10    300秒内对数据库至少10次修改</span><br><span class="line">save 60 10000  60秒内对数据库至少10000次修改</span><br></pre></td></tr></table></figure>
-<img src="/2018/04/02/读书笔记-Redis%20单机数据库的实现/RDB.png" title="RDB 文件结构">
-<p>使用 od 命令工具可以查看 RDB 内容</p>
-<ul>
-<li><p>SAVE 命令由服务器进程直接执行保存操作, 会阻塞服务器</p>
-</li>
-<li><p>BGSAVE 命令由子进行执行保存操作, 不会阻塞服务器执行, 但是会拒绝再次服务器进行再次接收的 SAVE, BGSAVE, BGREWRITEAOF 命令防止竞争</p>
-</li>
-<li><p>服务器状态中会保存所有用 save 选项设置的保存条件, 当任意一个保存条件被满足时, 服务器会自动执行 BGSAVE 命令</p>
-</li>
-<li><p>RDB 是一个经过压缩的二进制文件, 有多个部分组成</p>
-</li>
-<li><p>对于不同类型的键值对, RDB 文件会使用不同的方式来保存它们</p>
-</li>
-</ul>
-<h5 id="3-AOF-持久化"><a href="#3-AOF-持久化" class="headerlink" title="3. AOF 持久化"></a>3. AOF 持久化</h5><ol>
-<li><p>AOF 持久化是通过保存 Redis 服务器所执行的写命令(SET、SADD、RPUSH)来记录数据库状态的, 这个保存的过程是由 serverCron 函数中的 flushAppendOnlyFile 来完成的, 也是由配置文件中的 appendfsync 选项来设置的</p>
-</li>
-<li><p>随着服务器时间的运行, AOF 中记录的写操作越来越多, 文件体积也越来越大, 使用 AOF 文件来进行数据还原所需的时间也就越多, 因此 AOF 文件重写机制: 通过读取服务器当前的数据库状态, 然后用一条命令去记录键值对, 代替之前记录这个键值对的多条命令 </p>
-</li>
-<li><p>AOF 重写机制采用后台子进程的方式来实现, 虽然不阻塞服务器继续处理命令请求, 但随之而来带来了数据同步不一致的问题, 因此 Redis 服务器设置了一个 AOF 重写缓存区, 每次子进程重写完成时, 服务器进程将 AOF 缓冲区的记录追加到新的 AOF 文件末尾, 这也是 BGREWRITEAOF 命令的实现原理</p>
-</li>
-</ol>
-<h5 id="4-事件"><a href="#4-事件" class="headerlink" title="4. 事件"></a>4. 事件</h5><ul>
-<li><p>Redis 服务器是一个事件驱动程序, 服务器处理的事件分为时间事件和文件事件两类</p>
-</li>
-<li><p>文件事件处理器是基于 Reactor 模式实现的网络通信程序</p>
-</li>
-<li><p>文件事件是对套接字操作的抽象: 每次套接字变为可应答(acceptable), 可写(writable)或者可读(readable)时, 相应的文件事件就会产生</p>
-</li>
-<li><p>文件事件分为 AE_READABLE 和 AE_WRITABLE 两类事件</p>
-</li>
-<li><p>时间事件分为定时事件和周期性事件</p>
-</li>
-<li><p>服务器一般情况下只执行 serverCron 函数的一个时间事件, 并且这个事件是周期性事件</p>
-</li>
-<li><p>时间事件的实际处理时间通常比设定的到达时间晚一些</p>
-</li>
-</ul>
-<h5 id="5-客户端"><a href="#5-客户端" class="headerlink" title="5. 客户端"></a>5. 客户端</h5><p>通过使用由 I/O 多路复用技术实现的文件处理器, Redis 服务器使用单线程单进程的方式来处理命令请求, 并与多个客户端进行网络通信</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; CLIENT list</span><br><span class="line">id=5 addr=127.0.0.1:58793 fd=8 name= age=0 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=client</span><br></pre></td></tr></table></figure>
-<p>通过客户端的标志属性 flags 可以查明客户端的角色, 以及目前客户端所处的状态, 例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 客户端是一个主服务器</span><br><span class="line">REDIS_MASTER</span><br><span class="line"># 客户端正在被列表命令阻塞</span><br><span class="line">REDIS_BLOCKED</span><br><span class="line"># 客户端正在执行事务, 但事务的安全性已被破坏</span><br><span class="line">REDIS_MULTI | REDIS_DIRTY_CAS</span><br><span class="line"># 客户端是一个从服务器, 并且版本低于 Redis 2.8</span><br><span class="line">REDIS_SLAVE | REDIS_PRE_PSYNC</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>服务器状态结构使用 clients 链表连接多个客户端状态, 新添加的客户端状态会被放到链表的末尾</p>
-</li>
-<li><p>客户端状态的 flags 属性使用不同标志来表示客户端的角色, 以及客户端当前所处的状态</p>
-</li>
-<li><p>输入缓冲区记录了客户端发送的命令请求, 这个缓冲区的大小不能超过 1GB</p>
-</li>
-<li><p>命令参数和参数个数会被记录在客户端状态的 argv 和 argc 属性里面, 而 cmd 属性则记录对了客户端要执行命令是实现函数</p>
-</li>
-<li><p>客户端有固定大小缓冲区和可变大小缓冲区两种缓冲区可用, 其中固定大小缓冲区的最大大小为 16KB, 而可变大小缓冲区的最大大小不能超过服务器设置的硬性限制</p>
-</li>
-<li><p>输出缓冲区限制值有两种, 如果输出缓冲区的大小超过了服务器设置的硬性限制, 那么客户端会被立即关闭; 除此之外, 如果客户端在一定时间内, 一直超过服务器设置的软性限制, 那么客户端也会被关闭</p>
-</li>
-<li><p>当一个客户端通过网络连接上服务器时, 服务器会为这个客户端创建相应的客户端状态, 网络连接关闭、发送了不合协议格式的命令请求、成为 CLIENT KILL 命令的目标、空转时间超时、输出缓冲区的大小超出限制, 以上这些原因都会造客户端被关闭</p>
-</li>
-<li><p>处理 LUA 脚本的伪客户端在服务器初始化时创建, 这个客户端会一直存在, 直到服务器关闭</p>
-</li>
-<li><p>载入 AOF 文件时使用的伪客户端在载入工作开始时动态创建, 载入工作完毕之后关闭</p>
-</li>
-</ul>
-<h5 id="6-服务器"><a href="#6-服务器" class="headerlink" title="6. 服务器"></a>6. 服务器</h5><ul>
-<li><p>一个命令请求从发送到完成主要包括以下几个步骤: 1) 客户端将命令请求发送给服务器; 2) 服务器读取命令请求; 3） 命令执行器根据参数查找命令的实现函数; 4) 服务器将命令回复给客户端</p>
-</li>
-<li><p>serverCron 函数默认每隔 100ms 执行一次, 它的主要工作包括更新服务器状态信息, 处理服务器接收的 SIGTERM 信号, 管理客户端资源和数据库状态, 检查并执行持久化操作</p>
-</li>
-<li><p>服务器从启动到能够处理客户端的命令请求需要执行以下步骤: 1) 初始化服务器状态; 2) 载入服务器配置; 3) 初始化服务器数据结构; 4) 还原数据库状态; 5) 执行事件循环</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjj58whum001gmhs6h043pacp" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjjgl2qrp001uihs6ot9rl9b4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -2106,7 +1991,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -2115,7 +2000,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">30</span></li></ul>
         </div>
     </div>
 

@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>读书笔记-程序员的自我修养（八） | 着陆的橘子</title>
+    <title>Java分布式服务框架 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Windows 下的动态链接 普及：Windows 下的 DLL 文件和 EXE 文件实际上是一个概念，都是 PE 格式 的二进制文件，扩展名并不唯一：.dll 和 .ocx 或是 .cpl 都是 dll 文件，软件更新包（Service  Packs）机制就是通过升级 DLL 的形式进行自我完善  普及：当一个 dll 被装载到内存中之后，通常有两个地址概念分别是：基地址（Base Addres">
+    <meta name="description" content="简述业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为) 分布式服务框架包括: RPC组件, 配置化服务发布, 基于服务注册中心的订阅和发布, 服务治理 RPC 组件: 通信框架, 编码, 协议栈涉及到的技术: Socket 通信, 多">
 <meta name="keywords" content="读书">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读书笔记-程序员的自我修养（八）">
-<meta property="og:url" content="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/index.html">
+<meta property="og:title" content="Java分布式服务框架">
+<meta property="og:url" content="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="Windows 下的动态链接 普及：Windows 下的 DLL 文件和 EXE 文件实际上是一个概念，都是 PE 格式 的二进制文件，扩展名并不唯一：.dll 和 .ocx 或是 .cpl 都是 dll 文件，软件更新包（Service  Packs）机制就是通过升级 DLL 的形式进行自我完善  普及：当一个 dll 被装载到内存中之后，通常有两个地址概念分别是：基地址（Base Addres">
+<meta property="og:description" content="简述业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为) 分布式服务框架包括: RPC组件, 配置化服务发布, 基于服务注册中心的订阅和发布, 服务治理 RPC 组件: 通信框架, 编码, 协议栈涉及到的技术: Socket 通信, 多">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-06-14T02:46:54.000Z">
+<meta property="og:updated_time" content="2018-07-09T05:47:56.662Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读书笔记-程序员的自我修养（八）">
-<meta name="twitter:description" content="Windows 下的动态链接 普及：Windows 下的 DLL 文件和 EXE 文件实际上是一个概念，都是 PE 格式 的二进制文件，扩展名并不唯一：.dll 和 .ocx 或是 .cpl 都是 dll 文件，软件更新包（Service  Packs）机制就是通过升级 DLL 的形式进行自我完善  普及：当一个 dll 被装载到内存中之后，通常有两个地址概念分别是：基地址（Base Addres">
+<meta name="twitter:title" content="Java分布式服务框架">
+<meta name="twitter:description" content="简述业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为) 分布式服务框架包括: RPC组件, 配置化服务发布, 基于服务注册中心的订阅和发布, 服务治理 RPC 组件: 通信框架, 编码, 协议栈涉及到的技术: Socket 通信, 多">
     
 
     
@@ -179,7 +179,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-读书笔记-程序员的自我修养（八）" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-Java分布式服务框架" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -187,7 +187,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            读书笔记-程序员的自我修养（八）
+            Java分布式服务框架
         </h1>
     
 
@@ -196,8 +196,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/06/14/读书笔记-程序员的自我修养（八）/">
-            <time datetime="2017-06-14T02:45:07.000Z" itemprop="datePublished">2017-06-14</time>
+        <a href="/2018/07/06/Java分布式服务框架/">
+            <time datetime="2018-07-06T07:13:28.000Z" itemprop="datePublished">2018-07-06</time>
         </a>
     </div>
 
@@ -217,63 +217,18 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h2 id="Windows-下的动态链接"><a href="#Windows-下的动态链接" class="headerlink" title="Windows 下的动态链接"></a>Windows 下的动态链接</h2><ul>
-<li><p><strong>普及</strong>：Windows 下的 DLL 文件和 EXE 文件实际上是一个概念，都是 <strong>PE 格式</strong> 的二进制文件，扩展名并不唯一：<strong>.dll</strong> 和 <strong>.ocx</strong> 或是 <strong>.cpl</strong> 都是 dll 文件，<strong>软件更新包（Service  Packs）</strong>机制就是通过升级 DLL 的形式进行自我完善</p>
-</li>
-<li><p><strong>普及</strong>：当一个 dll 被装载到内存中之后，通常有两个地址概念分别是：<strong>基地址（Base Address）</strong> 和 <strong>相对地址（RVA, Relative Virtual Address）</strong>，基地址就是被装载的起始地址，RVA地址就是 地址 + 基地址</p>
-</li>
-<li><p><strong>普及</strong>：dll 实现进程共享数据段，不推荐，存在一定的安全风险，应该尽量 <strong>避免</strong> 这种 dll 共享数据段来实现进程间通信</p>
-</li>
-<li><p><strong>普及</strong>：声明 dll 中的某个函数为 <strong>导出函数</strong> 的办法有两种：一种是使用 <strong> __declspec(dllexport)</strong> 扩展，另一种是采用模块定义<strong>（.def）</strong>文件声明</p>
-</li>
-<li><p><strong>普及</strong>：dll 支持显示运行时链接，提供了 <strong> 3 个 API</strong> 分别是：LoadLibrary，GerProcAddress，FreeLibrary</p>
-</li>
-<li><p><strong>符号导入导出表</strong></p>
-<ul>
-<li><strong>导出表</strong>，EXP文件，导出重定向，<strong>导入表</strong>，导入函数调用，这些都是 dll 中存在的结构和方式，均与符号和函数相关</li>
-</ul>
-</li>
-<li><p><strong>DLL优化</strong></p>
-<ul>
-<li><p><strong>应用程序在加载 dll 导致启动速度变慢</strong>，这里主要有两个原因：1. dll 的代码段和数据段本身并不是地址无关的，当被装载的目标地址被占用时，整个 dll 便会引起 rebase，<strong>频繁的 rebase</strong> 情况更加糟糕； 2. 导入函数的符号在运行时需要被 <strong>逐个查找解析</strong>，这里用的是二分查找，整个过程随着 dll 数量的增加，也是非常耗时的</p>
-</li>
-<li><p><strong>重定基地址（Rebasing）</strong>：只需要重新定位基地址即可，其余的 RVA 只是的偏移量，不受影响，当且仅当 dll 被装载时，基地址被占用的情况下，才会发生 重定位，所以 windows 系统为本身自带的许多库单独划分了一段空间区域（0x70000000 ~ 0x80000000），用于映射这些系统常用的 dll</p>
-</li>
-<li><p><strong>dll 绑定</strong>：把导出函数的地址保存到模块的导入表中，省去了每次启动时符号解析的过程，根本优化在于：当程序每次运行时，所有被依赖的 dll 都会装载，并且一些列的导入导出符号依赖关系都会 <strong>被重新解析</strong>，大多数情况下，这些 dll 都会 <strong>以同样的顺序</strong> 被装载到 <strong>同样的内存地址</strong>，所以他们的到处符号的地址都是不变的</p>
-</li>
-</ul>
-</li>
-<li><p><strong>在使用 C++ 时需要注意的动态链接事项</strong></p>
-<ol>
-<li><p>所有接口函数都应该是抽象的，所有的方法都应该是纯虚的</p>
-</li>
-<li><p>所有的全局函数都应该是用 extern “C” 来防止名字修饰的不兼容，并且导出函数都是应该是 __stdcall 调用规范的</p>
-</li>
-<li><p>不要使用 C++ 标准的 STL</p>
-</li>
-<li><p>不要使用异常</p>
-</li>
-<li><p>不要使用虚析构函数</p>
-</li>
-<li><p>不要在 dll 里面申请内存，而且在 dll 外释放（或者相反）</p>
-</li>
-<li><p>不要再接口中使用重载方法</p>
-</li>
-</ol>
-</li>
-<li><p><strong>DLL HELL：主要是更新过程中的兼容性问题，解决方法如下：</strong></p>
-<ul>
-<li><p>静态链接</p>
-</li>
-<li><p>防止 dll 覆盖（DLL Stomping）</p>
-</li>
-<li><p>避免 dll 冲突（Conflicting DLLs）</p>
-</li>
-<li><p><strong>应用程序使用 Manifest 文件来打包，控制自身依赖的 dll</strong></p>
-</li>
-</ul>
-</li>
-</ul>
+            <h5 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h5><p>业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为)</p>
+<p>分布式服务框架包括: <strong>RPC组件</strong>, 配置化服务<strong>发布</strong>, 基于服务<strong>注册中心</strong>的订阅和发布, <strong>服务治理</strong></p>
+<h5 id="RPC-组件-通信框架-编码-协议栈"><a href="#RPC-组件-通信框架-编码-协议栈" class="headerlink" title="RPC 组件: 通信框架, 编码, 协议栈"></a>RPC 组件: 通信框架, 编码, 协议栈</h5><p>涉及到的技术: Socket 通信, 多线程, 协议栈 -&gt; Netty</p>
+<p>关键字: 长连接, NIO(多路复用)</p>
+<p>epoll 没有最大连接句柄 1024/2048 的限制, 意味着只需要一个线程负责 Selector 的轮询, 就可以接入成千上万的客户端</p>
+<p>可靠性设计靠心跳来实现: TCP 层面的心跳检测(Keep-Alive), 协议层的心跳检测, 应用层的心跳检测</p>
+<p>Netty 的心跳检测实际上利用了链路空闲检测机制实现的, 默认为读写空闲(链路持续时间 t 没有接受或者发送消息)</p>
+<p>Netty 的 EventLoopGroup 线程组会默认创建 CPU Core * 2 个线程, 使用的时候一定要评估线程数指定, 最好不要使用默认, 或者创建一个数组, 按照 Hash 复用 EventLoopGroup</p>
+<h5 id="服务组件-路由"><a href="#服务组件-路由" class="headerlink" title="服务组件: 路由"></a>服务组件: 路由</h5><p>基于服务注册中心(例如: Zookeeper)的订阅发布机制, 消费者可通过主动查询和被动通知的方式获取服务提供者的地址, 消费者本地也缓存服务地址列表, 当注册中心挂掉时, 仍可向服务发起通信</p>
+<p>消费者访问服务的负载均衡: 随机, 轮循, 服务调用延时(消费者缓存服务调用延时, 计算权重, 让延时高的服务接收更少的消息), 一致性哈希</p>
+<p>本地路由优先策略: injvm(本地 JVM 中), innative(相同物理机或者VM)</p>
+<p>一致性哈希: 希望在增删节点(集群)的时候，让尽可能多的数据不失效, 精华:每个实际节点的N个虚拟节点尽量随机分布在整数环上,增加cache节点时,就能尽量保证移动到新cache节点的key来自于不同的cache节点, 从而保证负载均衡, 即 hash(key) -&gt; 虚拟节点 -&gt; 真实节点</p>
 
         
         </div>
@@ -284,7 +239,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/06/14/读书笔记-程序员的自我修养（八）/" data-id="cjjgl2qs2002jihs6f0jrc4b2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjjgl2qqz0008ihs633udzi72" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -359,19 +314,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2017/06/20/读书笔记-程序员的自我修养（九）/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    读书笔记-程序员的自我修养（九）
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/06/06/读书笔记-程序员的自我修养（七）/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/07/04/Java并发编程实践/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">读书笔记-程序员的自我修养（七）</div>
+            <div class="article-nav-title">Java并发编程实践</div>
         </a>
     
 </nav>
