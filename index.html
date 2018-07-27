@@ -225,6 +225,13 @@
 <p>消费者访问服务的负载均衡: 随机, 轮循, 服务调用延时(消费者缓存服务调用延时, 计算权重, 让延时高的服务接收更少的消息), 一致性哈希</p>
 <p>本地路由优先策略: injvm(本地 JVM 中), innative(相同物理机或者VM)</p>
 <p>一致性哈希: 希望在增删节点(集群)的时候，让尽可能多的数据不失效, 精华:每个实际节点的N个虚拟节点尽量随机分布在整数环上,增加cache节点时,就能尽量保证移动到新cache节点的key来自于不同的cache节点, 从而保证负载均衡, 即 hash(key) -&gt; 虚拟节点 -&gt; 真实节点</p>
+<h5 id="集群容错"><a href="#集群容错" class="headerlink" title="集群容错"></a>集群容错</h5><p>什么场景需要容错: 通信链路故障, 服务端超时, 服务端调用异常失败</p>
+<p>容错策略: 失败自动切换(Failover), 失败通知(Failback), 失败缓存(Failcache), 快速失败(Failfast)</p>
+<p>不同的容错策略适用于不同的业务服务, 容错接口开放使得服务提供者能够按需配置自己的策略 </p>
+<p>HSF 默认采取失败自动切换的容错</p>
+<h5 id="服务调用-同步-异步-泛化"><a href="#服务调用-同步-异步-泛化" class="headerlink" title="服务调用: 同步, 异步, 泛化"></a>服务调用: 同步, 异步, 泛化</h5><p>用户发起远程服务调用之后, 经历层层业务逻辑处理、消息编码、最终序列化后的消息会被放入到通信框架的消息队列中</p>
+<p>异步实际上是返回 Future 对象, 调用者可以通过 get 阻塞等待获取结果, 也可以通过 Future-Listener 进行回调</p>
+<p>泛化调用: 客户端没有API接口及数据模型时, 泛化引用将参数及返回值中的所有 POJO 均用 Map 表示; 服务端没有API接口及数据模型时, 泛化实现将参数及返回值中的所有 POJO 均用 Map 表示; 常用于通用测试</p>
 
         
         </div>
@@ -235,7 +242,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjjgl2qqz0008ihs633udzi72" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjk3a4v69000ab1s6s53y1v5u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -378,6 +385,9 @@
 <h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>计算密集型: 线程池大小为: Ncpu + 1, I/O 密集型: 线程池大小为: 2 * Ncpu</p>
 <p>对于 Executor, newCachedThreadPool 工厂方法是一种很好的默认选择, 它能提供比固定大小的线程池更好的排队性能。当需要限制当前任务的数量以满足资源管理需求时, 那么可以选择固定大小的线程池, 就像在接受网络客户请求的服务器应用程序中, 如果不进行限制, 那么肯容易发生过载问题</p>
 <p>只有当任务相互独立时, 为线程池或者工作队列设置界限才是合理的, 如果任务之间存在依赖性, 那么有界的线程池或队列就可能导致线程 “饥饿” 死锁问题</p>
+<h3 id="活跃性-性能和测试"><a href="#活跃性-性能和测试" class="headerlink" title="活跃性, 性能和测试"></a>活跃性, 性能和测试</h3><p>死锁与线程获得锁的顺序有关, 在数据库系统的设计中考虑了死锁的检测以及恢复, 即随机选择放弃一个事务, 让其他事务执行</p>
+<p>可伸缩性是指: 当增加计算资源时(例如 CPU, 内存, 存储容量或 I/O 带宽), 程序的吞吐量或者处理能力能相应增加</p>
+<p>缩小锁的范围(方法 -&gt; 对象 -&gt; 并发容器), 减小锁的粒度, 锁分段(ConcurrentHashMap)</p>
 
         
         </div>
@@ -388,7 +398,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjjgl2qr0000aihs6g4pujofi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjk3a4v680008b1s6dujji5ly" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -605,7 +615,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjjgl2qrh001aihs6ycv6yax7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/21/基础知识-MySQL/" data-id="cjk3a4v6q001bb1s63bq9tefq" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -818,7 +828,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjjgl2qrj001fihs68y6mu78b" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/06/19/网络基础知识/" data-id="cjk3a4v6r001db1s6nqtas7n7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -946,7 +956,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjjgl2qs3002nihs6qufwa4kg" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/23/面试基础问题/" data-id="cjk3a4v7d002wb1s6er1h5nb0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1073,7 +1083,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjjgl2qqw0007ihs6on07ycqh" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/05/08/Linux/" data-id="cjk3a4v6f000mb1s671o7h9r0" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1261,7 +1271,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjjgl2qrs0024ihs694g3g3z8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/" data-id="cjk3a4v79002mb1s65j1d2u7a" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1477,7 +1487,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjjgl2qrr0021ihs6lzmemqld" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/" data-id="cjk3a4v76002fb1s6z7covv1s" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1718,7 +1728,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjjgl2qrq001wihs64t81nmgc" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/" data-id="cjk3a4v75002cb1s65upm56el" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1902,7 +1912,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjjgl2qrp001uihs6ot9rl9b4" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjk3a4v6y001vb1s60xybld4q" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding

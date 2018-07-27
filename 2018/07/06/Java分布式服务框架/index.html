@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="简述业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为) 分布式服务框架包括: RPC组件, 配置化服务发布, 基于服务注册中心的订阅和发布, 服务治理 RPC 组件: 通信框架, 编码, 协议栈涉及到的技术: Socket 通信, 多">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-07-09T05:47:56.662Z">
+<meta property="og:updated_time" content="2018-07-12T01:31:14.116Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java分布式服务框架">
 <meta name="twitter:description" content="简述业界主流(O:Open Source): Thrift(O), Avro-RPC(O), Hessian(O), gRPC(O), Dubbo(O), HSF, Coral Service(亚马逊), DSF(华为) 分布式服务框架包括: RPC组件, 配置化服务发布, 基于服务注册中心的订阅和发布, 服务治理 RPC 组件: 通信框架, 编码, 协议栈涉及到的技术: Socket 通信, 多">
@@ -229,6 +229,13 @@
 <p>消费者访问服务的负载均衡: 随机, 轮循, 服务调用延时(消费者缓存服务调用延时, 计算权重, 让延时高的服务接收更少的消息), 一致性哈希</p>
 <p>本地路由优先策略: injvm(本地 JVM 中), innative(相同物理机或者VM)</p>
 <p>一致性哈希: 希望在增删节点(集群)的时候，让尽可能多的数据不失效, 精华:每个实际节点的N个虚拟节点尽量随机分布在整数环上,增加cache节点时,就能尽量保证移动到新cache节点的key来自于不同的cache节点, 从而保证负载均衡, 即 hash(key) -&gt; 虚拟节点 -&gt; 真实节点</p>
+<h5 id="集群容错"><a href="#集群容错" class="headerlink" title="集群容错"></a>集群容错</h5><p>什么场景需要容错: 通信链路故障, 服务端超时, 服务端调用异常失败</p>
+<p>容错策略: 失败自动切换(Failover), 失败通知(Failback), 失败缓存(Failcache), 快速失败(Failfast)</p>
+<p>不同的容错策略适用于不同的业务服务, 容错接口开放使得服务提供者能够按需配置自己的策略 </p>
+<p>HSF 默认采取失败自动切换的容错</p>
+<h5 id="服务调用-同步-异步-泛化"><a href="#服务调用-同步-异步-泛化" class="headerlink" title="服务调用: 同步, 异步, 泛化"></a>服务调用: 同步, 异步, 泛化</h5><p>用户发起远程服务调用之后, 经历层层业务逻辑处理、消息编码、最终序列化后的消息会被放入到通信框架的消息队列中</p>
+<p>异步实际上是返回 Future 对象, 调用者可以通过 get 阻塞等待获取结果, 也可以通过 Future-Listener 进行回调</p>
+<p>泛化调用: 客户端没有API接口及数据模型时, 泛化引用将参数及返回值中的所有 POJO 均用 Map 表示; 服务端没有API接口及数据模型时, 泛化实现将参数及返回值中的所有 POJO 均用 Map 表示; 常用于通用测试</p>
 
         
         </div>
@@ -239,7 +246,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjjgl2qqz0008ihs633udzi72" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/06/Java分布式服务框架/" data-id="cjk3a4v69000ab1s6s53y1v5u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
