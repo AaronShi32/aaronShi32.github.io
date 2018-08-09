@@ -3,15 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>标签: 读书 | 着陆的橘子</title>
+    <title>基础知识-SQL语法 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="着陆的橘子">
-<meta property="og:url" content="https://aaronshi32.github.io/tags/读书/index.html">
+    <meta name="description" content="SQL 语法基础DDL: create table/alter table/drop table/create index/drop index/create database/alter database  DML: select/update/delete/insert into TOP: select top number|percent from ….  其中 number 可以接 ord">
+<meta name="keywords" content="面试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基础知识-SQL语法">
+<meta property="og:url" content="https://aaronshi32.github.io/2018/08/08/基础知识-SQL语法/index.html">
 <meta property="og:site_name" content="着陆的橘子">
+<meta property="og:description" content="SQL 语法基础DDL: create table/alter table/drop table/create index/drop index/create database/alter database  DML: select/update/delete/insert into TOP: select top number|percent from ….  其中 number 可以接 ord">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-08T04:40:29.533Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="着陆的橘子">
+<meta name="twitter:title" content="基础知识-SQL语法">
+<meta name="twitter:description" content="SQL 语法基础DDL: create table/alter table/drop table/create index/drop index/create database/alter database  DML: select/update/delete/insert into TOP: select top number|percent from ….  其中 number 可以接 ord">
     
 
     
@@ -174,328 +179,174 @@
 </aside>
 
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fa fa-tag"></i></span>
-        <h1 class="title">#读书</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-基础知识-SQL语法" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/07/06/Java分布式服务框架/">Java分布式服务框架</a>
+        <h1 class="article-title" itemprop="name">
+            基础知识-SQL语法
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2018/07/06/Java分布式服务框架/">
-            <time datetime="2018-07-06T07:13:28.000Z" itemprop="datePublished">2018-07-06</time>
+        <a href="/2018/08/08/基础知识-SQL语法/">
+            <time datetime="2018-08-08T00:44:29.000Z" itemprop="datePublished">2018-08-08</time>
         </a>
     </div>
 
 
-                    
-                    
+                        
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
+        <a class="tag-link" href="/tags/面试/">面试</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/07/04/Java并发编程实践/">Java并发编程实践</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="SQL-语法"><a href="#SQL-语法" class="headerlink" title="SQL 语法"></a>SQL 语法</h3><h4 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h4><p>DDL: create table/alter table/drop table/create index/drop index/create database/alter database </p>
+<p>DML: select/update/delete/insert into</p>
+<p>TOP: select top number|percent from ….  其中 number 可以接 order by 排序, percent 不可以</p>
+<p>通配符: ‘%’ 若干个, ‘_’ 一个, ‘[ANF]’ 包含 A 或 N 或 F, ‘[!ANF]’ 不包含 A 或 N 或 F</p>
+<p>Between..And: 在 mysql 中不包含右边界</p>
+<p>AS: 别名 select name as n, sale as s …</p>
+<p>JOIN table ON col.A = col.B: 内 JOIN 只返回两张表有的记录, 左 JOIN 返回左表全部记录, 右 JOIN 返回右表全部记录,  Full JOIN 返回全部表记录</p>
+<p>UNION: 用于合并两个或多个 SELECT 语句的结果集, 内部的 SELECT 语句必须拥有相同数量的列, 列也必须拥有相似的数据类型, UNION 会去重, 若不去重则用 UNION ALL</p>
+<p>SELECT INTO: 从一个表中选取数据，然后把数据插入另一个表中. SELECT * INTO new_table_name FROM old_tablename</p>
+<p>CREATE INDEX index_name ON table_name (column_name): 创建索引</p>
+<p>ALTER TABLE table_name ADD column_name datatype: 添加列</p>
+<p>ALTER TABLE table_name DROP COLUMN column_name: 删除列</p>
+<p>ALTER TABLE table_name ALTER COLUMN column_name datatype: 修改列类型</p>
+<p>CREATE VIEW view_name AS …: 创建视图</p>
+<p>GROUP BY: 合计函数 (比如 SUM) 常常需要, 按列规约结果</p>
+<p>HAVING：在 SQL 中增加 HAVING 子句原因是，WHERE 关键字无法与合计函数一起使用。</p>
+<h4 id="高级"><a href="#高级" class="headerlink" title="高级"></a>高级</h4><p>MySQL</p>
+<ul>
+<li><p>IF( expr1 , expr2 , expr3 )</p>
+</li>
+<li><p>CASE WHEN: case 列名 when 条件 then 结果 else 其它结果 end 别名</p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line"><span class="keyword">CASE</span> detail.<span class="string">`status`</span> <span class="keyword">WHEN</span> <span class="string">'0'</span> <span class="keyword">THEN</span> <span class="string">'未开仓'</span></span><br><span class="line"><span class="keyword">WHEN</span> <span class="string">'1'</span> <span class="keyword">THEN</span> <span class="string">'已开仓'</span></span><br><span class="line"><span class="keyword">WHEN</span> <span class="string">'2'</span> <span class="keyword">THEN</span> <span class="string">'已平仓'</span></span><br><span class="line"><span class="keyword">ELSE</span> <span class="string">'取消订单'</span> <span class="keyword">END</span></span><br><span class="line"><span class="keyword">status</span>,</span><br><span class="line"><span class="keyword">CASE</span> o.type <span class="keyword">WHEN</span> <span class="string">'0'</span> <span class="keyword">THEN</span> <span class="string">'单期'</span></span><br><span class="line"><span class="keyword">WHEN</span> <span class="string">'1'</span> <span class="keyword">THEN</span> <span class="string">'多期'</span></span><br><span class="line"><span class="keyword">ELSE</span> <span class="string">'策略'</span> <span class="keyword">END</span> </span><br><span class="line">typeName</span><br><span class="line"><span class="keyword">FROM</span> t_order_detail detail</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> t_order o <span class="keyword">ON</span> o.id = detail.orderId</span><br></pre></td></tr></table></figure>
+<ul>
+<li>IFNULL( expr1 , expr2 ): 在 expr1 的值不为 NULL的情况下都返回 expr1，否则返回 expr2</li>
+</ul>
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/07/04/Java并发编程实践/">
-            <time datetime="2018-07-04T05:36:08.000Z" itemprop="datePublished">2018-07-04</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
+        
         </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/">读书笔记-深入分析 Java Web 技术内幕（三）</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/28/读书笔记-深入分析 Java Web 技术内幕（三）/">
-            <time datetime="2018-04-28T02:15:26.000Z" itemprop="datePublished">2018-04-28</time>
-        </a>
-    </div>
+        <footer class="article-footer">
+            <div class="share-container">
 
 
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/">读书笔记-深入分析 Java Web 技术内幕（二）</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/23/读书笔记-深入分析 Java Web 技术内幕（二）/">
-            <time datetime="2018-04-23T08:15:26.000Z" itemprop="datePublished">2018-04-23</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/">读书笔记-深入分析 Java Web 技术内幕（一）</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/19/读书笔记-深入分析 Java Web 技术内幕（一）/">
-            <time datetime="2018-04-19T02:33:12.000Z" itemprop="datePublished">2018-04-19</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/10/读书笔记-Redis 独立功能的实现/">读书笔记-Redis 独立功能的实现</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/10/读书笔记-Redis 独立功能的实现/">
-            <time datetime="2018-04-10T02:14:49.000Z" itemprop="datePublished">2018-04-10</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/05/读书笔记-Redis 多机数据库的实现/">读书笔记-Redis 多机数据库的实现</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/05/读书笔记-Redis 多机数据库的实现/">
-            <time datetime="2018-04-05T09:56:15.000Z" itemprop="datePublished">2018-04-05</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">读书笔记-Redis 单机数据库的实现</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/04/02/读书笔记-Redis 单机数据库的实现/">
-            <time datetime="2018-04-02T05:55:51.000Z" itemprop="datePublished">2018-04-02</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/03/28/2018书单/">2018书单</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/03/28/2018书单/">
-            <time datetime="2018-03-28T01:27:38.000Z" itemprop="datePublished">2018-03-28</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/日常/">日常</a>, <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/02/02/读书笔记-Redis 数据结构与对象/">读书笔记-Redis 数据结构与对象</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/02/02/读书笔记-Redis 数据结构与对象/">
-            <time datetime="2018-02-02T02:49:06.000Z" itemprop="datePublished">2018-02-02</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
 </div>
 
-    <nav id="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/tags/读书/page/2/">2</a><a class="page-number" href="/tags/读书/page/3/">3</a><a class="extend next" rel="next" href="/tags/读书/page/2/">下一页 &raquo;</a>
-    </nav>
+    <a data-url="https://aaronshi32.github.io/2018/08/08/基础知识-SQL语法/" data-id="cjkmhodk9001epps6t9j63ue7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/07/06/Java分布式服务框架/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Java分布式服务框架</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+    </section>
+
 </section>
             
                 <aside id="sidebar">

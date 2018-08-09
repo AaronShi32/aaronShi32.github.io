@@ -140,11 +140,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                47
+                48
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                10
+                11
                 <span>标签</span>
             </div>
         </div>
@@ -175,6 +175,190 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-Redis 独立功能的实现" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/04/10/读书笔记-Redis 独立功能的实现/">读书笔记-Redis 独立功能的实现</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/10/读书笔记-Redis 独立功能的实现/">
+            <time datetime="2018-04-10T02:14:49.000Z" itemprop="datePublished">2018-04-10</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="Redis：独立功能的实现"><a href="#Redis：独立功能的实现" class="headerlink" title="Redis：独立功能的实现"></a>Redis：独立功能的实现</h3><h5 id="1-发布与订阅"><a href="#1-发布与订阅" class="headerlink" title="1. 发布与订阅"></a>1. 发布与订阅</h5><p>Redis 的发布与订阅功能由 PUBLISH、(UN)SUBSCRIBE、PSUBSCRIBE 等命令组成</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct redisServer &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 保存所有频道的订阅关系</span></span><br><span class="line">	dict *pubsub_channels;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 保存所有模式的订阅关系</span></span><br><span class="line">	list *pubsub_patterns;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Redis 将所有频道的订阅关系都保存在服务器状态的 pubsub_channels 字典里面, 这个字典的键是某个被订阅的频道, 而键的值则是一个链表, 链表里面记录了所有订阅这个频道的客户端</p>
+<ul>
+<li><p>服务器数据结构在 pubsub_channels 字典保存了所有频道的订阅关系: SUBSCRIBE 命令负责将客户端和被订阅的频道关联到这个字典里面, 而 UNSUBCRIBE 命令则负责解除客户端和被退订频道之间的关联</p>
+</li>
+<li><p>服务器数据结构在 pubsub_patterns 链表保存了所有模式的订阅关系: PSUBCRIBE 命令负责将客户端和被订阅的模式记录到这个链表中, 而 PUNSUBSCRIBE 命令则负责移除客户端和被退订模式之间的关联</p>
+</li>
+<li><p>PUBLISH 命令通过访问 pubsub_channels 字典来向频道的所有订阅者发送消息, 通过访问 pubsub_patterns 链表来向所有匹配频道的模式的订阅者发送消息</p>
+</li>
+<li><p>PUBSUB 命令的三个子命令都是读取通过 pubsub_channels 字典和 pubsub_patterns 链表中的信息来实现的</p>
+</li>
+</ul>
+<h5 id="2-事务"><a href="#2-事务" class="headerlink" title="2. 事务"></a>2. 事务</h5><p>Redis 通过 MULTI、EXEC、WATCH 等命令来实现事务(transaction)功能</p>
+<p>WATCH 命令是一个乐观锁, 它可以在 EXEC 命令执行之前, 监事任意数量的数据库键, 并在 EXEC 命令执行时, 检查被监视的键是否至少有一个已经被修改过了, 如果是的话, 服务器将拒绝执行事务, 并向客户端返回代表事务执行失败的空回复</p>
+<ul>
+<li><p>事务在执行过程中不会被中断, 当事务队列中的所有命令都被执行完毕之后, 事务才会结束</p>
+</li>
+<li><p>带有 WATCH 命令的事务会将客户端和被监视的键在数据库的 watched_keys 字典中进行关联, 当键被修改时, 程序会将所有监视被修改键的客户端的 REDIS_DIRTY_CAS 标志打开</p>
+</li>
+<li><p>只有在客户端的 REDIS_DIRTY_CAS 标志未被打开时, 服务器才会执行客户端提交的事务, 否则将拒绝</p>
+</li>
+<li><p>Redis 的事务总是具有 ACID 中的原子性、一致性和隔离性, 当服务器运行在 AOF 持久化模式下, 并且 appendfsync 选项的值为 always 时, 事务也具有耐久性</p>
+</li>
+</ul>
+<h5 id="3-排序"><a href="#3-排序" class="headerlink" title="3. 排序"></a>3. 排序</h5><ul>
+<li><p>SORT 命令通过将被排序键包含的元素载入到数组里面, 然后对数组进行排序来完成对键进行排序工作</p>
+</li>
+<li><p>在默认情况下, SORT 命令假设被排序键包含的都是数字值, 并且以数字值的方式来进行排序</p>
+</li>
+<li><p>如果 SORT 命令使用了 ALPHA 选项, 那么 SORT 命令假设被排序键包含的都是字符串值, 并且以字符串的方式来进行排序</p>
+</li>
+<li><p>SORT 命令的排序操作由快速排序算法实现</p>
+</li>
+<li><p>当 SORT 命令使用了 BY 选项时, 命令使用其他键的值作为权重来进行排序操作</p>
+</li>
+<li><p>除了 GET 选项之外, 调整选项的摆放位置不会影响 SORT 命令的排序结果</p>
+</li>
+</ul>
+<h5 id="4-慢查询日志"><a href="#4-慢查询日志" class="headerlink" title="4. 慢查询日志"></a>4. 慢查询日志</h5><p>Reids 的慢日志查询功能用于记录执行时间超过给定时长的命令请求, 用户可以通过这个功能产生的日志来监视和优化查询速度</p>
+<ul>
+<li><p>Redis 服务器将所有的慢查询日志保存在服务器状态的 slowlog 链表中, 每个链表节点都包含一个 slowlogEntry 结构, 每个 slowlogEntry 结构代表一条慢查询日志</p>
+</li>
+<li><p>打印和删除慢查询日志可以通过遍历 slowlog 链表来完成</p>
+</li>
+<li><p>slowlog 链表的长度就是服务器所保存慢查询在日志的数量</p>
+</li>
+<li><p>新的慢查询日志会被添加到 slowlog 链表的表头, 如果日志的数量超过 slowlog-max-len 选项的值, 那么多出来的日志会被删除</p>
+</li>
+</ul>
+<h5 id="5-监视器"><a href="#5-监视器" class="headerlink" title="5. 监视器"></a>5. 监视器</h5><ul>
+<li><p>客户端可以通过执行 MONITOR 命令转换成监视器, 接收并打印服务器处理的每个命令请求信息</p>
+</li>
+<li><p>当一个客户端变为监视器时, 该客户端的 REDIS_MONITOR 标识会被打开</p>
+</li>
+<li><p>服务器将所有监视器都记录在 monitors 链表中</p>
+</li>
+<li><p>每次处理命令请求时, 服务器都会遍历 monitors 链表, 将相关信息发送给监视器</p>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2018/04/10/读书笔记-Redis 独立功能的实现/" data-id="cjkmhodkf001qpps6gi48os1l" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-Redis 多机数据库的实现" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -295,7 +479,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjk3a4v6x001sb1s6sva238ir" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/05/读书笔记-Redis 多机数据库的实现/" data-id="cjkmhodl30031pps6chw35kaa" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -533,7 +717,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjk3a4v6v001nb1s6k30zb05u" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/04/02/读书笔记-Redis 单机数据库的实现/" data-id="cjkmhodke001npps6m75tpc2j" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -674,7 +858,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjk3a4v630005b1s629yrdfqt" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/Java基础知识索引/" data-id="cjkmhodjh0005pps6y0b2wrsm" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -815,7 +999,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjk3a4v5w0001b1s6yaymbz7w" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/03/28/2018书单/" data-id="cjkmhodj60000pps6empd7ju8" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1056,7 +1240,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjk3a4v6w001qb1s6okc98q52" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/02/02/读书笔记-Redis 数据结构与对象/" data-id="cjkmhodkg001spps6zsuwnn2c" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1189,7 +1373,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjk3a4v6o0016b1s6gj95oqgr" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/01/16/加密算法/" data-id="cjkmhodk40012pps6x2cj44ty" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1292,7 +1476,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/基础知识/">基础知识</a>
+        <a class="tag-link" href="/tags/面试/">面试</a>
     </div>
 
                     </div>
@@ -1357,7 +1541,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjk3a4v6m0011b1s6gvn9yx2t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/25/基础知识-HashMap实现与原理/" data-id="cjkmhodk50015pps6uo5qkw8t" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1460,7 +1644,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/基础知识/">基础知识</a>
+        <a class="tag-link" href="/tags/面试/">面试</a>
     </div>
 
                     </div>
@@ -1513,7 +1697,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjk3a4v6p0018b1s6fshaop4v" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/12/11/基础知识-Java语法/" data-id="cjkmhodk70019pps62l6b9lgn" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1616,7 +1800,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/基础知识/">基础知识</a>
+        <a class="tag-link" href="/tags/面试/">面试</a>
     </div>
 
                     </div>
@@ -1663,234 +1847,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjk3a4v6n0014b1s6so5mdim2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-SpringBoot 问题汇总" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/10/16/SpringBoot 问题汇总/">SpringBoot 问题汇总</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/10/16/SpringBoot 问题汇总/">
-            <time datetime="2017-10-16T03:22:52.000Z" itemprop="datePublished">2017-10-16</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/框架/">框架</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>最近上手项目, 开始接触了 SpringBoot, 相比较 SpringMVC 而言, 省去了繁琐的配置, 秉承默认大于配置的原则, 使用起来更加简单方便。但越是<br>黑盒(简单), 使用起来越不安, 这里将学习过程中遇到的问题记录下来, 慢慢地打开这个黑盒</p>
-<ul>
-<li><p>初始化工程问题</p>
-<ol>
-<li><p>使用 Maven 初始化, 有两种方式, 以此解决 Maven 不支持多 parent 的问题</p>
-<ul>
-<li><p>继承默认的 parent</p>
-  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Inherit defaults from Spring Boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<pre><code>    - 将 SpringBoot 的依赖添加到 dependencyManagement 中，并且设置  scope=import 
-
-        <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Override Spring Data release train provided by Spring Boot --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.data<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-data-releasetrain<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>Fowler-SR2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Spring Boot basic dependencies --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-2. Maven用户可以继承 spring-boot-starter-parent 项目来获取合适的默认设置。该parent项目提供以下特性
-
-    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- 默认编译级别为Java 1.6</span><br><span class="line">- 源码编码为 UTF-8</span><br><span class="line">- 一个 dependency management 节点，允许你省略常见依赖的 &lt;version&gt; 标签，继承自 spring-boot-dependencies POM。</span><br><span class="line">- 恰到好处的资源过滤</span><br><span class="line">- 恰到好处的插件配置（exec插件，surefire，Git commit ID，shade）</span><br><span class="line">- 恰到好处的对 application.properties 和 application.yml 进行筛选，</span><br><span class="line">- 包括特定 profile（profile-specific）的文件，比如 applicationfoo.</span><br><span class="line">- properties 和 application-foo.yml</span><br></pre></td></tr></table></figure>
-
-3. Spring Boot Starters 列表
-
-    官方：https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#using-boot-starter
-
-    中文：http://blog.csdn.net/chszs/article/details/50610474
-
-4. 配置工程自检功能：`spring-boot-starter-actuator`
-
-    <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-    配置文件中增加：management.security.enabled=false
-
-    访问以下网站：
-
-    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/beans</span><br><span class="line">http://localhost:8080/env</span><br><span class="line">http://localhost:8080/health</span><br><span class="line">http://localhost:8080/metrics</span><br><span class="line">http://localhost:8080/trace</span><br><span class="line">http://localhost:8080/mappings</span><br></pre></td></tr></table></figure>
-</code></pre><ul>
-<li><p><strong>默认</strong> 的奥秘，来源于：<code>spring-boot-autoconfigure 的 JAR 文件</code></p>
-<ol>
-<li><p>@SpringBootApplication 注解等价于以默认属性使用 @Configuration ， @EnableAutoConfiguration 和 @ComponentScan，即开启组件扫描和自动配置</p>
-</li>
-<li><p>application.properties（yml） 默认加载路径：当前目录下 /config 子目录，当前目录，classpath 下的 /config，classpath 根路径。如果不喜欢将 application.properties 作为配置文件名，你可以通过指定 spring.config.name 环境属性来切换其他的名称，也可以使用spring.config.location 环境属性引用一个明确的路径（目录位置或文件路径列表以逗号分割）</p>
-</li>
-<li><p>Spring 4.0 的条件化配置是自动配置的基础，当满足一定条件时才会执行某段程序，比如在 classpath 中发现了 JdbcTemplate 时才自动注入，这使得众多 autoconfig 选项得以简化</p>
-</li>
-<li><p>配置的加载顺序</p>
-<p> Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对属性值进行合理的覆盖，属性会以如下的顺序进行设值：</p>
-<ol>
-<li><p>home目录下的devtools全局设置属性（ ~/.spring-bootdevtools.properties ，如果devtools激活）</p>
-</li>
-<li><p>测试用例上的@TestPropertySource注解</p>
-</li>
-<li><p>测试用例上的@SpringBootTest#properties注解</p>
-</li>
-<li><p>命令行参数</p>
-</li>
-<li><p>来自 SPRING_APPLICATION_JSON 的属性（环境变量或系统属性中内嵌的内联JSON）</p>
-</li>
-<li><p>ServletConfig 初始化参数</p>
-</li>
-<li><p>ServletContext 初始化参数</p>
-</li>
-<li><p>来自于 java:comp/env 的JNDI属性</p>
-</li>
-<li><p>Java系统属性（System.getProperties()）</p>
-</li>
-<li><p>操作系统环境变量</p>
-</li>
-<li><p>RandomValuePropertySource，只包含 random.* 中的属性</p>
-</li>
-<li><p>没有打进jar包的Profile-specific应用属性（ application-{profile}.properties 和YAML变量）</p>
-</li>
-<li><p>打进jar包中的Profile-specific应用属性（ application-{profile}.properties 和YAML变量）</p>
-</li>
-<li><p>没有打进jar包的应用配置（ application.properties 和YAML变量）</p>
-</li>
-<li><p>打进jar包中的应用配置（ application.properties 和YAML变量）</p>
-</li>
-<li><p>@Configuration 类上的 @PropertySource 注解</p>
-</li>
-<li><p>默认属性（使用 SpringApplication.setDefaultProperties 指定）</p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>开发调试问题</p>
-<ol>
-<li><p>使用 spring-boot-devtools 来实现热部署（TODO）</p>
-</li>
-<li><p>Maven 构建插件的主要功能是把项目打包成一个可执行的超级 JAR（uber-JAR），包括把应用程序的所有依赖打入 JAR 文件内，并为 JAR 添加一个描述文件，其中的内容能够通过 <code>java -jar</code> 来运行应用程序</p>
-</li>
-</ol>
-</li>
-<li><p>Spring 启动问题</p>
-<p>  精辟：读取配置说明（xml，java配置，Groovy配置，其他类型配置），再应用程序上下文里初始化 Bean，将 Bean 注入依赖他们的其他 Bean 中，Spring 帮你通过 组件扫描，自动织入和生命切面等额外辅助功能，帮你简单的做了初始化的事情</p>
-</li>
-<li><p>导入的 starter 是如何 在 application.properties 中给出配置提示的</p>
-<p>  starter 的包 /META-INF/spring.factories 中会有 org.springframework.boot.autoconfigure.EnableAutoConfiguration 自动配置的实现类，打开这个类可以看到实现了 ImportBeanDefinitionRegistrar 接口的 registerBeanDefinitions 方法，如此一来，配置文件中就会给出提示啦</p>
-</li>
-</ul>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2017/10/16/SpringBoot 问题汇总/" data-id="cjk3a4v6f000kb1s651bt9vwa" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/11/25/基础知识-Http 和 Https/" data-id="cjkmhodk60017pps6vyzyp0zd" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1979,7 +1936,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1988,7 +1945,7 @@ b. 惰性空间释放：当 SDS 需要缩短保存的字符串时，程序不会
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">30</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">6</span></li></ul>
         </div>
     </div>
 

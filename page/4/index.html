@@ -140,11 +140,11 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                47
+                48
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                10
+                11
                 <span>标签</span>
             </div>
         </div>
@@ -175,6 +175,173 @@
 
             
             <section id="main">
+    <article id="post-读书笔记-程序员的自我修养（四）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/13/读书笔记-程序员的自我修养（四）/">读书笔记-程序员的自我修养（四）</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/13/读书笔记-程序员的自我修养（四）/">
+            <time datetime="2017-05-13T02:50:07.000Z" itemprop="datePublished">2017-05-13</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/读书/">读书</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="链接的接口：符号"><a href="#链接的接口：符号" class="headerlink" title="链接的接口：符号"></a>链接的接口：符号</h3><ul>
+<li><p><strong>普及</strong> : 链接的过程 <strong>实际上</strong> 就是 <strong>相互拼合</strong> 的过程，即目标文件中的（函数和变量） <strong>地址引用</strong>。<strong>符号</strong> 是拼合剂</p>
+</li>
+<li><p><strong>普及</strong> : 我们将函数和变量统称为 <strong>符号（Symbol）</strong>，函数名货变量名就是 <strong>符号名（Symbol Name）</strong></p>
+</li>
+<li><p><strong>普及</strong>：符号统一存放在目标文件的 <strong>符号表（Symbol Table）</strong> 中，每个定义的符号有一个对应的 <strong>符号值（Symbol Value）</strong></p>
+</li>
+<li><p>主要关注的 <strong>链接对象</strong> 有：1. 定义在本目标文件的 <strong>全局符号</strong>，可以被其他目标文件引用 2. 在本目标文件中引用的 <strong>全局符号</strong>，却没有定义在本目标文件中，这一般叫做外部符号</p>
+</li>
+<li><p>ELF符号表 [<strong>.symtab</strong>]  <strong>结构详解</strong>：</p>
+<ul>
+<li><p><strong>逻辑结构</strong>：<strong>Elf32_Sym</strong> 结构体 对应一个符号，符号表是一个 <strong>数组</strong>，其中</p>
+<ul>
+<li><p><strong>符号类型和绑定信息（st_info）</strong>：类型：局部，全局，<strong>弱引用</strong>，绑定信息：位置，对象，函数，段，文件</p>
+</li>
+<li><p><strong>符号所在段（st_shndx）</strong>：符号定义在本目标文件中，即对应段的下表，如不在，则跟 <strong>深入静态链接</strong> 的 <strong>COMMON块</strong> 有关</p>
+</li>
+<li><p><strong>符号值（st_value）</strong>：依据符号所在段不同，值也会有不同的类型</p>
+</li>
+</ul>
+</li>
+<li><p><strong>特殊符号</strong>：有些符号并没有在你的程序中定义，但是你可以直接声明并且引用它，称之为特殊符号，比如：<strong>__executable_start</strong>，<strong>__etext</strong>，<strong>__edata</strong>，<strong>__end</strong> 这些符号当且仅在 <strong>链接过程中控制</strong></p>
+</li>
+<li><p><strong>符号的管理</strong></p>
+<ul>
+<li><p>修饰与函数签名：为了防止程序中的符号冲突，先后发明了 <strong>名称空间（namespace）</strong>，<strong>符号修饰（Name Decoration）</strong> 等机制，以 <strong>函数签名（Function Signature）</strong> 作为符号的唯一标识，避免多个符号冲突，链接器无法识别</p>
+</li>
+<li><p>exten “C”：C++中用来声明或定义一个 C 符号的语法，配合 <strong>__cplusplus</strong> 来定义变量，这样就可以在 C 或 C++ 中正确的定义符号，使得链接器能够找到目标符号进行链接</p>
+</li>
+<li><p>弱符号和强符号： 都是针对定义而言的，编译器默认函数和初始化了的全局变量为 <strong>强符号（Strong Symbol）</strong>，未初始化的全局变量为 <strong>弱符号（Weak Symbol）</strong>，链接器会在链接的时候，遵循3种选择规则，来选择强符号还是弱符号：1. 相同变量强弱都定义，选择强，2. 不允许强符号被多次定义，3. 都是弱，选择占用空间最大的</p>
+</li>
+<li><p>弱引用和强引用：当链接器在引用决议时未发现符号就报错时，就是强引用，相反，不报错的就是弱引用。之所以有弱引用的存在，是为了使得程序可以在未发现符号的时候，使用原来库的定义，即便去掉了某个模块，也不会报错，方便解耦</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>调式信息 <strong>DWARF（Debug With Arbitrary Record Format）</strong></p>
+<ul>
+<li>使用命令 <code>strip</code> 来去掉 ELF 文件中的调试信息， 大幅度减少文件大小</li>
+</ul>
+</li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://aaronshi32.github.io/2017/05/13/读书笔记-程序员的自我修养（四）/" data-id="cjkmhodl1002ypps6y5dvj3iu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-读书笔记-程序员的自我修养（三）" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -291,7 +458,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjk3a4v730027b1s6jm48ilmj" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/09/读书笔记-程序员的自我修养（三）/" data-id="cjkmhodkp002cpps688r8yo52" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -470,7 +637,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjk3a4v74002ab1s635ogl3jp" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/08/读书笔记-程序员的自我修养（二）/" data-id="cjkmhodkq002epps6457udvp2" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -650,7 +817,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjk3a4v700020b1s62bq7a17m" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/05/06/读书笔记-程序员的自我修养（一）/" data-id="cjkmhodkl0025pps6aoi7cemu" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -827,7 +994,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjk3a4v6d000hb1s6l8dsxtp7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/03/14/SonarQube安装使用调试/" data-id="cjkmhodjt000lpps6kdf9a1dm" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -959,7 +1126,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjk3a4v6s001gb1s6mrnfc7s7" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/27/疑难杂症-解决MSYS2在Window上越用越慢的方法/" data-id="cjkmhodkd001lpps6kyg83p8n" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1134,7 +1301,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjk3a4v6g000pb1s69sjx6nff" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/13/Tensorflow学习-机器学习/" data-id="cjkmhodjy000spps6ml5g1u43" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1288,7 +1455,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjk3a4v6h000rb1s6dzdbmquw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-环境搭建/" data-id="cjkmhodk0000vpps6bjxlmc75" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1425,7 +1592,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjk3a4v6j000wb1s6yhvnucaa" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/02/08/Tensorflow学习-神经网络/" data-id="cjkmhodk1000xpps6vn8216ns" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1577,161 +1744,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjk3a4v5s0000b1s6dkoocwm5" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Markdown解析器-Showdown" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2016/12/01/Markdown解析器-Showdown/">Markdown解析器-Showdown</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2016/12/01/Markdown解析器-Showdown/">
-            <time datetime="2016-12-01T07:26:35.000Z" itemprop="datePublished">2016-12-01</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/工具/">工具</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>由于工作中需要将 markdown 格式的文件转换成 html，因此抽空研究了下业界的工具<code>Showdown</code>，Showdown 是一个可以将标准 markdown 规范解析生成基础 html 的工具，使用起来很简单，通过命令：<code>showdown makehtml -i &lt;input&gt; -o &lt;output&gt;</code>即可完成转化，详细的介绍请参考官方文档 <a href="https://github.com/showdownjs" target="_blank" rel="noopener">Showdown</a>，在此就不过多赘述了。</p>
-<h4 id="Extensions-与-Listeners"><a href="#Extensions-与-Listeners" class="headerlink" title="Extensions 与 Listeners"></a>Extensions 与 Listeners</h4><p>通过研究发现，当需要解析一些”自定义”的 markdown 规范时，Showdown 提供了清晰良好的代码格式，方便我们扩展，包括<code>extensions</code>, <code>listener</code>的方式，可以进行注册，监听，来看 Showdown 的入口文件，里面有这样三行代码： </p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//src/cli/makehtml.cmd.js</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> converter = <span class="keyword">new</span> showdown.Converter(argv);</span><br><span class="line">  ...</span><br><span class="line">  input = fs.readFileSync(argv.i, enc);</span><br><span class="line">  ...</span><br><span class="line">  output = converter.makeHtml(input);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以分析出，<code>converter</code>通过接受参数，来配置各种<code>extensions</code>和<code>listener</code>，然后直接从源文件中读取，经过 makeHtml 一转换就变成 html 了</p>
-<p>官方也提供了几个现有的 <code>extensions</code>， 如 <a href="https://github.com/showdownjs/table-extension" target="_blank" rel="noopener">table-extension</a> <a href="https://github.com/showdownjs/prettify-extension" target="_blank" rel="noopener">prettify-extension</a> 等，这些现有的<code>extensions</code>都是对 markdown 的元素进行了自定义的解析和渲染，如果是基于标准的 markdown 语法，使用这种方式进行自定义渲染就非常方便了</p>
-<p>关于 Listeners 可以参考下面的工作原理章节</p>
-<h4 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h4><p>关于工作原理，可以用一句话来概括：<strong>Showdown使用正则表达式解析 markdown 语法，然后直接渲染成 html</strong>，注意这里面有两个关键词：</p>
-<ul>
-<li><p>正则表达式解析</p>
-<p>  来看一个 Parser 的源码片段：</p>
-</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 斜体和黑体的解析器：italicsAndBold</span></span><br><span class="line">showdown.subParser(<span class="string">'italicsAndBold'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">text, options, globals</span>) </span>&#123;</span><br><span class="line"><span class="meta">  'use strict'</span>;</span><br><span class="line"></span><br><span class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.before'</span>, text, options, globals);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (options.literalMidWordUnderscores) &#123;</span><br><span class="line">    <span class="comment">//underscores</span></span><br><span class="line">    <span class="comment">// Since we are consuming a \s character, we need to add it</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)__(?=\S)([\s\S]+?)__(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(^|\s|&gt;|\b)_(?=\S)([\s\S]+?)_(?=\b|&lt;|\s|$)/gm</span>, <span class="string">'$1&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line">    <span class="comment">//asterisks</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(\*\*)(?=\S)([^\r]*?\S[*]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(\*)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line"></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// &lt;strong&gt; must go first:</span></span><br><span class="line">    text = text.replace(<span class="regexp">/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g</span>, <span class="string">'&lt;strong&gt;$2&lt;/strong&gt;'</span>);</span><br><span class="line">    text = text.replace(<span class="regexp">/(\*|_)(?=\S)([^\r]*?\S)\1/g</span>, <span class="string">'&lt;em&gt;$2&lt;/em&gt;'</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  text = globals.converter._dispatch(<span class="string">'italicsAndBold.after'</span>, text, options, globals);</span><br><span class="line">  <span class="keyword">return</span> text;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>每个 Parser 的开始和结束，都抛出了相应的事件供监听，这就是 <code>listener</code> 扩展的机制，每次处理的结果都是返回 text 文本，可以看到在解析器中，对输入的文本进行正则表达式的匹配并直接替换成了相应的 html 元素</p>
-<ul>
-<li><p>直接渲染</p>
-<p>  所谓直接渲染，就是上面代码中的<code>replace</code>，这样的处理为后续的需求埋下隐患：</p>
-<ol>
-<li><p>如果某个 markdown 片段需要作为整体的渲染，则无法满足</p>
-</li>
-<li><p>如果对渲染之后的 html 进行样式更改，加入css，则无法满足</p>
-<p>可以看出，replace 替换的仅仅是 html 基本元素样式，且没有 id，class 等信息，因此极大程度上约束了生成的 html 样式，并不利于满足一些实际需求，然而 Showdown 的代码架构，将各个 markdown 元素分别定义了单独的解析器，这就为我们提供了一个思路，可以根据自定义的 markdown 的格式通过自定义的 parser 解析出来就好了，例如：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">### start 修订记录 ###</span></span><br><span class="line">1.0</span><br><span class="line">date: 11.3</span><br><span class="line">2.0</span><br><span class="line">date: 12.9</span><br><span class="line"><span class="section">### end 修订记录 ###</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-</ul>
-<p>解析器可以以 start 和 end 作为判断，整体将修订记录渲染成想要的格式，因此，对 Showdown 工程有以下重构想法：</p>
-<p><strong>解析和渲染解耦，不通过 replace 直接完成, 而是通过 taffydb 将解析出来的数据进行存储(参考jsdoc)，这样做的好处是：规则制定者可以自定义 markdown 语法片段并通过解析器解析出来，然后存放到数据库中，不需要关心接下来如何渲染，前端工程师可以直接从数据库中取出相应的片段信息，配合css，进行定制化渲染。借助于中间数据库的解耦，使得最后生成出来的html可以加入css样式，从而满足一切定制化需求，即 <code>解析 - 数据 -渲染</code></strong></p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>以上是在结合工作需求的基础上研究 Showdown 工具的一些想法，还是软件工程里的一句老话：从需求出发的改动才附有意义</p>
-
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://aaronshi32.github.io/2016/12/01/Markdown解析器-Showdown/" data-id="cjk3a4v650007b1s6ve9fbcgi" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2017/01/09/2017书单/" data-id="cjkmhodja0001pps6s39l8xxl" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1820,7 +1833,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">八月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1829,7 +1842,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">30</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">6</span></li></ul>
         </div>
     </div>
 
