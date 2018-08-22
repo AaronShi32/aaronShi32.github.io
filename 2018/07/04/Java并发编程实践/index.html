@@ -5,18 +5,18 @@
     
     <title>Java并发编程实践 | 着陆的橘子</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="线程安全性线程安全定义: 不管运行时线程采取何种调度方式, 代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: 关键字 synchronized, volatile 变量, 显示锁, 原子变量 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生">
-<meta name="keywords" content="读书">
+    <meta name="description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
+<meta name="keywords" content="读书,面试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java并发编程实践">
 <meta property="og:url" content="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/index.html">
 <meta property="og:site_name" content="着陆的橘子">
-<meta property="og:description" content="线程安全性线程安全定义: 不管运行时线程采取何种调度方式, 代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: 关键字 synchronized, volatile 变量, 显示锁, 原子变量 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生">
+<meta property="og:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-07-13T08:30:34.867Z">
+<meta property="og:updated_time" content="2018-08-21T07:42:50.147Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java并发编程实践">
-<meta name="twitter:description" content="线程安全性线程安全定义: 不管运行时线程采取何种调度方式, 代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: 关键字 synchronized, volatile 变量, 显示锁, 原子变量 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生">
+<meta name="twitter:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
     
 
     
@@ -206,7 +206,7 @@
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/读书/">读书</a>
+        <a class="tag-link" href="/tags/读书/">读书</a>, <a class="tag-link" href="/tags/面试/">面试</a>
     </div>
 
                     </div>
@@ -217,15 +217,39 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h3><p>线程安全定义: 不管运行时线程采取何种调度方式, 代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的</p>
-<p>同步机制: 关键字 synchronized, volatile 变量, 显示锁, 原子变量</p>
+            <h3 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h3><p>定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的</p>
+<p>同步机制: synchronized, volatile, lock, atom</p>
 <p>两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可见性)</p>
-<p>synchronized 是可重入的, 否则下面这段代码将会死锁</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SyncMain</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        LongWidget w = <span class="keyword">new</span> LongWidget();</span><br><span class="line">        w.work();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">work</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"super is working..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LongWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">work</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"sub is working..."</span>);</span><br><span class="line">        <span class="keyword">super</span>.work();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>volatile 的实现原理: 不会将该变量上的操作重排序, 也不会放入缓存寄存器中</p>
+<p>synchronized 是可重入的, 重入的一种实现方法是为每个锁关联一个获取计数值和一个所有者线程。当计数值为0时, 这个锁就被认为是没有被任何线程持有</p>
+<p>重排序: 在没有同步的情况下, 编译器、处理器以及运行时等都可能对操作的执行顺序进行一些意想不到的调整。在缺乏足够同步的多线程程序中, 要相对内存操作的执行顺序进行判断, 几乎无法得出正确的结论</p>
+<p>进一步衍生: 重排序的As-if-serial语义意思是，所有的动作(Action)都可以为了优化而被重排序，但是必须保证它们重排序后的结果和程序代码本身的应有结果是一致的。Java编译器、运行时和处理器都会保证单线程下的as-if-serial语义。<br>比如，<strong>为了保证这一语义，重排序不会发生在有数据依赖的操作之中</strong></p>
+<p>加锁的意义: 保证互斥行为(可见性和原子性)以及内存可见性, 确保所有线程都能看到共享变量的最新值, 所有执行读操作或者写操作的线程都必须在同一个锁上同步</p>
+<p>volatile 的实现原理: 不会将该变量上的操作重排序(内存屏障), 也不会放入缓存寄存器中</p>
 <p>同步机制可确保原子性和可见性, volatile 只能保证可见性(++count 无法保证原子性)</p>
-<p>线程封闭: 将访问的共享可变数据限制在单线程之内, 就不需要同步, ThreadLocal</p>
+<p>ThreadLocal, 线程封闭, 不共享的变量: 为变量在每个线程中都创建一个副本，每个线程可以访问自己内部的副本变量, 实现为: ThreadLocal<t> -&gt; Map<thread, t=""> -&gt; thread.threadLocals -&gt; 内部类 ThreadLocalMap, 场景: 数据库连接, Session 管理</thread,></t></p>
 <p><strong>想要做到线程安全: 同步保证原子性操作, 轻量 Volatile 保证可见性, 不变的对象一定是线程安全的(final)</strong></p>
+<p>内存屏障:<br>1) Happens-before的前后两个操作不会被重排序且后者对前者的内存可见<br>2) LoadLoad屏障：对于这样的语句Load1; LoadLoad; Load2，在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。<br>   StoreStore屏障：对于这样的语句Store1; StoreStore; Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。<br>   LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。<br>   StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见</p>
+<p>volatile语义中的内存屏障:</p>
+<ul>
+<li><p>在每个volatile写操作前插入StoreStore屏障，在写操作后插入StoreLoad屏障；</p>
+</li>
+<li><p>在每个volatile读操作前插入LoadLoad屏障，在读操作后插入LoadStore屏障；</p>
+</li>
+</ul>
+<p>final语义中的内存屏障:</p>
+<ul>
+<li><p>写final域：在编译器写final域完毕，构造体结束之前，会插入一个StoreStore屏障，保证前面的对final写入对其他线程/CPU可见，并阻止重排序。</p>
+</li>
+<li><p>读final域：在上述规则2中，两步操作不能重排序的机理就是在读final域前插入了LoadLoad屏障。</p>
+</li>
+</ul>
+<h3 id="锁的实现"><a href="#锁的实现" class="headerlink" title="锁的实现"></a>锁的实现</h3><p>乐观锁和悲观锁</p>
+<ul>
+<li><p>乐观锁, 持有后再请求, 告知失败, 请求线程可在一定时间内重试, 不会挂起</p>
+</li>
+<li><p>悲观锁, 持有后再请求, 被挂起, 直到锁释放后恢复线程执行, 有可能获得该锁</p>
+</li>
+</ul>
 <h3 id="构建线程安全类"><a href="#构建线程安全类" class="headerlink" title="构建线程安全类"></a>构建线程安全类</h3><p>同步容器: Vector 和 HashTable, 方法级加锁(synchronized), 并发效率低</p>
 <p>并发容器: ConcurrentHashMap, ConcurrentLinkedQueue, CopyOnWriteArrayList 等, 灵活加锁, 并发效率高</p>
 <p>阻塞队列实现生产者-消费者: BlockingQueue 的实现有 LinkedBlockingQueue 和 ArrayBlockingQueue 都是 FIFO 队列, PriorityBlockingQueue 是优先级队列, 其中 put 和 take 方法是阻塞, offer 和 poll 是非阻塞, 对于无边界的队列而言永远不会阻塞</p>
@@ -243,8 +267,30 @@
 <p>还可以通过 JVM 钩子关闭线程, 但是极度不推荐, 线程可分为两种: 普通线程和守护线程 </p>
 <p>使用 newTaskFor 钩子函数来改进用来封装非标准取消的方法。这是 ThreadPoolExecutor 的新特性, 当提交一个 callable 给 ExecutorService 时，submit 返回一个 Future，可以用 Future 来取消任务。</p>
 <p>newTaskFor 钩子是一个工厂方法，创建一个 Future 来代表任务，这个 Future 属于由 FutureTask 实现的 RunnableFuture 接口，这个接口可以自定义 cancel 方法，实现自定义的取消方式</p>
-<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>计算密集型: 线程池大小为: Ncpu + 1, I/O 密集型: 线程池大小为: 2 * Ncpu</p>
-<p>对于 Executor, newCachedThreadPool 工厂方法是一种很好的默认选择, 它能提供比固定大小的线程池更好的排队性能。当需要限制当前任务的数量以满足资源管理需求时, 那么可以选择固定大小的线程池, 就像在接受网络客户请求的服务器应用程序中, 如果不进行限制, 那么肯容易发生过载问题</p>
+<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>线程池大小如何界定, 是 Fix 还是 Cache? </p>
+<ul>
+<li><p>计算密集型: 线程池大小为: Ncpu + 1, I/O 密集型: 线程池大小为: 2 * Ncpu</p>
+</li>
+<li><p>newFixedThreadPool</p>
+<ul>
+<li><p>corePoolSize == maximumPoolSize</p>
+</li>
+<li><p>workQueue 是无界队列(容易造成资源耗尽)</p>
+</li>
+<li><p>当需要限制当前任务的数量以满足资源管理需求时, 那么可以选择固定大小的线程池(服务器网络请求限制)</p>
+</li>
+</ul>
+</li>
+<li><p>newCachedThreadPool</p>
+<ul>
+<li><p>workQueue 是有界队列, 饱和之后执行拒绝策略, 而实现中采用了 SynchronousQueue(同步移交)</p>
+</li>
+<li><p>提供比固定大小的线程池更好的排队性能(而不是一直hang住等待线程)</p>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize, // 基本大小</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">int</span> maximumPoolSize, // 最大大小</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">long</span> keepAliveTime, //</span></span></span><br><span class="line"><span class="function"><span class="params">                          TimeUnit unit, // 时间单位</span></span></span><br><span class="line"><span class="function"><span class="params">                          BlockingQueue&lt;Runnable&gt; workQueue, // 任务队列</span></span></span><br><span class="line"><span class="function"><span class="params">                          ThreadFactory threadFactory,</span></span></span><br><span class="line"><span class="function"><span class="params">                          RejectedExecutionHandler handler)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
 <p>只有当任务相互独立时, 为线程池或者工作队列设置界限才是合理的, 如果任务之间存在依赖性, 那么有界的线程池或队列就可能导致线程 “饥饿” 死锁问题</p>
 <h3 id="活跃性-性能和测试"><a href="#活跃性-性能和测试" class="headerlink" title="活跃性, 性能和测试"></a>活跃性, 性能和测试</h3><p>死锁与线程获得锁的顺序有关, 在数据库系统的设计中考虑了死锁的检测以及恢复, 即随机选择放弃一个事务, 让其他事务执行</p>
 <p>可伸缩性是指: 当增加计算资源时(例如 CPU, 内存, 存储容量或 I/O 带宽), 程序的吞吐量或者处理能力能相应增加</p>
@@ -259,7 +305,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjkmhodjm0008pps6br9e5k3r" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjksb2l1c0008jls6b9cnwkry" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -380,7 +426,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">6</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">7</span></li></ul>
         </div>
     </div>
 
