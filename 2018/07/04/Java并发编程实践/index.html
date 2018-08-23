@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-21T07:42:50.147Z">
+<meta property="og:updated_time" content="2018-08-23T07:30:01.824Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java并发编程实践">
 <meta name="twitter:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
@@ -295,6 +295,46 @@
 <h3 id="活跃性-性能和测试"><a href="#活跃性-性能和测试" class="headerlink" title="活跃性, 性能和测试"></a>活跃性, 性能和测试</h3><p>死锁与线程获得锁的顺序有关, 在数据库系统的设计中考虑了死锁的检测以及恢复, 即随机选择放弃一个事务, 让其他事务执行</p>
 <p>可伸缩性是指: 当增加计算资源时(例如 CPU, 内存, 存储容量或 I/O 带宽), 程序的吞吐量或者处理能力能相应增加</p>
 <p>缩小锁的范围(方法 -&gt; 对象 -&gt; 并发容器), 减小锁的粒度, 锁分段(ConcurrentHashMap)</p>
+<h3 id="锁的实现-1"><a href="#锁的实现-1" class="headerlink" title="锁的实现"></a>锁的实现</h3><p>锁干了什么? 答: 对共享资源的互斥性以及内存可见性</p>
+<p>内置锁有什么功能局限? 答: 无法中断一个正在等待获取锁的线程, 或者无法在请求获取一个锁时无限等待下去, 阻塞加锁</p>
+<p>显示锁有什么好处? 答: 锁粒度更低, 可实现如 ConcurrentHashMap 式的分段加锁</p>
+<p>内置锁: Synchronized 和 volatile</p>
+<p>显示锁: ReentrantLock</p>
+<p>内置锁的实现原理</p>
+<p>synchronized 有以下3种应用方式</p>
+<ul>
+<li><p>修饰实例方法，作用于当前实例加锁</p>
+</li>
+<li><p>修饰静态方法，作用于当前类对象加锁</p>
+</li>
+<li><p>修饰代码块，指定加锁对象，对给定对象加锁</p>
+</li>
+</ul>
+<p>同步代码块的实现是基于进入和退出管程(Monitor)对象实现, 翻译成字节码是 monitorenter 和 monitorexit</p>
+<p>同步方法的实现是JVM通过ACC_SYNCHRONIZED访问标志来辨别一个方法是否声明为同步方法</p>
+<p>volatile 的实现原理: 不会将该变量上的操作重排序(内存屏障), 也不会放入缓存寄存器中</p>
+<p>volatile语义中的内存屏障:</p>
+<ul>
+<li><p>在每个volatile写操作前插入StoreStore屏障，在写操作后插入StoreLoad屏障；</p>
+</li>
+<li><p>在每个volatile读操作前插入LoadLoad屏障，在读操作后插入LoadStore屏障；</p>
+</li>
+</ul>
+<p>Synchronized 可确保原子性和可见性, volatile 只能保证可见性(++count 无法保证原子性)</p>
+<p>显示锁的实现原理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//juc lock</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">lock</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">lockInterruptibly</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException</span>; <span class="comment">//中断锁</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">tryLock</span><span class="params">()</span></span>; <span class="comment">//轮询锁</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">tryLock</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span> <span class="keyword">throws</span> InterruptedException</span>; <span class="comment">//定时锁</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">Condition <span class="title">newCondition</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>公平性: 在公平锁上, 线程将按照它们发出请求的顺序来获取锁, 非公平则允许插队, 取决于场景中挂起和恢复线程的开销大小, 在激烈竞争的情况下, 则采取非公平锁比较好</p>
+<p>实现: CopyOnWriteArrayList</p>
+<p>一个资源可以被多个读操作访问, 或者被一个写操作访问, 但两者不能同时进行</p>
+<p>内部是非公平锁, 读不加锁, 写加锁</p>
+<p>显示锁的底层是 AQS(AbstractQueuedSynchronizer)</p>
+<p>总结: 与内置锁相比, 显示锁提供了一些扩展功能, 在处理锁的不可用性方面有着更高的灵活性</p>
+<p>读写锁允许多个读线程并发地访问被保护的对象, 当访问以读取操作为主的数据结构时, 它能够提高程序的可伸缩性</p>
+<h3 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h3><p>CAS(Compare-and-Swap): 操作系统级别支持的一种无锁操作, 通过代码中显示的重试机制来实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">compareAndSwap</span><span class="params">(<span class="keyword">int</span> expectedValue, <span class="keyword">int</span> newValue)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> oldValue = value; <span class="comment">//当前值</span></span><br><span class="line">    <span class="keyword">if</span>(oldValue == expectedValue)&#123; <span class="comment">//当前值 == 期望值 才改变当前值</span></span><br><span class="line">         value = newValue;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> oldValue; <span class="comment">//返回当前值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原子变量类是基于 CAS 实现的, 比锁的粒度更细, 量级更轻, 以下是 i++ 原子性的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> v;</span><br><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    v = value.get();</span><br><span class="line">&#125;<span class="keyword">while</span>(v != value.compareAndSwap(v, v + <span class="number">1</span>));</span><br><span class="line"><span class="keyword">return</span> v + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>在高度竞争的情况下, 锁的性能将超过原子变量的性能, 但通常竞争量很小的情况下, 原子变量更优, 这是因为锁在发生竞争时会挂起线程, 降低了CPU使用率, 调用原子变量的类可自行负责竞争管理(重试, 退让)</p>
 
         
         </div>
@@ -305,7 +345,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjl55t41i0008rjs667clqp75" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjl68z6ro00082js6p6le44wv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
