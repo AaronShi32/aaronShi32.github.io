@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="着陆的橘子">
 <meta property="og:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-23T07:30:01.824Z">
+<meta property="og:updated_time" content="2018-08-24T08:43:17.469Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java并发编程实践">
 <meta name="twitter:description" content="线程安全定义: 1)不管运行时线程采取何种调度方式, 2)代码中不需要任何额外的同步或协同, 这个类都能表现出正确的行为, 无状态的对象, 不可变对象一定是线程安全的 同步机制: synchronized, volatile, lock, atom 两个维度: 防止某个线程正在使用对象状态而另一个线程在同时修改状态(同步机制); 确保当一个线程修改了对象状态后, 其他线程能够看到发生的状态变化(可">
@@ -149,7 +149,7 @@
                 <span>文章</span>
             </div>
             <div class="article-info-block">
-                11
+                10
                 <span>标签</span>
             </div>
         </div>
@@ -327,7 +327,7 @@
 <p>实现: CopyOnWriteArrayList</p>
 <p>一个资源可以被多个读操作访问, 或者被一个写操作访问, 但两者不能同时进行</p>
 <p>内部是非公平锁, 读不加锁, 写加锁</p>
-<p>显示锁的底层是 AQS(AbstractQueuedSynchronizer)</p>
+<p>显示锁的底层是 AQS(AbstractQueuedSynchronizer), 它使得一组线程(称之为等待线程集合)能够通过某种方式来等待特定的条件变成真, 并自动唤醒, 与传统队列不同的是它的对象是一个个正在等待的线程</p>
 <p>总结: 与内置锁相比, 显示锁提供了一些扩展功能, 在处理锁的不可用性方面有着更高的灵活性</p>
 <p>读写锁允许多个读线程并发地访问被保护的对象, 当访问以读取操作为主的数据结构时, 它能够提高程序的可伸缩性</p>
 <h3 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h3><p>CAS(Compare-and-Swap): 操作系统级别支持的一种无锁操作, 通过代码中显示的重试机制来实现</p>
@@ -345,7 +345,7 @@
 
 </div>
 
-    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjl68z6ro00082js6p6le44wv" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
+    <a data-url="https://aaronshi32.github.io/2018/07/04/Java并发编程实践/" data-id="cjm7udf9w0008ues6b2f9yjpw" class="article-share-link"><i class="fa fa-share"></i>如需转载，请注明出处</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -466,7 +466,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/总结/">总结</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">7</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/人工智能/">人工智能</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/基础知识/">基础知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/框架/">框架</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/疑难杂症/">疑难杂症</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统/">系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">28</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a><span class="tag-list-count">8</span></li></ul>
         </div>
     </div>
 
